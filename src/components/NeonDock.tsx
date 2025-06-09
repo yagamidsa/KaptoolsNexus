@@ -400,13 +400,6 @@ const NeonDock: React.FC = () => {
                             <span className="dock-icon">⚡</span>
                             <span className="dock-text">APPS</span>
                         </div>
-                        <button
-                            className="dock-close"
-                            onClick={() => setIsExpanded(false)}
-                            title="Cerrar"
-                        >
-                            ✕
-                        </button>
                     </div>
 
                     <div className="dock-apps">

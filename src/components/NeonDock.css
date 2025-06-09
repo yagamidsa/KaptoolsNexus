@@ -163,29 +163,6 @@
     text-transform: uppercase;
 }
 
-.dock-close {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgba(255, 107, 157, 0.2);
-    border: 1px solid #ff6b9d;
-    color: #ff6b9d;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.dock-close:hover {
-    background: rgba(255, 107, 157, 0.3);
-    transform: scale(1.1);
-}
-
 /* Apps Container */
 .dock-apps {
     display: flex;
@@ -558,12 +535,6 @@
 
     .dock-text {
         font-size: 9px;
-    }
-
-    .dock-close {
-        width: 18px;
-        height: 18px;
-        font-size: 11px;
     }
 
     /* Tooltips más compactos */

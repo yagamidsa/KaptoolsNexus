@@ -1,6 +1,6 @@
 /* src/components/DownloadFiles.css */
 
-.df-download-modal-backdrop {
+.download-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -110,7 +110,7 @@
     opacity: 0.9;
 }
 
-.df-close-button {
+.close-button {
     width: 36px;
     height: 36px;
     border-radius: 8px;
@@ -124,7 +124,7 @@
     justify-content: center;
 }
 
-.df-close-button:hover {
+.close-button:hover {
     background: rgba(239, 68, 68, 0.2);
     border-color: rgba(239, 68, 68, 0.4);
     color: #ef4444;
@@ -427,10 +427,10 @@
 .modal-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none ;
+    transform: none !important;
 }
 
-.df-loading-spinner {
+.loading-spinner {
     width: 16px;
     height: 16px;
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -446,7 +446,7 @@
 }
 
 /* PROGRESS OVERLAY - Versión mejorada y más realista */
-.df-progress-overlay {
+.progress-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -721,10 +721,10 @@
 }
 
 .success-details {
-    font-size: 12px ;
-    color: #00ff87 ;
+    font-size: 12px !important;
+    color: #00ff87 !important;
     font-weight: 600;
-    margin-top: 12px ;
+    margin-top: 12px !important;
 }
 
 .error-message {
@@ -882,11 +882,11 @@
 }
 
 /* Mejoras adicionales */
-.df-download-modal-backdrop::-webkit-scrollbar {
+.download-modal-backdrop::-webkit-scrollbar {
     display: none;
 }
 
-.df-download-modal-backdrop {
+.download-modal-backdrop {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -1050,7 +1050,7 @@
     }
 }
 
-.modal-button.primary:disabled .df-loading-spinner {
+.modal-button.primary:disabled .loading-spinner {
     animation: spin 1s linear infinite, loading-pulse 2s ease infinite;
 }
 
@@ -1131,7 +1131,7 @@
 }
 
 /* Mejor feedback para elementos clickeables */
-.df-close-button:active {
+.close-button:active {
     transform: rotate(90deg) scale(0.95);
 }
 
@@ -1255,9 +1255,9 @@
     *,
     *::before,
     *::after {
-        animation-duration: 0.01ms ;
-        animation-iteration-count: 1 ;
-        transition-duration: 0.01ms ;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
 
@@ -1279,7 +1279,7 @@
 
 /* Print styles (por si acaso) */
 @media print {
-    .df-download-modal-backdrop {
+    .download-modal-backdrop {
         display: none;
     }
 }
@@ -1298,7 +1298,7 @@
         gap: 12px;
     }
 
-    .df-close-button {
+    .close-button {
         position: absolute;
         top: 16px;
         right: 16px;
@@ -1362,7 +1362,7 @@
     outline-offset: 2px;
 }
 
-.df-close-button:focus-visible {
+.close-button:focus-visible {
     outline: 2px solid #ef4444;
     outline-offset: 2px;
 }
@@ -1374,7 +1374,7 @@
 
 /* Efectos de performance optimizados */
 .download-modal,
-.df-progress-overlay {
+.progress-overlay {
     will-change: transform, opacity;
 }
 
@@ -1382,7 +1382,7 @@
     will-change: width;
 }
 
-.df-loading-spinner {
+.loading-spinner {
     will-change: transform;
 }
 

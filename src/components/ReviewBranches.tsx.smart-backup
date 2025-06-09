@@ -568,7 +568,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         };
 
         return (
-            <div className="rb-file-diff-overlay" onClick={(e) => {
+            <div className="file-diff-overlay" onClick={(e) => {
                 if (e.target === e.currentTarget) setShowFileDiff(false);
             }}>
                 <div className="file-diff-modal">
@@ -667,7 +667,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
                     <button
                         onClick={onClose}
-                        className="action-button rb-close-button"
+                        className="action-button close-button"
                     >
                         ✕ {!isMobile && 'Close'}
                     </button>
@@ -770,7 +770,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
             <div className="branches-table-container">
                 {loading ? (
                     <div className="loading-state">
-                        <span className="rb-loading-spinner">⚡</span>
+                        <span className="loading-spinner">⚡</span>
                         <span>Loading branches...</span>
                     </div>
                 ) : filteredAndSortedBranches.length === 0 ? (
@@ -880,11 +880,11 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
             {/* Comparison Modal */}
             {showComparison && comparison && selectedBranch && (
-                <div className="rb-comparison-modal-overlay" onClick={(e) => {
+                <div className="comparison-modal-overlay" onClick={(e) => {
                     if (e.target === e.currentTarget) setShowComparison(false);
                 }}>
                     <div className="comparison-modal">
-                        <div className="rb-modal-header">
+                        <div className="modal-header">
                             <div className="modal-title">
                                 <span className="modal-icon">📊</span>
                                 <h3>Branch Comparison</h3>
@@ -897,7 +897,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                             </button>
                         </div>
 
-                        <div className="rb-modal-content">
+                        <div className="modal-content">
                             <div className="comparison-header">
                                 <div className="comparison-info">
                                     <span className="comparing">Comparing:</span>
@@ -966,7 +966,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
             {/* Loading overlay para file diff */}
             {loadingFileDiff && (
                 <div className="loading-overlay">
-                    <div className="rb-loading-spinner">
+                    <div className="loading-spinner">
                         <span className="spinner"></span>
                         <span>Loading file diff...</span>
                     </div>

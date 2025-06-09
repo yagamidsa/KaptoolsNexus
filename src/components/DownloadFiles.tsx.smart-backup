@@ -165,12 +165,12 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
 
     return (
         <div
-            className="download-df-modal-backdrop"
+            className="download-modal-backdrop"
             onClick={handleBackdropClick}
         >
             <div className="download-modal">
                 {/* Header */}
-                <div className="download-df-modal-header">
+                <div className="download-modal-header">
                     <div className="header-content">
                         <div className="header-icon">
                             {/* Azure Cloud SVG Icon */}
@@ -198,7 +198,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             <p>Download BEE, CeV and Link files</p>
                         </div>
                     </div>
-                    <button className="df-close-button" onClick={onClose}>
+                    <button className="close-button" onClick={onClose}>
                         {/* Close X SVG */}
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path
@@ -213,7 +213,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
 
                 {/* 🔥 PROGRESS BAR PROFESIONAL */}
                 {showProgress && (
-                    <div className="df-progress-overlay">
+                    <div className="progress-overlay">
                         <div className="progress-modal">
                             <div className="progress-header">
                                 <div className="progress-icon">
@@ -454,7 +454,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                     >
                         {loading ? (
                             <>
-                                <div className="df-loading-spinner"></div>
+                                <div className="loading-spinner"></div>
                                 Downloading...
                             </>
                         ) : (
