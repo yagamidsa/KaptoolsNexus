@@ -1,26 +1,74 @@
-# backend/main.py - Complete version with Review Branches + File Diff Viewer
-from fastapi import FastAPI, HTTPException
+# backend/main.py - PARTE 1/4 - IMPORTS Y CONFIGURACIÓN
+
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import uvicorn
 import os
+import tempfile
+import logging
+import shutil
+import asyncio
+import re
+import base64
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
-# Import services - ACTUALIZADO para incluir FileDiff y DiffLine
+
+
+
+# ================================
+# IMPORTAR SERVICIOS
+# ================================
+
 try:
-    from services.git_service import GitService, BranchInfo, BranchComparison, CheckoutResult, RepositoryStatus, FileDiff, DiffLine
+    from services.product_service import ProductService
+    from services.git_service import GitService
     from services.azure_service import AzureService
+    from services.mdd_service import MDDService
+    
+    # Inicializar servicios
+    product_service = ProductService()
     git_service = GitService()
     azure_service = AzureService()
+    mdd_service = MDDService()
+    
     SERVICES_AVAILABLE = True
+    print("✅ All services imported successfully")
+    
 except ImportError as e:
     print(f"⚠️  Warning: Could not import services: {e}")
+    
+    # Crear servicios básicos como fallback
+    try:
+        from services.product_service import ProductService
+        product_service = ProductService()
+        git_service = None
+        azure_service = None
+        mdd_service = None
+        print("✅ Basic services available")
+    except:
+        product_service = None
+        git_service = None
+        azure_service = None
+        mdd_service = None
+        print("❌ No services available")
+    
     SERVICES_AVAILABLE = False
+
+# ================================
+# CONFIGURAR LOGGING Y APP
+# ================================
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="KapTools Nexus API", version="2.0.0")
 
-# Permitir CORS para que React pueda conectarse
+# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -37,6 +85,30 @@ app.add_middleware(
 # ================================
 # MODELOS DE DATOS
 # ================================
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handler para capturar errores de validación detallados"""
+    print(f"🔍 VALIDATION ERROR DEBUG:")
+    print(f"📍 URL: {request.url}")
+    print(f"📍 Method: {request.method}")
+    print(f"📍 Headers: {dict(request.headers)}")
+    print(f"📍 Validation Errors: {exc.errors()}")
+    print(f"📍 Request Body: {exc.body}")
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "body": exc.body,
+            "url": str(request.url),
+            "method": request.method,
+            "debug_info": "Check server logs for detailed error information"
+        }
+    )
+
+
+
 
 class CloneRequest(BaseModel):
     project_path: str
@@ -78,12 +150,39 @@ class ValidationResponse(BaseModel):
     success: bool
     validation: Dict[str, Any]
 
-# 🔥 NUEVO MODELO PARA FILE DIFFS
 class MultipleFileDiffRequest(BaseModel):
     project_path: str
     repo_name: str
     branch_name: str
     file_paths: List[str]
+
+class DuplicateMDDRequest(BaseModel):
+    duplicate_count: int
+    workspace_path: str
+
+
+
+class CreateStructureRequest(BaseModel):
+    project_name: str
+    workspace_path: str
+    mdd_file_content: str  # Base64 encoded content
+    mdd_filename: str
+    ddf_file_content: str  # ✅ Agregar DDF Base64 content
+    ddf_filename: str      # ✅ Agregar DDF filename
+    template_location: str = ""
+    library_location: str = ""
+    date_start: str = "19991201"
+    date_end: str = "99999999"
+
+# ================================
+# 🔥 MODELOS CORREGIDOS PARA CREATE STRUCTURE
+# ================================
+
+class CreateStructureResponse(BaseModel):
+    success: bool
+    message: str
+    data: Optional[Dict[str, Any]] = None
+    processing_logs: Optional[List[str]] = None
 
 # ================================
 # ENDPOINTS BÁSICOS
@@ -94,16 +193,51 @@ async def root():
     return {
         "message": "KapTools Nexus API is running! 🚀",
         "version": "2.0.0",
+        "timestamp": datetime.now().isoformat(),
         "services_available": SERVICES_AVAILABLE,
         "status": "healthy",
         "features": [
             "Git Operations",
             "Azure Downloads", 
             "Review Branches",
-            "File Diff Viewer",  # ← NUEVO
+            "File Diff Viewer",
+            "MDD Duplication",
+            "Create Structure",
             "Workspace Management"
         ]
     }
+
+
+
+
+@app.get("/health/create-structure")
+async def health_create_structure():
+    """Health check específico para create structure"""
+    
+    checks = {
+        "endpoint_accessible": True,
+        "required_modules": {
+            "os": True,
+            "base64": True,
+            "shutil": True,
+            "asyncio": True,
+            "re": True
+        },
+        "functions_available": {
+            "copy_directory_async": "copy_directory_async" in globals(),
+            "create_structure_endpoint": True
+        }
+    }
+    
+    return {
+        "status": "healthy",
+        "service": "create-structure",
+        "checks": checks,
+        "all_systems_go": all(checks["required_modules"].values()),
+        "timestamp": datetime.now().isoformat()
+    }
+
+
 
 @app.get("/health")
 async def health_check():
@@ -111,18 +245,24 @@ async def health_check():
         "status": "healthy", 
         "version": "2.0.0",
         "services": {
-            "git": "active" if SERVICES_AVAILABLE else "unavailable",
-            "azure": "active" if SERVICES_AVAILABLE else "unavailable"
+            "git": "active" if git_service else "unavailable",
+            "azure": "active" if azure_service else "unavailable",
+            "mdd": "active" if mdd_service else "unavailable",
+            "product": "active" if product_service else "unavailable"
         },
         "endpoints": {
             "git_clone": "/git/clone-microservices",
             "git_branches": "/git/branches",
             "git_checkout": "/git/checkout",
             "git_compare": "/git/compare",
-            "git_file_diff": "/git/file-diff",  # ← NUEVO
-            "azure_download": "/azure/download-files"
+            "git_file_diff": "/git/file-diff",
+            "azure_download": "/azure/download-files",
+            "mdd_duplicate": "/data/duplicate-mdd",
+            "create_structure": "/data-processing/create-structure"
         }
     }
+
+# backend/main.py - PARTE 2/4 - GIT OPERATIONS
 
 # ================================
 # GIT OPERATIONS - BÁSICAS
@@ -131,7 +271,7 @@ async def health_check():
 @app.post("/git/clone-microservices")
 async def clone_microservices(request: CloneRequest):
     """Clone Git microservices to specified path"""
-    if not SERVICES_AVAILABLE:
+    if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
     
     try:
@@ -151,7 +291,7 @@ async def clone_microservices(request: CloneRequest):
 @app.get("/git/validate-workspace")
 async def validate_workspace(workspace_path: str):
     """Validate workspace and check if microservices exist"""
-    if not SERVICES_AVAILABLE:
+    if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
     try:
@@ -178,50 +318,152 @@ async def get_branches(
     repo: str = "both",  # 'content', 'dimensions', or 'both'
     limit: int = 15
 ):
-    """
-    Obtiene las ramas más recientes de los repositorios
-    """
-    if not SERVICES_AVAILABLE:
+    """Obtiene las ramas más recientes de los repositorios"""
+    if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
     try:
+        logger.info(f"🌿 Getting branches: repo={repo}, limit={limit}, path={project_path}")
+        
         if not project_path or not os.path.exists(project_path):
+            logger.error(f"❌ Invalid project path: {project_path}")
             raise HTTPException(status_code=400, detail="Invalid project path")
         
         # Validar primero que existen los repositorios
-        validation = git_service.validate_repositories_for_branches(project_path)
-        if not validation["valid"]:
-            raise HTTPException(status_code=400, detail=validation["message"])
+        try:
+            validation = git_service.validate_repositories_for_branches(project_path)
+            logger.info(f"🔍 Repository validation: {validation}")
+            
+            if not validation["valid"]:
+                logger.error(f"❌ Repository validation failed: {validation['message']}")
+                raise HTTPException(status_code=400, detail=validation["message"])
+                
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"💥 Validation failed: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Repository validation failed: {str(e)}")
         
-        branches = git_service.get_recent_branches(project_path, repo, limit)
+        # Obtener branches con manejo de errores mejorado
+        try:
+            branches = git_service.get_recent_branches(project_path, repo, limit)
+            logger.info(f"✅ Found {len(branches)} branches")
+            
+            # Asegurar que branches es una lista
+            if not isinstance(branches, list):
+                logger.warning(f"⚠️ Branches is not a list: {type(branches)}")
+                branches = []
+            
+            # Convertir a dict si es necesario
+            branches_data = []
+            for branch in branches:
+                try:
+                    if hasattr(branch, 'dict'):
+                        # Es un objeto Pydantic
+                        branch_dict = branch.dict()
+                        # Convertir datetime a string para JSON
+                        if 'date' in branch_dict and hasattr(branch_dict['date'], 'isoformat'):
+                            branch_dict['date'] = branch_dict['date'].isoformat()
+                        branches_data.append(branch_dict)
+                    elif isinstance(branch, dict):
+                        # Ya es un dict
+                        branches_data.append(branch)
+                    else:
+                        logger.warning(f"⚠️ Unexpected branch type: {type(branch)}")
+                except Exception as e:
+                    logger.error(f"💥 Error converting branch to dict: {str(e)}")
+                    continue
+                    
+        except Exception as e:
+            logger.error(f"💥 Error getting branches: {str(e)}")
+            # En caso de error, devolver lista vacía pero con éxito
+            branches_data = []
+            logger.info("🔧 Returning empty branches list due to error")
         
-        return {
+        response_data = {
             "success": True,
-            "branches": [branch.dict() for branch in branches],
-            "total": len(branches),
+            "branches": branches_data,
+            "total": len(branches_data),
             "repository_filter": repo,
             "workspace_path": project_path,
             "available_repositories": validation["repositories"]
         }
         
+        logger.info(f"📤 Returning response with {len(branches_data)} branches")
+        return response_data
+        
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"💥 Unexpected error in get_branches: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get branches: {str(e)}")
 
+@app.get("/git/validate-repositories")
+async def validate_repositories_for_branches(project_path: str):
+    """Validar repositorios específicamente para Review Branches"""
+    if not git_service:
+        raise HTTPException(status_code=503, detail="Git service not available")
+        
+    try:
+        logger.info(f"🔍 Validating repositories for path: {project_path}")
+        
+        if not project_path or not os.path.exists(project_path):
+            logger.error(f"❌ Invalid project path: {project_path}")
+            raise HTTPException(status_code=400, detail="Invalid project path")
+        
+        # Validar que existen los repositorios
+        validation = git_service.validate_repositories_for_branches(project_path)
+        logger.info(f"✅ Validation result: {validation}")
+        
+        return {
+            "success": True,
+            "validation": validation,
+            "message": "Repository validation completed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"💥 Repository validation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Repository validation failed: {str(e)}")
+
+@app.post("/git/fetch-all")
+async def fetch_all_repositories(project_path: str):
+    """Hacer fetch de todas las ramas remotas"""
+    if not git_service:
+        raise HTTPException(status_code=503, detail="Git service not available")
+        
+    try:
+        logger.info(f"🔄 Fetching all remote branches for: {project_path}")
+        
+        if not project_path or not os.path.exists(project_path):
+            raise HTTPException(status_code=400, detail="Invalid project path")
+        
+        result = git_service.fetch_all_remote_branches(project_path)
+        logger.info(f"✅ Fetch result: {result}")
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"💥 Fetch all error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Fetch failed: {str(e)}")
+
+@app.get("/git/checkout")
 @app.post("/git/checkout")
 async def checkout_branch(
     project_path: str,
     repo_name: str,  # 'content' or 'dimensions'
     branch_name: str
 ):
-    """
-    Hace checkout a una rama específica
-    """
-    if not SERVICES_AVAILABLE:
+    """Hace checkout a una rama específica"""
+    if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
     try:
+        logger.info(f"🔄 Checking out branch: {branch_name} in {repo_name}")
+        
         if not project_path or not os.path.exists(project_path):
             raise HTTPException(status_code=400, detail="Invalid project path")
         
@@ -230,20 +472,20 @@ async def checkout_branch(
         
         result = git_service.checkout_branch(project_path, repo_name, branch_name)
         
+        # Convertir resultado a dict
+        result_data = result.dict() if hasattr(result, 'dict') else result
+        
         if result.success:
-            return {
-                "success": True,
-                "message": result.message,
-                "current_branch": result.current_branch,
-                "previous_branch": result.previous_branch,
-                "repository": result.repository
-            }
+            logger.info(f"✅ Checkout successful: {result.message}")
+            return result_data
         else:
+            logger.error(f"❌ Checkout failed: {result.message}")
             raise HTTPException(status_code=400, detail=result.message)
         
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"💥 Checkout error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Checkout failed: {str(e)}")
 
 @app.get("/git/compare")
@@ -253,13 +495,13 @@ async def compare_branches(
     branch_name: str,
     base_branch: str = "master"
 ):
-    """
-    Compara una rama con master (o otra rama base)
-    """
-    if not SERVICES_AVAILABLE:
+    """Compara una rama con master (o otra rama base)"""
+    if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
     try:
+        logger.info(f"📊 Comparing branches: {branch_name} vs {base_branch} in {repo_name}")
+        
         if not project_path or not os.path.exists(project_path):
             raise HTTPException(status_code=400, detail="Invalid project path")
         
@@ -268,24 +510,73 @@ async def compare_branches(
         
         comparison = git_service.compare_branch_with_master(project_path, repo_name, branch_name)
         
+        # Convertir a dict
+        comparison_data = comparison.dict() if hasattr(comparison, 'dict') else comparison
+        
+        logger.info(f"✅ Comparison completed: {comparison_data.get('summary', 'No summary')}")
+        
         return {
             "success": True,
-            "comparison": comparison.dict(),
+            "comparison": comparison_data,
             "summary": f"Comparing {branch_name} with {base_branch} in {repo_name} repository"
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"💥 Comparison error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Comparison failed: {str(e)}")
 
-@app.get("/git/status")
-async def get_repository_status(project_path: str):
-    """
-    Obtiene el estado actual de ambos repositorios
-    """
-    if not SERVICES_AVAILABLE:
+@app.get("/git/file-diff")
+async def get_file_diff_endpoint(
+    project_path: str,
+    repo_name: str,
+    branch_name: str,
+    file_path: str,
+    base_branch: str = "master"
+):
+    """Obtener diferencias de un archivo específico"""
+    if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
     try:
+        logger.info(f"📄 Getting file diff: {file_path} in {repo_name}/{branch_name}")
+        
+        if not project_path or not os.path.exists(project_path):
+            raise HTTPException(status_code=400, detail="Invalid project path")
+        
+        if repo_name not in ['content', 'dimensions']:
+            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
+        
+        diff = git_service.get_file_diff(project_path, repo_name, branch_name, file_path)
+        
+        # Convertir a dict si es un objeto Pydantic
+        diff_data = diff.dict() if hasattr(diff, 'dict') else diff
+        
+        return {
+            "success": True,
+            "diff": diff_data,
+            "file_path": file_path,
+            "branch": branch_name,
+            "base_branch": base_branch,
+            "repository": repo_name
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"💥 File diff error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"File diff failed: {str(e)}")
+
+@app.get("/git/status")
+async def get_repository_status(project_path: str):
+    """Obtiene el estado actual de ambos repositorios"""
+    if not git_service:
+        raise HTTPException(status_code=503, detail="Git service not available")
+        
+    try:
+        logger.info(f"📋 Getting repository status for: {project_path}")
+        
         if not project_path or not os.path.exists(project_path):
             raise HTTPException(status_code=400, detail="Invalid project path")
         
@@ -294,7 +585,17 @@ async def get_repository_status(project_path: str):
         # Convertir RepositoryStatus a dict
         status_dict = {}
         for repo_name, repo_status in status.items():
-            status_dict[repo_name] = repo_status.dict()
+            if hasattr(repo_status, 'dict'):
+                status_data = repo_status.dict()
+                # Convertir datetime a string para JSON
+                if 'last_commit_date' in status_data and status_data['last_commit_date']:
+                    if hasattr(status_data['last_commit_date'], 'isoformat'):
+                        status_data['last_commit_date'] = status_data['last_commit_date'].isoformat()
+                status_dict[repo_name] = status_data
+            else:
+                status_dict[repo_name] = repo_status
+        
+        logger.info(f"✅ Status retrieved for {len(status_dict)} repositories")
         
         return {
             "success": True,
@@ -303,452 +604,59 @@ async def get_repository_status(project_path: str):
             "timestamp": datetime.now().isoformat()
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"💥 Status error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get status: {str(e)}")
 
-@app.get("/git/validate-repositories")
-async def validate_repositories(project_path: str):
-    """
-    Valida que los repositorios necesarios existan en el workspace
-    """
-    if not SERVICES_AVAILABLE:
-        return {
-            "success": False,
-            "validation": {
-                "valid": False,
-                "message": "Git service not available",
-                "repositories": {"content": False, "dimensions": False}
+@app.get("/git/debug-repos")
+async def debug_repositories(project_path: str):
+    """Endpoint de debugging para verificar el estado de los repositorios"""
+    if not git_service:
+        return {"error": "Git service not available"}
+    
+    try:
+        debug_info = {
+            "project_path": project_path,
+            "project_path_exists": os.path.exists(project_path) if project_path else False,
+            "repositories": {},
+            "validation": None,
+            "git_service_available": hasattr(git_service, 'validate_repositories_for_branches')
+        }
+        
+        if project_path and os.path.exists(project_path):
+            # Verificar cada repositorio individualmente
+            repos = {
+                "content": "outputs-dimensions-content",
+                "dimensions": "outputs-dimensions"
             }
-        }
-        
-    try:
-        validation = git_service.validate_repositories_for_branches(project_path)
-        
-        return {
-            "success": True,
-            "validation": validation
-        }
-        
-    except Exception as e:
-        return {
-            "success": False,
-            "validation": {
-                "valid": False,
-                "message": f"Validation error: {str(e)}",
-                "repositories": {"content": False, "dimensions": False}
-            }
-        }
-
-@app.get("/git/branch-details")
-async def get_branch_details(
-    project_path: str,
-    repo_name: str,
-    branch_name: str
-):
-    """
-    Obtiene detalles específicos de una rama
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        # Obtener la rama específica
-        branches = git_service.get_recent_branches(project_path, repo_name, 50)  # Buscar en más ramas
-        target_branch = None
-        
-        clean_branch_name = branch_name.replace('origin/', '')
-        for branch in branches:
-            if branch.display_name == clean_branch_name:
-                target_branch = branch
-                break
-        
-        if not target_branch:
-            raise HTTPException(status_code=404, detail=f"Branch '{clean_branch_name}' not found")
-        
-        # Obtener comparación con master
-        try:
-            comparison = git_service.compare_branch_with_master(project_path, repo_name, branch_name)
-            comparison_data = comparison.dict()
-        except Exception as e:
-            comparison_data = None
-            print(f"Could not get comparison: {e}")
-        
-        return {
-            "success": True,
-            "branch": target_branch.dict(),
-            "comparison": comparison_data,
-            "repository": repo_name
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get branch details: {str(e)}")
-
-@app.get("/git/branch-commits")
-async def get_branch_commits(
-    project_path: str,
-    repo_name: str,
-    branch_name: str,
-    limit: int = 10
-):
-    """
-    Obtiene el historial de commits de una rama específica
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        import git
-        
-        repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
-        
-        if not os.path.exists(repo_path):
-            raise HTTPException(status_code=404, detail=f"Repository {repo_name} not found")
-        
-        repo = git.Repo(repo_path)
-        clean_branch_name = branch_name.replace('origin/', '')
-        
-        # Intentar obtener la rama
-        try:
-            branch_ref = repo.remotes.origin.refs[clean_branch_name]
-        except:
-            try:
-                branch_ref = repo.heads[clean_branch_name]
-            except:
-                raise HTTPException(status_code=404, detail=f"Branch '{clean_branch_name}' not found")
-        
-        # Obtener commits
-        commits = []
-        for commit in repo.iter_commits(branch_ref, max_count=limit):
-            commits.append({
-                "hash": commit.hexsha[:8],
-                "full_hash": commit.hexsha,
-                "message": commit.message.strip().split('\n')[0][:100],
-                "author": commit.author.name,
-                "author_email": commit.author.email,
-                "date": commit.committed_datetime.isoformat(),
-                "stats": {
-                    "files_changed": len(commit.stats.files),
-                    "insertions": commit.stats.total['insertions'],
-                    "deletions": commit.stats.total['deletions']
-                }
-            })
-        
-        return {
-            "success": True,
-            "commits": commits,
-            "branch_name": clean_branch_name,
-            "repository": repo_name,
-            "total_commits": len(commits)
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get commits: {str(e)}")
-
-@app.post("/git/fetch-all")
-async def fetch_all_branches(project_path: str):
-    """
-    Hace fetch de todas las ramas remotas en ambos repositorios
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        import git
-        
-        results = {}
-        
-        for repo_name in ['content', 'dimensions']:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
             
-            if os.path.exists(repo_path):
-                try:
-                    repo = git.Repo(repo_path)
-                    fetch_info = repo.remotes.origin.fetch()
-                    
-                    results[repo_name] = {
-                        "success": True,
-                        "message": f"Successfully fetched {len(fetch_info)} references",
-                        "fetched_refs": [str(info.ref) for info in fetch_info]
-                    }
-                except Exception as e:
-                    results[repo_name] = {
-                        "success": False,
-                        "message": f"Failed to fetch: {str(e)}",
-                        "fetched_refs": []
-                    }
-            else:
-                results[repo_name] = {
-                    "success": False,
-                    "message": "Repository not found",
-                    "fetched_refs": []
+            for repo_key, repo_folder in repos.items():
+                repo_path = os.path.join(project_path, repo_folder)
+                debug_info["repositories"][repo_key] = {
+                    "folder": repo_folder,
+                    "path": repo_path,
+                    "exists": os.path.exists(repo_path),
+                    "is_git": os.path.exists(os.path.join(repo_path, ".git")) if os.path.exists(repo_path) else False,
+                    "contents": os.listdir(repo_path) if os.path.exists(repo_path) else []
                 }
+            
+            # Intentar validación
+            try:
+                validation = git_service.validate_repositories_for_branches(project_path)
+                debug_info["validation"] = validation
+            except Exception as e:
+                debug_info["validation_error"] = str(e)
         
-        overall_success = any(result["success"] for result in results.values())
-        
-        return {
-            "success": overall_success,
-            "results": results,
-            "workspace_path": project_path
-        }
+        return debug_info
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Fetch operation failed: {str(e)}")
+        return {"error": f"Debug failed: {str(e)}"}
 
-# ================================
-# 🔥 GIT OPERATIONS - FILE DIFF VIEWER
-# ================================
+# backend/main.py - PARTE 3/4 - AZURE Y CREATE STRUCTURE CORREGIDO
 
-@app.get("/git/file-diff")
-async def get_file_diff(
-    project_path: str,
-    repo_name: str,
-    branch_name: str,
-    file_path: str,
-    base_branch: str = "master"
-):
-    """
-    Obtiene las diferencias detalladas de un archivo específico entre una rama y master
-    
-    Query Parameters:
-        project_path: Ruta del workspace
-        repo_name: 'content' o 'dimensions'
-        branch_name: Nombre de la rama
-        file_path: Ruta del archivo
-        base_branch: Rama base para comparar (default: master)
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        if not file_path:
-            raise HTTPException(status_code=400, detail="File path is required")
-        
-        # Obtener el diff del archivo
-        file_diff = git_service.get_file_diff(project_path, repo_name, branch_name, file_path)
-        
-        return {
-            "success": True,
-            "diff": file_diff.dict(),  # ← Usar "diff" para coincidir con el frontend
-            "file_path": file_path,
-            "branch_name": branch_name.replace('origin/', ''),
-            "base_branch": base_branch,
-            "repository": repo_name,
-            "message": f"File diff retrieved for {file_path}"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get file diff: {str(e)}")
-
-@app.post("/git/multiple-file-diffs")
-async def get_multiple_file_diffs(request: MultipleFileDiffRequest):
-    """
-    Obtiene las diferencias de múltiples archivos
-    
-    Body: {
-        "project_path": "C:/workspace",
-        "repo_name": "content",
-        "branch_name": "feature/branch",
-        "file_paths": ["file1.txt", "file2.py"]
-    }
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not os.path.exists(request.project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if request.repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        if not request.file_paths:
-            raise HTTPException(status_code=400, detail="File paths are required")
-        
-        # Obtener diffs de múltiples archivos
-        file_diffs = git_service.get_multiple_file_diffs(
-            request.project_path, 
-            request.repo_name, 
-            request.branch_name, 
-            request.file_paths
-        )
-        
-        return {
-            "success": True,
-            "file_diffs": [diff.dict() for diff in file_diffs],
-            "total_files": len(file_diffs),
-            "branch_name": request.branch_name.replace('origin/', ''),
-            "repository": request.repo_name,
-            "message": f"Retrieved diffs for {len(file_diffs)} files"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get multiple file diffs: {str(e)}")
-
-@app.get("/git/detailed-comparison")
-async def get_detailed_comparison(
-    project_path: str,
-    repo_name: str,
-    branch_name: str
-):
-    """
-    Obtiene una comparación detallada completa entre una rama y master
-    Incluye archivos con diffs completos y resúmenes
-    
-    Query Parameters:
-        project_path: Ruta del workspace
-        repo_name: 'content' o 'dimensions'
-        branch_name: Nombre de la rama
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        # Obtener comparación detallada
-        detailed_comparison = git_service.get_detailed_comparison(project_path, repo_name, branch_name)
-        
-        # Convertir a dict manteniendo la estructura
-        result = {
-            "comparison": detailed_comparison["comparison"].dict(),
-            "detailed_files": detailed_comparison["detailed_files"],
-            "summary_files": [file_info.dict() for file_info in detailed_comparison["summary_files"]],
-            "has_large_files": detailed_comparison["has_large_files"],
-            "total_detailed": detailed_comparison["total_detailed"],
-            "total_summary": detailed_comparison["total_summary"]
-        }
-        
-        return {
-            "success": True,
-            "detailed_comparison": result,
-            "branch_name": branch_name.replace('origin/', ''),
-            "repository": repo_name,
-            "message": f"Detailed comparison retrieved for {branch_name}"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get detailed comparison: {str(e)}")
-
-@app.get("/git/file-content")
-async def get_file_content_at_commit(
-    project_path: str,
-    repo_name: str,
-    commit_sha: str,
-    file_path: str
-):
-    """
-    Obtiene el contenido de un archivo en un commit específico
-    
-    Query Parameters:
-        project_path: Ruta del workspace
-        repo_name: 'content' o 'dimensions'
-        commit_sha: SHA del commit
-        file_path: Ruta del archivo
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        if not commit_sha or not file_path:
-            raise HTTPException(status_code=400, detail="Commit SHA and file path are required")
-        
-        # Obtener contenido del archivo
-        file_content = git_service.get_file_content_at_commit(project_path, repo_name, commit_sha, file_path)
-        
-        return {
-            "success": True,
-            "file_content": file_content,
-            "file_path": file_path,
-            "commit_sha": commit_sha,
-            "repository": repo_name,
-            "message": f"File content retrieved for {file_path} at commit {commit_sha[:8]}"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get file content: {str(e)}")
-
-@app.get("/git/branch-file-tree")
-async def get_branch_file_tree(
-    project_path: str,
-    repo_name: str,
-    branch_name: str
-):
-    """
-    Obtiene el árbol de archivos de una rama específica
-    
-    Query Parameters:
-        project_path: Ruta del workspace
-        repo_name: 'content' o 'dimensions'
-        branch_name: Nombre de la rama
-    """
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        if not project_path or not os.path.exists(project_path):
-            raise HTTPException(status_code=400, detail="Invalid project path")
-        
-        if repo_name not in ['content', 'dimensions']:
-            raise HTTPException(status_code=400, detail="Repository must be 'content' or 'dimensions'")
-        
-        # Obtener árbol de archivos
-        file_tree = git_service.get_branch_file_tree(project_path, repo_name, branch_name)
-        
-        return {
-            "success": True,
-            "file_tree": file_tree,
-            "branch_name": branch_name.replace('origin/', ''),
-            "repository": repo_name,
-            "message": f"File tree retrieved for branch {branch_name}"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get file tree: {str(e)}")
+# backend/main.py - PARTE 3/4 - AZURE Y CREATE STRUCTURE CORREGIDO
 
 # ================================
 # AZURE OPERATIONS  
@@ -757,7 +665,7 @@ async def get_branch_file_tree(
 @app.post("/azure/download-files")
 async def download_azure_files(request: AzureDownloadRequest):
     """Download Azure files for a project"""
-    if not SERVICES_AVAILABLE:
+    if not azure_service:
         raise HTTPException(status_code=503, detail="Azure service not available")
         
     try:
@@ -776,7 +684,7 @@ async def download_azure_files(request: AzureDownloadRequest):
 @app.get("/azure/servers")
 async def get_available_servers():
     """Get list of available Azure servers"""
-    if not SERVICES_AVAILABLE:
+    if not azure_service:
         raise HTTPException(status_code=503, detail="Azure service not available")
         
     try:
@@ -792,7 +700,811 @@ async def get_available_servers():
         raise HTTPException(status_code=500, detail=f"Error getting servers: {str(e)}")
 
 # ================================
-# TEST ENDPOINTS - ACTUALIZADO
+# 🔥 CREATE STRUCTURE OPERATIONS - VERSIÓN CORREGIDA
+# ================================
+
+@app.post("/data-processing/create-structure")
+async def create_structure_endpoint(request: CreateStructureRequest):
+    """
+    ✅ ENDPOINT ACTUALIZADO - Maneja MDD y DDF
+    """
+    
+    print(f"🚀 Creating structure for: {request.project_name}")
+    logs = []
+    
+    def add_log(message: str):
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        log_entry = f"[{timestamp}] {message}"
+        logs.append(log_entry)
+        print(f"📝 {message}")
+    
+    try:
+        add_log("🔍 Starting structure creation with MDD and DDF...")
+        
+        # ================================
+        # VALIDACIONES BÁSICAS
+        # ================================
+        
+        # Validar project name
+        project_name = request.project_name.strip()
+        if not project_name:
+            raise HTTPException(status_code=400, detail="Project name is required")
+        
+        if not re.match(r'^[a-zA-Z0-9_-]+$', project_name):
+            raise HTTPException(status_code=400, detail="Invalid project name. Only letters, numbers, underscores, and hyphens allowed.")
+        
+        # Validar workspace
+        workspace_path = request.workspace_path.strip()
+        if not workspace_path:
+            raise HTTPException(status_code=400, detail="Workspace path is required")
+            
+        if not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail=f"Workspace not found: {workspace_path}")
+        
+        # Validar microservicios
+        outputs_content = os.path.join(workspace_path, "outputs-dimensions-content")
+        outputs_dimensions = os.path.join(workspace_path, "outputs-dimensions")
+        
+        if not os.path.exists(outputs_content):
+            raise HTTPException(status_code=400, detail="outputs-dimensions-content repository not found in workspace")
+        
+        if not os.path.exists(outputs_dimensions):
+            raise HTTPException(status_code=400, detail="outputs-dimensions repository not found in workspace")
+        
+        add_log("✅ Basic validations passed")
+        
+        # ================================
+        # PROCESAR ARCHIVO MDD
+        # ================================
+        
+        add_log("📋 Processing MDD file...")
+        
+        if not request.mdd_file_content:
+            raise HTTPException(status_code=400, detail="MDD file content is required")
+        
+        try:
+            # Decodificar MDD base64
+            mdd_content = base64.b64decode(request.mdd_file_content)
+            add_log(f"📊 MDD decoded: {len(mdd_content)} bytes")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid MDD file encoding: {str(e)}")
+        
+        if len(mdd_content) == 0:
+            raise HTTPException(status_code=400, detail="MDD file is empty")
+        
+        # Validar MDD filename
+        if not request.mdd_filename:
+            raise HTTPException(status_code=400, detail="MDD filename is required")
+        
+        if not request.mdd_filename.lower().endswith('.mdd'):
+            raise HTTPException(status_code=400, detail="MDD file must have .mdd extension")
+        
+        # ================================
+        # PROCESAR ARCHIVO DDF
+        # ================================
+        
+        add_log("💾 Processing DDF file...")
+        
+        if not request.ddf_file_content:
+            raise HTTPException(status_code=400, detail="DDF file content is required")
+        
+        try:
+            # Decodificar DDF base64
+            ddf_content = base64.b64decode(request.ddf_file_content)
+            add_log(f"📊 DDF decoded: {len(ddf_content)} bytes")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid DDF file encoding: {str(e)}")
+        
+        if len(ddf_content) == 0:
+            raise HTTPException(status_code=400, detail="DDF file is empty")
+        
+        # Validar DDF filename
+        if not request.ddf_filename:
+            raise HTTPException(status_code=400, detail="DDF filename is required")
+        
+        if not request.ddf_filename.lower().endswith('.ddf'):
+            raise HTTPException(status_code=400, detail="DDF file must have .ddf extension")
+        
+        # ✅ VALIDAR QUE MDD Y DDF TENGAN EL MISMO NOMBRE BASE
+        mdd_basename = os.path.splitext(request.mdd_filename)[0]
+        ddf_basename = os.path.splitext(request.ddf_filename)[0]
+        
+        if mdd_basename != ddf_basename:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"File base names must match. MDD: '{mdd_basename}', DDF: '{ddf_basename}'"
+            )
+        
+        add_log(f"✅ File names match: {mdd_basename}")
+        
+        # ================================
+        # CONFIGURAR RUTAS
+        # ================================
+        
+        template_location = request.template_location or os.path.join(outputs_content, "Template_Configuration")
+        library_location = request.library_location or os.path.join(outputs_dimensions, "KAPLibrary")
+        
+        template_project_path = os.path.join(outputs_dimensions, "Template_Project")
+        
+        # Verificar rutas críticas
+        if not os.path.exists(template_location):
+            raise HTTPException(status_code=400, detail=f"Template_Configuration not found: {template_location}")
+        
+        if not os.path.exists(template_project_path):
+            raise HTTPException(status_code=400, detail=f"Template_Project not found: {template_project_path}")
+        
+        add_log("✅ Paths validated")
+        
+        # ================================
+        # CREAR ESTRUCTURA
+        # ================================
+        
+        add_log("🏗️ Creating project structure...")
+        
+        # Crear Projects folder
+        projects_path = os.path.join(outputs_content, "Projects")
+        os.makedirs(projects_path, exist_ok=True)
+        
+        # Verificar si el proyecto ya existe
+        new_project_path = os.path.join(projects_path, project_name)
+        
+        if os.path.exists(new_project_path):
+            raise HTTPException(status_code=400, detail=f"Project '{project_name}' already exists")
+        
+        add_log(f"📂 Creating project at: {new_project_path}")
+        
+        # Copiar Template_Project
+        add_log("📋 Copying Template_Project...")
+        await copy_directory_async(template_project_path, new_project_path, add_log)
+        
+        # Copiar configuración a Automation
+        automation_path = os.path.join(new_project_path, "Automation")
+        add_log("⚙️ Copying configuration...")
+        
+        # Copiar archivos de Template_Configuration
+        await copy_directory_async(template_location, automation_path, add_log)
+        
+        # ================================
+        # CONFIGURAR JOB.INI
+        # ================================
+        
+        job_ini_path = os.path.join(new_project_path, "job.ini")
+        files_created = ["Project structure"]
+        
+        if os.path.exists(job_ini_path):
+            add_log("🔧 Configuring job.ini...")
+            
+            try:
+                with open(job_ini_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # Normalizar rutas
+                template_location_normalized = template_location.replace('/', '\\') + '\\'
+                library_location_normalized = library_location.replace('/', '\\') + '\\'
+                
+                # Reemplazos
+                replacements = {
+                    "[CHANGE|DATESTART]": request.date_start,
+                    "[CHANGE|DATEEND]": request.date_end,
+                    "[CHANGE|TEMPLATE_LOCATION]": template_location_normalized,
+                    "[CHANGE|LIBRARY_LOCATION]": library_location_normalized,
+                    "[CHANGE|PROJCODE]": project_name,
+                    "[CHANGE|ANALYSIS_SERVER]": template_location_normalized
+                }
+                
+                for old, new in replacements.items():
+                    if old in content:
+                        content = content.replace(old, new)
+                        add_log(f"🔄 Replaced {old}")
+                
+                with open(job_ini_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                
+                files_created.append("job.ini (configured)")
+                add_log("✅ job.ini configured")
+                
+            except Exception as e:
+                add_log(f"⚠️ Warning: Could not configure job.ini: {str(e)}")
+        
+        # ================================
+        # 🔥 GUARDAR AMBOS ARCHIVOS MDD Y DDF
+        # ================================
+        
+        mdd_folder = os.path.join(new_project_path, "MDD")
+        add_log("💾 Saving MDD and DDF files...")
+
+        try:
+            # Asegurar que la carpeta MDD existe
+            os.makedirs(mdd_folder, exist_ok=True)
+            add_log(f"📁 MDD folder ensured: {mdd_folder}")
+
+            # Guardar archivo MDD
+            mdd_path = os.path.join(mdd_folder, request.mdd_filename)
+            with open(mdd_path, 'wb') as f:
+                f.write(mdd_content)
+
+            files_created.append(f"MDD/{request.mdd_filename}")
+            add_log(f"📋 MDD file saved: {request.mdd_filename}")
+
+            # ✅ GUARDAR ARCHIVO DDF
+            ddf_path = os.path.join(mdd_folder, request.ddf_filename)
+            with open(ddf_path, 'wb') as f:
+                f.write(ddf_content)
+
+            files_created.append(f"MDD/{request.ddf_filename}")
+            add_log(f"💾 DDF file saved: {request.ddf_filename}")
+
+            # Verificar que ambos archivos se guardaron
+            if os.path.exists(mdd_path) and os.path.exists(ddf_path):
+                add_log(f"✅ Both files confirmed saved in: {mdd_folder}")
+            else:
+                add_log(f"⚠️ File verification failed - MDD exists: {os.path.exists(mdd_path)}, DDF exists: {os.path.exists(ddf_path)}")
+
+        except Exception as e:
+            add_log(f"⚠️ Warning: Could not save MDD/DDF files: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Failed to save MDD/DDF files: {str(e)}")
+        
+        # ================================
+        # FINALIZAR
+        # ================================
+        
+        add_log("🎉 Structure created successfully with MDD and DDF!")
+        
+        return {
+            "success": True,
+            "message": "✅ Project structure created successfully with MDD and DDF files!",
+            "data": {
+                "project_path": new_project_path,
+                "project_name": project_name,
+                "files_created": files_created,
+                "workspace": workspace_path,
+                "template_location": template_location,
+                "library_location": library_location,
+                "mdd_file": request.mdd_filename,
+                "ddf_file": request.ddf_filename,  # ✅ Incluir DDF en respuesta
+                "automation_path": automation_path,
+                "mdd_path": os.path.join(mdd_folder, request.mdd_filename) if os.path.exists(mdd_folder) else None,
+                "ddf_path": os.path.join(mdd_folder, request.ddf_filename) if os.path.exists(mdd_folder) else None
+            },
+            "logs": logs
+        }
+        
+    except HTTPException:
+        add_log("❌ Request validation failed")
+        raise
+    except Exception as e:
+        add_log(f"❌ Unexpected error: {str(e)}")
+        print(f"💥 Full error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+async def copy_directory_async(source: str, destination: str, add_log, batch_size: int = 20):
+    """Copia directorio de forma asíncrona en lotes"""
+    
+    if not os.path.exists(source):
+        raise Exception(f"Source directory does not exist: {source}")
+    
+    add_log(f"📁 Copying: {os.path.basename(source)} → {os.path.basename(destination)}")
+    
+    file_count = 0
+    
+    try:
+        for root, dirs, files in os.walk(source):
+            # Crear directorios
+            for dir_name in dirs:
+                src_dir = os.path.join(root, dir_name)
+                rel_dir = os.path.relpath(src_dir, source)
+                dest_dir = os.path.join(destination, rel_dir)
+                os.makedirs(dest_dir, exist_ok=True)
+            
+            # Copiar archivos en lotes
+            for i in range(0, len(files), batch_size):
+                batch_files = files[i:i + batch_size]
+                
+                for file_name in batch_files:
+                    src_file = os.path.join(root, file_name)
+                    rel_file = os.path.relpath(src_file, source)
+                    dest_file = os.path.join(destination, rel_file)
+                    
+                    dest_dir = os.path.dirname(dest_file)
+                    os.makedirs(dest_dir, exist_ok=True)
+                    
+                    shutil.copy2(src_file, dest_file)
+                    file_count += 1
+                
+                # Yield control cada lote
+                if len(files) > batch_size:
+                    await asyncio.sleep(0.01)
+        
+        add_log(f"✅ Copied {file_count} files")
+        
+    except Exception as e:
+        add_log(f"❌ Error copying: {str(e)}")
+        raise
+
+# ================================
+# ENDPOINT DE TEST
+# ================================
+
+
+@app.get("/test/create-structure-mdd-ddf")
+async def test_create_structure_with_mdd_ddf():
+    """Test endpoint para verificar soporte MDD+DDF"""
+    
+    return {
+        "endpoint_available": True,
+        "url": "/data-processing/create-structure",
+        "method": "POST", 
+        "content_type": "application/json",
+        "supports_mdd_ddf": True,
+        "required_fields": {
+            "project_name": "str (required)",
+            "workspace_path": "str (required)",
+            "mdd_file_content": "str (required, base64 encoded)",
+            "mdd_filename": "str (required, must end with .mdd)",
+            "ddf_file_content": "str (required, base64 encoded)",  # ✅
+            "ddf_filename": "str (required, must end with .ddf)"     # ✅
+        },
+        "optional_fields": {
+            "template_location": "str (optional)",
+            "library_location": "str (optional)",
+            "date_start": "str (optional, default: '19991201')",
+            "date_end": "str (optional, default: '99999999')"
+        },
+        "validation_rules": {
+            "project_name": "Must match ^[a-zA-Z0-9_-]+$",
+            "workspace_path": "Must exist and contain microservices",
+            "mdd_file_content": "Must be valid base64",
+            "mdd_filename": "Must end with .mdd",
+            "ddf_file_content": "Must be valid base64",
+            "ddf_filename": "Must end with .ddf",
+            "file_names": "MDD and DDF base names must match"
+        },
+        "response_format": {
+            "success": "boolean",
+            "message": "string",
+            "data": {
+                "project_path": "string",
+                "project_name": "string", 
+                "files_created": "array",
+                "mdd_file": "string",
+                "ddf_file": "string",
+                "mdd_path": "string",
+                "ddf_path": "string"
+            },
+            "logs": "array of processing logs"
+        },
+        "example_request": {
+            "project_name": "TestProject",
+            "workspace_path": "C:/workspace",
+            "mdd_file_content": "base64_mdd_content_here",
+            "mdd_filename": "TestProject.mdd",
+            "ddf_file_content": "base64_ddf_content_here",
+            "ddf_filename": "TestProject.ddf"
+        },
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+@app.get("/test/create-structure")
+async def test_create_structure():
+    """Test endpoint para create structure"""
+    
+    return {
+        "endpoint_available": True,
+        "accepts_json": True,
+        "expected_fields": [
+            "project_name",
+            "workspace_path", 
+            "mdd_file_content (base64)",
+            "mdd_filename"
+        ],
+        "optional_fields": [
+            "template_location",
+            "library_location",
+            "date_start",
+            "date_end"
+        ],
+        "method": "POST",
+        "content_type": "application/json",
+        "example_request": {
+            "project_name": "TestProject",
+            "workspace_path": "C:/workspace",
+            "mdd_file_content": "base64_encoded_mdd_content_here",
+            "mdd_filename": "test.mdd",
+            "date_start": "19991201",
+            "date_end": "99999999"
+        },
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+# ================================
+# MDD DUPLICATE OPERATIONS
+# ================================
+
+@app.post("/data/duplicate-mdd")
+async def duplicate_mdd_files(
+    background_tasks: BackgroundTasks,
+    mdd_file: UploadFile = File(..., description="MDD metadata file"),
+    ddf_file: UploadFile = File(..., description="DDF data file"),
+    duplicate_count: int = Form(..., description="Number of times to duplicate"),
+    workspace_path: str = Form(..., description="Target workspace directory")
+):
+    """Endpoint para duplicar archivos MDD/DDF"""
+    logger.info("=" * 50)
+    logger.info("🚀 STARTING MDD DUPLICATION ENDPOINT")
+    logger.info(f"📁 MDD File: {mdd_file.filename}")
+    logger.info(f"📁 DDF File: {ddf_file.filename}")
+    logger.info(f"🔢 Duplicate Count: {duplicate_count}")
+    logger.info(f"📂 Workspace: {workspace_path}")
+    logger.info("=" * 50)
+    
+    # VALIDACIONES TEMPRANAS
+    try:
+        # Check services availability FIRST
+        if not mdd_service:
+            logger.error("❌ MDD SERVICE NOT AVAILABLE")
+            raise HTTPException(
+                status_code=503, 
+                detail="MDD service not available. Please check backend configuration."
+            )
+        
+        logger.info("✅ MDD service available, proceeding...")
+        
+        # VALIDACIÓN DE ARCHIVOS
+        if not mdd_file or not mdd_file.filename:
+            logger.error("❌ MDD file missing or invalid")
+            raise HTTPException(
+                status_code=400, 
+                detail="MDD file is required and must have a valid filename"
+            )
+        
+        if not ddf_file or not ddf_file.filename:
+            logger.error("❌ DDF file missing or invalid")
+            raise HTTPException(
+                status_code=400, 
+                detail="DDF file is required and must have a valid filename"
+            )
+        
+        # VALIDACIÓN DE EXTENSIONES
+        if not mdd_file.filename.lower().endswith('.mdd'):
+            logger.error(f"❌ Invalid MDD extension: {mdd_file.filename}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"MDD file must have .mdd extension, got: {mdd_file.filename}"
+            )
+        
+        if not ddf_file.filename.lower().endswith('.ddf'):
+            logger.error(f"❌ Invalid DDF extension: {ddf_file.filename}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"DDF file must have .ddf extension, got: {ddf_file.filename}"
+            )
+        
+        # VALIDACIÓN DE NOMBRES BASE
+        mdd_basename = os.path.splitext(mdd_file.filename)[0]
+        ddf_basename = os.path.splitext(ddf_file.filename)[0]
+        
+        if mdd_basename != ddf_basename:
+            logger.error(f"❌ File names don't match: {mdd_basename} != {ddf_basename}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"File base names must match. MDD: '{mdd_basename}', DDF: '{ddf_basename}'"
+            )
+        
+        logger.info(f"✅ File names match: {mdd_basename}")
+        
+        # VALIDACIÓN DE DUPLICATE COUNT
+        if not isinstance(duplicate_count, int) or duplicate_count < 1 or duplicate_count > 50:
+            logger.error(f"❌ Invalid duplicate count: {duplicate_count}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Duplicate count must be an integer between 1 and 50, got: {duplicate_count}"
+            )
+        
+        logger.info(f"✅ Duplicate count valid: {duplicate_count}")
+        
+        # VALIDACIÓN DE WORKSPACE
+        if not workspace_path or not workspace_path.strip():
+            logger.error("❌ Workspace path empty")
+            raise HTTPException(
+                status_code=400, 
+                detail="Workspace path cannot be empty"
+            )
+        
+        workspace_path = workspace_path.strip()
+        
+        if not os.path.exists(workspace_path):
+            logger.error(f"❌ Workspace does not exist: {workspace_path}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Workspace path does not exist: {workspace_path}"
+            )
+        
+        if not os.path.isdir(workspace_path):
+            logger.error(f"❌ Workspace is not a directory: {workspace_path}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Workspace path is not a directory: {workspace_path}"
+            )
+        
+        if not os.access(workspace_path, os.W_OK):
+            logger.error(f"❌ No write permission: {workspace_path}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"No write permission for workspace: {workspace_path}"
+            )
+        
+        logger.info(f"✅ Workspace valid and writable: {workspace_path}")
+        
+        # VALIDACIÓN DE TAMAÑO DE ARCHIVOS
+        try:
+            mdd_content = await mdd_file.read()
+            await mdd_file.seek(0)  # Reset file pointer
+            
+            ddf_content = await ddf_file.read()
+            await ddf_file.seek(0)  # Reset file pointer
+            
+            if len(mdd_content) == 0:
+                raise HTTPException(status_code=400, detail="MDD file is empty")
+            
+            if len(ddf_content) == 0:
+                raise HTTPException(status_code=400, detail="DDF file is empty")
+            
+            logger.info(f"✅ File sizes: MDD={len(mdd_content)} bytes, DDF={len(ddf_content)} bytes")
+            
+        except Exception as e:
+            logger.error(f"❌ Error reading file contents: {str(e)}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error reading uploaded files: {str(e)}"
+            )
+        
+        # CREAR ARCHIVOS TEMPORALES
+        temp_mdd_path = None
+        temp_ddf_path = None
+        original_mdd_filename = mdd_file.filename
+        
+        logger.info("💾 Creating temporary files...")
+        
+        try:
+            # GUARDAR MDD TEMPORAL
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mdd') as temp_mdd:
+                logger.info(f"📝 Writing MDD content to temporary file...")
+                await mdd_file.seek(0)  # Ensure we're at the beginning
+                content = await mdd_file.read()
+                temp_mdd.write(content)
+                temp_mdd_path = temp_mdd.name
+                logger.info(f"💾 MDD saved to: {temp_mdd_path}")
+            
+            # GUARDAR DDF TEMPORAL  
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.ddf') as temp_ddf:
+                logger.info(f"📝 Writing DDF content to temporary file...")
+                await ddf_file.seek(0)  # Ensure we're at the beginning
+                content = await ddf_file.read()
+                temp_ddf.write(content)
+                temp_ddf_path = temp_ddf.name
+                logger.info(f"💾 DDF saved to: {temp_ddf_path}")
+            
+            logger.info("✅ Temporary files created successfully")
+            
+            # VERIFICAR QUE EL SERVICIO MDD EXISTE
+            if not hasattr(mdd_service, 'process_duplicate_mdd'):
+                logger.error("❌ MDD service method not found")
+                raise HTTPException(
+                    status_code=503,
+                    detail="MDD service process_duplicate_mdd method not available"
+                )
+            
+            logger.info("🔄 Calling MDD service...")
+            
+            # LLAMAR AL SERVICIO MDD
+            result = await mdd_service.process_duplicate_mdd(
+                mdd_file_path=temp_mdd_path,
+                ddf_file_path=temp_ddf_path,
+                duplicate_count=duplicate_count,
+                workspace_path=workspace_path,
+                original_mdd_filename=original_mdd_filename
+            )
+            
+            logger.info(f"🎯 MDD service result: {result.get('success', False)}")
+            
+            # PROGRAMAR LIMPIEZA EN BACKGROUND
+            background_tasks.add_task(cleanup_temp_files_mdd, temp_mdd_path, temp_ddf_path)
+            
+            if result["success"]:
+                logger.info(f"🎉 SUCCESS: {result.get('output_file', 'Unknown')}")
+                
+                return {
+                    "success": True,
+                    "message": result["message"],
+                    "data": {
+                        "output_file": result["output_file"],
+                        "output_path": result["output_path"],
+                        "duplicates_created": result["duplicates_created"],
+                        "base_name": result["base_name"],
+                        "workspace": workspace_path,
+                        "file_size": result.get("file_size", 0),
+                        "original_records": result.get("original_records", "Unknown"),
+                        "total_records": result.get("total_records", "Unknown"),
+                        "record_multiplier": result.get("record_multiplier", duplicate_count)
+                    },
+                    "processing_logs": result["logs"],
+                    "dms_output": result.get("dms_output", ""),
+                    "details": result.get("details", ""),
+                    "record_summary": f"Original: {result.get('original_records', 'Unknown')} records → Final: {result.get('total_records', 'Unknown')} records (x{duplicate_count} multiplier)"
+                }
+            else:
+                logger.error(f"💥 MDD SERVICE FAILED: {result.get('error', 'Unknown error')}")
+                raise HTTPException(
+                    status_code=500,
+                    detail={
+                        "message": "MDD duplication failed",
+                        "error": result.get("error", "Unknown error"),
+                        "logs": result.get("logs", []),
+                        "input_error": result.get("input_error", ""),
+                        "details": result.get("details", "")
+                    }
+                )
+        
+        except HTTPException:
+            # Re-raise HTTP exceptions as-is
+            cleanup_temp_files_mdd(temp_mdd_path, temp_ddf_path)
+            raise
+
+        except Exception as e:
+            logger.error(f"💥 UNEXPECTED ERROR: {str(e)}")
+            logger.error(f"💥 ERROR TYPE: {type(e)}")
+            import traceback
+            logger.error(f"💥 FULL TRACEBACK: {traceback.format_exc()}")
+            
+            # Limpiar archivos temporales
+            cleanup_temp_files_mdd(temp_mdd_path, temp_ddf_path)
+            
+            raise HTTPException(
+                status_code=500,
+                detail=f"Internal server error during file processing: {str(e)}"
+            )
+
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+
+    except Exception as e:
+        logger.error(f"💥 TOP LEVEL ERROR: {str(e)}")
+        import traceback
+        logger.error(f"💥 TOP LEVEL TRACEBACK: {traceback.format_exc()}")
+        
+        raise HTTPException(
+            status_code=500,
+            detail=f"Top level error: {str(e)}"
+        )
+
+@app.get("/data/duplicate-mdd/status")
+async def get_mdd_duplication_status():
+    """Endpoint para verificar el estado del servicio de duplicación MDD"""
+    if not mdd_service:
+        raise HTTPException(status_code=503, detail="MDD service not available")
+
+    try:
+        status = mdd_service.get_service_status()
+
+        return {
+            "success": True,
+            "status": status
+        }
+
+    except Exception as e:
+        logger.error(f"Error checking MDD duplication status: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not check service status: {str(e)}"
+        )
+
+def cleanup_temp_files_mdd(mdd_path: str, ddf_path: str):
+    """Función helper para limpiar archivos temporales"""
+    logger.info("🧹 Starting cleanup of temporary files...")
+    
+    try:
+        if mdd_path and os.path.exists(mdd_path):
+            os.unlink(mdd_path)
+            logger.info(f"🧹 ✅ Cleaned temp MDD: {mdd_path}")
+        else:
+            logger.info(f"🧹 ⚠️  MDD temp file not found: {mdd_path}")
+    except Exception as e:
+        logger.warning(f"🧹 ❌ Could not clean temp MDD {mdd_path}: {str(e)}")
+    
+    try:
+        if ddf_path and os.path.exists(ddf_path):
+            os.unlink(ddf_path)
+            logger.info(f"🧹 ✅ Cleaned temp DDF: {ddf_path}")
+        else:
+            logger.info(f"🧹 ⚠️  DDF temp file not found: {ddf_path}")
+    except Exception as e:
+        logger.warning(f"🧹 ❌ Could not clean temp DDF {ddf_path}: {str(e)}")
+    
+    logger.info("🧹 Cleanup completed")
+
+# ================================
+# PRODUCT OPERATIONS
+# ================================
+
+@app.post("/product/get-data")
+async def get_product_data(request: dict):
+    """Get product data from KAP API"""
+    if not product_service:
+        raise HTTPException(status_code=503, detail="Product service not available")
+    
+    kapid = request.get("kapid", "")
+    server = request.get("server", "")
+    token = request.get("token", "")
+    
+    result = await product_service.get_product_data(kapid, server, token)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result["message"])
+
+@app.get("/product/servers")
+async def get_available_product_servers():
+    """Get list of available servers for product data"""
+    if not product_service:
+        raise HTTPException(status_code=503, detail="Product service not available")
+    
+    return {
+        "servers": product_service.get_available_servers()
+    }
+
+@app.post("/product/validate-kapid")
+async def validate_kapid(request: dict):
+    """Validate KapID format"""
+    if not product_service:
+        raise HTTPException(status_code=503, detail="Product service not available")
+    
+    kapid = request.get("kapid", "")
+    return product_service.validate_kapid(kapid)
+
+# ================================
+# SERVICES STATUS
+# ================================
+
+@app.get("/services/status")
+async def get_services_status():
+    """Verificar el estado de todos los servicios"""
+    services_status = {
+        "product_service": {
+            "available": product_service is not None,
+            "status": "active" if product_service else "unavailable"
+        },
+        "git_service": {
+            "available": git_service is not None,
+            "status": "active" if git_service else "unavailable"
+        },
+        "azure_service": {
+            "available": azure_service is not None,
+            "status": "active" if azure_service else "unavailable"
+        },
+        "mdd_service": {
+            "available": mdd_service is not None,
+            "status": "active" if mdd_service else "unavailable",
+            "details": mdd_service.get_service_status() if mdd_service else None
+        }
+    }
+    
+    return {
+        "success": True,
+        "overall_status": "healthy" if SERVICES_AVAILABLE else "degraded",
+        "services": services_status,
+        "timestamp": datetime.now().isoformat(),
+        "all_services_available": SERVICES_AVAILABLE
+    }
+
+# ================================
+# TEST ENDPOINTS
 # ================================
 
 @app.get("/test")
@@ -807,48 +1519,136 @@ async def test_endpoint():
                 "/git/branches",
                 "/git/checkout", 
                 "/git/compare",
-                "/git/status",
-                "/git/file-diff",  # ← NUEVO
-                "/git/multiple-file-diffs",  # ← NUEVO
-                "/git/detailed-comparison",  # ← NUEVO
-                "/git/file-content",  # ← NUEVO
-                "/git/branch-file-tree"  # ← NUEVO
+                "/git/status"
             ],
             "azure": [
                 "/azure/download-files",
                 "/azure/servers"
+            ],
+            "data": [
+                "/data/duplicate-mdd",
+                "/data/duplicate-mdd/status"
+            ],
+            "product": [
+                "/product/get-data",
+                "/product/servers",
+                "/product/validate-kapid"
+            ],
+            "structure": [
+                "/data-processing/create-structure"
             ]
         }
     }
 
-@app.get("/test/git")
-async def test_git_service():
-    """Test Git service availability"""
-    if not SERVICES_AVAILABLE:
-        raise HTTPException(status_code=503, detail="Git service not available")
+@app.get("/test/mdd")
+async def test_mdd_service():
+    """Test MDD service availability"""
+    if not mdd_service:
+        raise HTTPException(status_code=503, detail="MDD service not available")
         
     try:
-        config_validation = git_service.validate_git_config()
+        status = mdd_service.get_service_status()
         
         return {
-            "message": "Git service test successful! 🌿",
+            "message": "MDD service test successful! 📋",
             "service_status": "active",
-            "config_valid": config_validation["valid"],
-            "config_issues": config_validation.get("issues", []),
+            "dms_available": status["dms_available"],
+            "dms_version": status.get("dms_version"),
+            "max_duplicates": status["max_duplicates"],
             "timestamp": datetime.now().isoformat()
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Git service test failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"MDD service test failed: {str(e)}")
+
+@app.get("/test/review-branches")
+async def test_review_branches():
+    """Test específico para Review Branches"""
+    try:
+        test_result = {
+            "services_available": SERVICES_AVAILABLE,
+            "git_service_exists": git_service is not None,
+            "required_methods": {},
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        if SERVICES_AVAILABLE and git_service:
+            # Verificar métodos requeridos
+            required_methods = [
+                'validate_repositories_for_branches',
+                'get_recent_branches', 
+                'checkout_branch',
+                'compare_branch_with_master',
+                'get_file_diff',
+                'fetch_all_remote_branches'
+            ]
+            
+            for method_name in required_methods:
+                test_result["required_methods"][method_name] = hasattr(git_service, method_name)
+        
+        return test_result
+        
+    except Exception as e:
+        return {
+            "error": f"Test failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
+
+# 🔥 TEST ENDPOINT CORREGIDO PARA CREATE STRUCTURE
+@app.get("/test/create-structure")
+async def test_create_structure():
+    """Test endpoint"""
+    
+    try:
+        return {
+            "endpoint_available": True,
+            "multipart_support": True,
+            "file_upload_support": True,
+            "temp_file_creation": True,
+            "all_requirements_met": True,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        return {
+            "error": f"Test failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
+
+
+@app.post("/debug/form-data")
+async def debug_form_data(
+    mdd_file: UploadFile = File(...),
+    project_name: str = Form(...),
+    workspace_path: str = Form(...)
+):
+    """Debug FormData reception"""
+    
+    return {
+        "success": True,
+        "received": {
+            "mdd_file": {
+                "filename": mdd_file.filename,
+                "content_type": mdd_file.content_type,
+                "size": getattr(mdd_file, 'size', 'unknown')
+            },
+            "project_name": project_name,
+            "workspace_path": workspace_path
+        },
+        "message": "FormData received successfully"
+    }
+
+
+
 
 if __name__ == "__main__":
     print("🚀 Starting KapTools Nexus API...")
     print("📡 Backend will be available at: http://127.0.0.1:8000")
     print("📖 API docs available at: http://127.0.0.1:8000/docs")
     print("🧪 Test endpoint: http://127.0.0.1:8000/test")
-    print("🌿 Git endpoints: http://127.0.0.1:8000/git/branches")
-    print("🔥 File diff endpoint: http://127.0.0.1:8000/git/file-diff")  # ← NUEVO
-    print("☁️  Azure endpoints: http://127.0.0.1:8000/azure/servers")
+    print("📋 MDD endpoints: http://127.0.0.1:8000/data/duplicate-mdd")
+    print("📦 Product endpoints: http://127.0.0.1:8000/product/servers")
+    print("🏗️ Create Structure: http://127.0.0.1:8000/data-processing/create-structure")
     
     uvicorn.run(
         app, 

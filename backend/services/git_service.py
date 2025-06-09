@@ -1,4 +1,4 @@
-# backend/services/git_service.py - VERSIÓN COMPLETA CORREGIDA
+# backend/services/git_service.py - PARTE 1: IMPORTS, MODELOS Y MÉTODOS BÁSICOS
 import os
 import subprocess
 import asyncio
@@ -8,8 +8,12 @@ from typing import Dict, List, Optional
 import configparser
 from datetime import datetime
 from pydantic import BaseModel
+import re
 
-# Modelos para Review Branches
+# ================================
+# MODELOS PARA REVIEW BRANCHES
+# ================================
+
 class BranchInfo(BaseModel):
     name: str
     display_name: str  # Sin 'origin/' prefix
@@ -58,7 +62,10 @@ class RepositoryStatus(BaseModel):
     last_commit_date: Optional[datetime] = None
     remote_url: Optional[str] = None
 
-# 🔥 NUEVOS MODELOS PARA FILE DIFF VIEWER
+# ================================
+# MODELOS PARA FILE DIFF VIEWER
+# ================================
+
 class DiffLine(BaseModel):
     """Single line in a file diff"""
     line_number_old: Optional[int] = None
@@ -74,6 +81,9 @@ class FileDiff(BaseModel):
     diff_lines: List[DiffLine] = []
     change_type: str = "modified"
 
+# ================================
+# SERVICIO GIT - INICIO DE CLASE
+# ================================
 
 class GitService:
     def __init__(self):
@@ -82,22 +92,31 @@ class GitService:
     def _load_config(self) -> configparser.ConfigParser:
         """Load configuration from config.ini"""
         config = configparser.ConfigParser()
-        config_path = Path(__file__).parent.parent / 'config' / 'config.ini'
-        if config_path.exists():
-            config.read(config_path)
+        # Buscar config.ini en diferentes ubicaciones posibles
+        possible_paths = [
+            Path(__file__).parent.parent / 'config' / 'config.ini',
+            Path(__file__).parent / 'config.ini',
+            Path(__file__).parent.parent / 'config.ini',
+            Path('config.ini'),
+            Path('other_files/config.ini')
+        ]
+        
+        for config_path in possible_paths:
+            if config_path.exists():
+                config.read(config_path)
+                print(f"✅ Config loaded from: {config_path}")
+                break
+        else:
+            print("⚠️ Config file not found, using defaults")
+        
         return config
     
+    # ================================
+    # MÉTODOS BÁSICOS DE GIT
+    # ================================
+    
     async def clone_microservices(self, project_path: str, branch: str = "develop") -> Dict[str, any]:
-        """
-        Clone microservices to specified path
-        
-        Args:
-            project_path: Path where to clone repositories
-            branch: Branch to clone (develop or master)
-            
-        Returns:
-            Dict with success status and message
-        """
+        """Clone microservices to specified path"""
         try:
             # Validate project path
             if not project_path or project_path.strip() == "Path of your workspace":
@@ -201,15 +220,7 @@ class GitService:
             }
     
     def validate_workspace(self, workspace_path: str) -> Dict[str, any]:
-        """
-        Validate workspace for Git operations
-        
-        Args:
-            workspace_path: Path to validate
-            
-        Returns:
-            Dict with validation results
-        """
+        """Validate workspace for Git operations"""
         issues = []
         
         if not workspace_path or workspace_path.strip() == "Path of your workspace":
@@ -260,390 +271,8 @@ class GitService:
             "git_available": len([i for i in issues if "Git" in i]) == 0
         }
     
-    def validate_git_config(self) -> Dict[str, any]:
-        """
-        Validate Git configuration
-        
-        Returns:
-            Dict with validation results
-        """
-        issues = []
-        
-        # Check required config keys
-        required_keys = [
-            'git_clone_command_content',
-            'git_clone_command_dimensions', 
-            'git_clone_command_content_master',
-            'git_clone_command_dimensions_master'
-        ]
-        
-        for key in required_keys:
-            value = self.config.get('Git', key, fallback='')
-            if not value:
-                issues.append(f"Missing Git configuration: {key}")
-        
-        # Check Git availability
-        try:
-            result = subprocess.run(['git', '--version'], capture_output=True, text=True)
-            if result.returncode != 0:
-                issues.append("Git is not installed or not available")
-        except FileNotFoundError:
-            issues.append("Git is not installed")
-        
-        return {
-            "valid": len(issues) == 0,
-            "issues": issues,
-            "git_section_exists": self.config.has_section('Git'),
-            "config_keys_found": [key for key in required_keys if self.config.get('Git', key, fallback='')]
-        }
-    
-    def get_git_config(self) -> Dict[str, any]:
-        """
-        Get Git configuration details
-        
-        Returns:
-            Dict with Git configuration
-        """
-        git_config = {}
-        
-        if self.config.has_section('Git'):
-            git_config = dict(self.config['Git'])
-        
-        return {
-            "config": git_config,
-            "section_exists": self.config.has_section('Git'),
-            "total_keys": len(git_config)
-        }
-
-    # 🌿 MÉTODOS PARA REVIEW BRANCHES
-
-    def get_recent_branches(self, project_path: str, repo_name: str = "both", limit: int = 15) -> List[BranchInfo]:
-        """
-        Obtiene las ramas más recientes de uno o ambos repositorios
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content', 'dimensions', o 'both'
-            limit: Número máximo de ramas por repositorio
-        """
-        branches = []
-        
-        repos_to_check = []
-        if repo_name in ['content', 'both']:
-            content_path = os.path.join(project_path, "outputs-dimensions-content")
-            if os.path.exists(content_path):
-                repos_to_check.append(('content', content_path))
-        
-        if repo_name in ['dimensions', 'both']:
-            dimensions_path = os.path.join(project_path, "outputs-dimensions")
-            if os.path.exists(dimensions_path):
-                repos_to_check.append(('dimensions', dimensions_path))
-        
-        for repo_type, repo_path in repos_to_check:
-            try:
-                repo = git.Repo(repo_path)
-                
-                # Obtener ramas remotas excluyendo HEAD y algunas especiales
-                exclude_patterns = ['HEAD', 'develop', 'release', 'main']
-                remote_refs = []
-                
-                # Fetch para obtener las últimas ramas
-                try:
-                    repo.remotes.origin.fetch()
-                except Exception as e:
-                    print(f"Warning: Could not fetch from origin: {e}")
-                
-                for ref in repo.remotes.origin.refs:
-                    branch_name = ref.name
-                    if not any(pattern in branch_name for pattern in exclude_patterns):
-                        remote_refs.append(ref)
-                
-                # Ordenar por fecha de commit (más recientes primero)
-                remote_refs.sort(key=lambda x: x.commit.committed_datetime, reverse=True)
-                
-                # Obtener la rama actual
-                try:
-                    current_branch = repo.active_branch.name
-                except:
-                    current_branch = None
-                
-                # Tomar solo las primeras 'limit' ramas
-                for ref in remote_refs[:limit]:
-                    display_name = ref.name.replace('origin/', '')
-                    
-                    # Calcular commits ahead/behind de master
-                    commits_ahead = 0
-                    commits_behind = 0
-                    try:
-                        if 'master' in [b.name for b in repo.heads]:
-                            master_ref = repo.heads.master
-                            ahead_behind = repo.git.rev_list('--left-right', '--count', 
-                                                           f'{master_ref.commit.hexsha}...{ref.commit.hexsha}')
-                            parts = ahead_behind.strip().split('\t')
-                            if len(parts) == 2:
-                                commits_behind = int(parts[0])
-                                commits_ahead = int(parts[1])
-                    except:
-                        pass
-                    
-                    branch_info = BranchInfo(
-                        name=ref.name,
-                        display_name=display_name,
-                        author=ref.commit.author.name,
-                        author_email=ref.commit.author.email,
-                        commit_hash=ref.commit.hexsha[:8],
-                        commit_message=ref.commit.message.strip().split('\n')[0][:100],
-                        date=ref.commit.committed_datetime,
-                        repository=repo_type,
-                        is_current=(display_name == current_branch),
-                        commits_ahead=commits_ahead,
-                        commits_behind=commits_behind
-                    )
-                    branches.append(branch_info)
-                    
-            except Exception as e:
-                print(f"Error processing {repo_type} repository: {e}")
-                continue
-        
-        # Ordenar todas las ramas por fecha
-        branches.sort(key=lambda x: x.date, reverse=True)
-        return branches
-
-    def checkout_branch(self, project_path: str, repo_name: str, branch_name: str) -> CheckoutResult:
-        """
-        Hace checkout a una rama específica
-        
-        Args:
-            project_path: Ruta del workspace  
-            repo_name: 'content' o 'dimensions'
-            branch_name: Nombre de la rama (sin 'origin/')
-        """
-        try:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
-            
-            if not os.path.exists(repo_path):
-                return CheckoutResult(
-                    success=False,
-                    message=f"Repository {repo_name} not found in workspace",
-                    current_branch="",
-                    repository=repo_name
-                )
-            
-            repo = git.Repo(repo_path)
-            
-            # Obtener rama actual antes del checkout
-            try:
-                previous_branch = repo.active_branch.name
-            except:
-                previous_branch = "detached"
-            
-            # Fetch primero para asegurar que tenemos la rama
-            repo.remotes.origin.fetch()
-            
-            # Limpiar el nombre de la rama
-            clean_branch_name = branch_name.replace('origin/', '')
-            
-            # Verificar si hay cambios sin commitear
-            if repo.is_dirty():
-                return CheckoutResult(
-                    success=False,
-                    message=f"Repository has uncommitted changes. Please commit or stash changes before checkout.",
-                    current_branch=previous_branch,
-                    repository=repo_name,
-                    previous_branch=previous_branch
-                )
-            
-            # Verificar si la rama local ya existe
-            local_branches = [b.name for b in repo.heads]
-            
-            if clean_branch_name in local_branches:
-                # Rama local existe, hacer checkout
-                repo.heads[clean_branch_name].checkout()
-            else:
-                # Crear rama local desde la remota
-                remote_ref = repo.remotes.origin.refs[clean_branch_name]
-                local_branch = repo.create_head(clean_branch_name, remote_ref)
-                local_branch.set_tracking_branch(remote_ref)
-                local_branch.checkout()
-            
-            # Verificar el checkout
-            current_branch = repo.active_branch.name
-            
-            return CheckoutResult(
-                success=True,
-                message=f"Successfully checked out to branch '{clean_branch_name}'",
-                current_branch=current_branch,
-                repository=repo_name,
-                previous_branch=previous_branch
-            )
-            
-        except Exception as e:
-            return CheckoutResult(
-                success=False,
-                message=f"Failed to checkout branch: {str(e)}",
-                current_branch="",
-                repository=repo_name
-            )
-
-    def compare_branch_with_master(self, project_path: str, repo_name: str, branch_name: str) -> BranchComparison:
-        """
-        Compara una rama con master y retorna las diferencias
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content' o 'dimensions'  
-            branch_name: Nombre de la rama a comparar
-        """
-        try:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
-            
-            if not os.path.exists(repo_path):
-                raise Exception(f"Repository {repo_name} not found")
-            
-            repo = git.Repo(repo_path)
-            
-            # Obtener referencias
-            master_ref = repo.heads.master
-            clean_branch_name = branch_name.replace('origin/', '')
-            
-            # Intentar obtener la rama como referencia remota primero
-            try:
-                branch_ref = repo.remotes.origin.refs[clean_branch_name]
-            except:
-                # Si no existe como remota, buscar como local
-                branch_ref = repo.heads[clean_branch_name]
-            
-            # Obtener diferencias
-            diffs = master_ref.commit.diff(branch_ref.commit, create_patch=True)
-            
-            files = []
-            total_additions = 0
-            total_deletions = 0
-            
-            for diff in diffs:
-                # Determinar tipo de cambio
-                if diff.new_file:
-                    change_type = "added"
-                elif diff.deleted_file:
-                    change_type = "deleted"
-                elif diff.renamed_file:
-                    change_type = "renamed"
-                else:
-                    change_type = "modified"
-                
-                # Contar líneas (aproximado)
-                additions = 0
-                deletions = 0
-                
-                if diff.diff:
-                    try:
-                        diff_text = diff.diff.decode('utf-8')
-                        lines = diff_text.split('\n')
-                        for line in lines:
-                            if line.startswith('+') and not line.startswith('+++'):
-                                additions += 1
-                            elif line.startswith('-') and not line.startswith('---'):
-                                deletions += 1
-                    except:
-                        # Si hay problemas de encoding, usar estimaciones
-                        additions = 1 if change_type == "added" else 0
-                        deletions = 1 if change_type == "deleted" else 0
-                
-                total_additions += additions
-                total_deletions += deletions
-                
-                files.append(ComparisonFile(
-                    path=diff.a_path or diff.b_path or "unknown",
-                    change_type=change_type,
-                    additions=additions,
-                    deletions=deletions,
-                    old_path=diff.a_path if diff.renamed_file else None
-                ))
-            
-            # Crear resumen
-            summary = f"{len(files)} files changed"
-            if total_additions > 0:
-                summary += f", {total_additions} insertions(+)"
-            if total_deletions > 0:
-                summary += f", {total_deletions} deletions(-)"
-            
-            return BranchComparison(
-                branch_name=clean_branch_name,
-                base_branch="master",
-                repository=repo_name,
-                total_files=len(files),
-                total_additions=total_additions,
-                total_deletions=total_deletions,
-                files=files,
-                summary=summary
-            )
-            
-        except Exception as e:
-            raise Exception(f"Failed to compare branches: {str(e)}")
-
-    def get_repository_status(self, project_path: str) -> Dict[str, RepositoryStatus]:
-        """
-        Obtiene el estado actual de ambos repositorios
-        """
-        status = {}
-        
-        for repo_name in ["content", "dimensions"]:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
-            
-            if os.path.exists(repo_path):
-                try:
-                    repo = git.Repo(repo_path)
-                    
-                    # Obtener rama actual
-                    try:
-                        current_branch = repo.active_branch.name
-                    except:
-                        current_branch = "detached"
-                    
-                    # Verificar cambios
-                    has_uncommitted = repo.is_dirty()
-                    has_untracked = len(repo.untracked_files) > 0
-                    is_clean = not has_uncommitted and not has_untracked
-                    
-                    # Información del último commit
-                    last_commit = repo.head.commit
-                    
-                    # URL remota
-                    try:
-                        remote_url = repo.remotes.origin.url
-                    except:
-                        remote_url = None
-                    
-                    status[repo_name] = RepositoryStatus(
-                        exists=True,
-                        is_git_repo=True,
-                        current_branch=current_branch,
-                        has_uncommitted_changes=has_uncommitted,
-                        has_untracked_files=has_untracked,
-                        is_clean=is_clean,
-                        last_commit_hash=last_commit.hexsha[:8],
-                        last_commit_date=last_commit.committed_datetime,
-                        remote_url=remote_url
-                    )
-                    
-                except Exception as e:
-                    print(f"Error checking {repo_name} status: {e}")
-                    status[repo_name] = RepositoryStatus(
-                        exists=True,
-                        is_git_repo=False
-                    )
-            else:
-                status[repo_name] = RepositoryStatus(
-                    exists=False,
-                    is_git_repo=False
-                )
-        
-        return status
-
     def validate_repositories_for_branches(self, project_path: str) -> Dict[str, any]:
-        """
-        Valida que los repositorios necesarios existan para Review Branches
-        """
+        """Valida que los repositorios necesarios existan para Review Branches"""
         try:
             if not project_path or not os.path.exists(project_path):
                 return {
@@ -686,28 +315,630 @@ class GitService:
                 "repositories": {"content": False, "dimensions": False}
             }
 
-    # 🔥 MÉTODOS PARA FILE DIFF VIEWER
+    def validate_git_config(self) -> Dict[str, any]:
+        """Validate Git configuration"""
+        issues = []
+        
+        # Check required config keys
+        required_keys = [
+            'git_clone_command_content',
+            'git_clone_command_dimensions', 
+            'git_clone_command_content_master',
+            'git_clone_command_dimensions_master'
+        ]
+        
+        for key in required_keys:
+            value = self.config.get('Git', key, fallback='')
+            if not value:
+                issues.append(f"Missing Git configuration: {key}")
+        
+        # Check Git availability
+        try:
+            result = subprocess.run(['git', '--version'], capture_output=True, text=True)
+            if result.returncode != 0:
+                issues.append("Git is not installed or not available")
+        except FileNotFoundError:
+            issues.append("Git is not installed")
+        
+        return {
+            "valid": len(issues) == 0,
+            "issues": issues,
+            "git_section_exists": self.config.has_section('Git'),
+            "config_keys_found": [key for key in required_keys if self.config.get('Git', key, fallback='')]
+        }
+    
+    def get_git_config(self) -> Dict[str, any]:
+        """Get Git configuration details"""
+        git_config = {}
+        
+        if self.config.has_section('Git'):
+            git_config = dict(self.config['Git'])
+        
+        return {
+            "config": git_config,
+            "section_exists": self.config.has_section('Git'),
+            "total_keys": len(git_config)
+        }
+    
+
+# ================================
+    # MÉTODOS PARA REVIEW BRANCHES
+    # ================================
+
+    def get_recent_branches(self, project_path: str, repo_name: str = "both", limit: int = 15) -> List[BranchInfo]:
+        """Obtiene las ramas más recientes de uno o ambos repositorios"""
+        branches = []
+
+        repos_to_check = []
+
+        # Mapeo correcto de nombres
+        if repo_name in ['content', 'both']:
+            content_path = os.path.join(project_path, "outputs-dimensions-content")
+            if os.path.exists(content_path) and os.path.exists(os.path.join(content_path, ".git")):
+                repos_to_check.append(('content', content_path))
+
+        if repo_name in ['dimensions', 'both']:
+            dimensions_path = os.path.join(project_path, "outputs-dimensions")
+            if os.path.exists(dimensions_path) and os.path.exists(os.path.join(dimensions_path, ".git")):
+                repos_to_check.append(('dimensions', dimensions_path))
+
+        for repo_type, repo_path in repos_to_check:
+            try:
+                repo = git.Repo(repo_path)
+
+                # Fetch remote branches
+                try:
+                    repo.remotes.origin.fetch()
+                except Exception as e:
+                    print(f"Warning: Could not fetch from origin for {repo_type}: {e}")
+
+                # Obtener ramas remotas excluyendo HEAD y algunas especiales
+                exclude_patterns = ['HEAD', 'develop', 'release', 'main', 'master']
+                remote_refs = []
+
+                try:
+                    for ref in repo.remotes.origin.refs:
+                        branch_name = ref.name
+                        display_name = branch_name.replace('origin/', '')
+
+                        # Excluir patrones específicos
+                        if not any(pattern.lower() in display_name.lower() for pattern in exclude_patterns):
+                            remote_refs.append(ref)
+                except Exception as e:
+                    print(f"Error getting remote refs for {repo_type}: {e}")
+                    continue
+                
+                # Ordenar por fecha de commit (más recientes primero)
+                try:
+                    remote_refs.sort(key=lambda x: x.commit.committed_datetime, reverse=True)
+                except Exception as e:
+                    print(f"Warning: Could not sort branches for {repo_type}: {e}")
+
+                # Obtener la rama actual
+                current_branch = None
+                try:
+                    current_branch = repo.active_branch.name
+                except:
+                    try:
+                        current_branch = repo.head.ref.name if repo.head.ref else None
+                    except:
+                        current_branch = None
+
+                # Tomar solo las primeras 'limit' ramas
+                for ref in remote_refs[:limit]:
+                    try:
+                        display_name = ref.name.replace('origin/', '')
+
+                        # Calcular commits ahead/behind de master
+                        commits_ahead = 0
+                        commits_behind = 0
+
+                        try:
+                            if hasattr(repo.remotes.origin.refs, 'master'):
+                                master_ref = repo.remotes.origin.refs.master
+                                commits_behind = len(list(repo.iter_commits(f'{ref.commit}..{master_ref.commit}')))
+                                commits_ahead = len(list(repo.iter_commits(f'{master_ref.commit}..{ref.commit}')))
+                        except Exception as e:
+                            print(f"Warning: Could not calculate ahead/behind for {display_name}: {e}")
+
+                        # Mensaje de commit
+                        commit_message = ""
+                        try:
+                            commit_message = ref.commit.message.strip()
+                            if commit_message:
+                                commit_message = commit_message.split('\n')[0][:100]
+                            else:
+                                commit_message = "No commit message"
+                        except:
+                            commit_message = "Error reading commit message"
+
+                        # Información del autor
+                        author_name = "Unknown"
+                        author_email = "unknown@unknown.com"
+                        try:
+                            author_name = ref.commit.author.name or "Unknown"
+                            author_email = ref.commit.author.email or "unknown@unknown.com"
+                        except:
+                            pass
+                        
+                        branch_info = BranchInfo(
+                            name=ref.name,
+                            display_name=display_name,
+                            author=author_name,
+                            author_email=author_email,
+                            commit_hash=ref.commit.hexsha[:8],
+                            commit_message=commit_message,
+                            date=ref.commit.committed_datetime,
+                            repository=repo_type,
+                            is_current=(display_name == current_branch),
+                            commits_ahead=commits_ahead,
+                            commits_behind=commits_behind
+                        )
+                        branches.append(branch_info)
+
+                    except Exception as e:
+                        print(f"Error processing branch {ref.name}: {e}")
+                        continue
+
+            except Exception as e:
+                print(f"Error processing {repo_type} repository: {e}")
+                continue
+            
+        # Ordenar todas las ramas por fecha
+        try:
+            branches.sort(key=lambda x: x.date, reverse=True)
+        except Exception as e:
+            print(f"Warning: Could not sort all branches: {e}")
+
+        return branches
+
+    def checkout_branch(self, project_path: str, repo_name: str, branch_name: str) -> CheckoutResult:
+        """Hace checkout a una rama específica con mapeo correcto"""
+        try:
+            # Mapeo correcto de nombres de repositorio
+            repo_folder_map = {
+                'content': 'outputs-dimensions-content',
+                'dimensions': 'outputs-dimensions'
+            }
+
+            if repo_name not in repo_folder_map:
+                return CheckoutResult(
+                    success=False,
+                    message=f"Invalid repository name: {repo_name}. Must be 'content' or 'dimensions'",
+                    current_branch="",
+                    repository=repo_name
+                )
+
+            repo_folder = repo_folder_map[repo_name]
+            repo_path = os.path.join(project_path, repo_folder)
+
+            if not os.path.exists(repo_path):
+                return CheckoutResult(
+                    success=False,
+                    message=f"Repository {repo_folder} not found in workspace: {repo_path}",
+                    current_branch="",
+                    repository=repo_name
+                )
+
+            if not os.path.exists(os.path.join(repo_path, ".git")):
+                return CheckoutResult(
+                    success=False,
+                    message=f"Path {repo_path} is not a Git repository",
+                    current_branch="",
+                    repository=repo_name
+                )
+
+            repo = git.Repo(repo_path)
+
+            # Obtener rama actual antes del checkout
+            previous_branch = "unknown"
+            try:
+                previous_branch = repo.active_branch.name
+            except:
+                try:
+                    previous_branch = repo.head.ref.name if repo.head.ref else "detached"
+                except:
+                    previous_branch = "detached"
+
+            # Fetch para obtener las referencias más recientes
+            try:
+                repo.remotes.origin.fetch()
+            except Exception as e:
+                print(f"Warning: Could not fetch from origin: {e}")
+
+            # Limpiar el nombre de la rama
+            clean_branch_name = branch_name.replace('origin/', '')
+
+            # Verificar si hay cambios sin commitear
+            try:
+                if repo.is_dirty(untracked_files=True):
+                    return CheckoutResult(
+                        success=False,
+                        message=f"Repository has uncommitted changes. Please commit or stash changes before checkout.",
+                        current_branch=previous_branch,
+                        repository=repo_name,
+                        previous_branch=previous_branch
+                    )
+            except Exception as e:
+                print(f"Warning: Could not check if repo is dirty: {e}")
+
+            # Realizar checkout
+            try:
+                # Verificar si la rama local ya existe
+                local_branches = [b.name for b in repo.heads]
+
+                if clean_branch_name in local_branches:
+                    # Rama local existe, hacer checkout
+                    repo.heads[clean_branch_name].checkout()
+                    print(f"Checked out to existing local branch: {clean_branch_name}")
+                else:
+                    # Crear rama local desde la remota
+                    try:
+                        remote_ref = repo.remotes.origin.refs[clean_branch_name]
+                        local_branch = repo.create_head(clean_branch_name, remote_ref)
+                        local_branch.set_tracking_branch(remote_ref)
+                        local_branch.checkout()
+                        print(f"Created and checked out new local branch: {clean_branch_name}")
+                    except Exception as e:
+                        return CheckoutResult(
+                            success=False,
+                            message=f"Could not find or create branch '{clean_branch_name}': {str(e)}",
+                            current_branch=previous_branch,
+                            repository=repo_name,
+                            previous_branch=previous_branch
+                        )
+            except Exception as e:
+                return CheckoutResult(
+                    success=False,
+                    message=f"Checkout operation failed: {str(e)}",
+                    current_branch=previous_branch,
+                    repository=repo_name,
+                    previous_branch=previous_branch
+                )
+
+            # Verificar el checkout
+            current_branch = previous_branch
+            try:
+                current_branch = repo.active_branch.name
+            except:
+                try:
+                    current_branch = repo.head.ref.name if repo.head.ref else "detached"
+                except:
+                    current_branch = "unknown"
+
+            success = current_branch == clean_branch_name
+
+            return CheckoutResult(
+                success=success,
+                message=f"Successfully checked out to branch '{clean_branch_name}'" if success else f"Checkout may have failed. Current branch: {current_branch}",
+                current_branch=current_branch,
+                repository=repo_name,
+                previous_branch=previous_branch
+            )
+
+        except Exception as e:
+            return CheckoutResult(
+                success=False,
+                message=f"Unexpected error during checkout: {str(e)}",
+                current_branch="",
+                repository=repo_name
+            )
+
+    def compare_branch_with_master(self, project_path: str, repo_name: str, branch_name: str) -> BranchComparison:
+        """Compara una rama con master usando mapeo correcto"""
+        try:
+            # Usar el mapeo correcto
+            repo_folder_map = {
+                'content': 'outputs-dimensions-content',
+                'dimensions': 'outputs-dimensions'
+            }
+
+            if repo_name not in repo_folder_map:
+                raise Exception(f"Invalid repository name: {repo_name}")
+
+            repo_folder = repo_folder_map[repo_name]
+            repo_path = os.path.join(project_path, repo_folder)
+
+            if not os.path.exists(repo_path):
+                raise Exception(f"Repository {repo_folder} not found at {repo_path}")
+
+            repo = git.Repo(repo_path)
+
+            # Obtener referencias
+            try:
+                # Intentar obtener master desde remoto primero
+                try:
+                    master_ref = repo.remotes.origin.refs.master
+                except:
+                    # Si no hay remoto master, usar local
+                    master_ref = repo.heads.master
+            except Exception as e:
+                raise Exception(f"Could not find master branch: {str(e)}")
+
+            # Obtener la rama a comparar
+            clean_branch_name = branch_name.replace('origin/', '')
+
+            try:
+                # Intentar remoto primero
+                try:
+                    branch_ref = repo.remotes.origin.refs[clean_branch_name]
+                except:
+                    # Si no hay remoto, usar local
+                    branch_ref = repo.heads[clean_branch_name]
+            except Exception as e:
+                raise Exception(f"Could not find branch '{clean_branch_name}': {str(e)}")
+
+            # Obtener diferencias
+            try:
+                diffs = master_ref.commit.diff(branch_ref.commit, create_patch=True)
+            except Exception as e:
+                raise Exception(f"Could not generate diff: {str(e)}")
+
+            files = []
+            total_additions = 0
+            total_deletions = 0
+
+            for diff in diffs:
+                try:
+                    # Determinar tipo de cambio
+                    if diff.new_file:
+                        change_type = "added"
+                    elif diff.deleted_file:
+                        change_type = "deleted"
+                    elif diff.renamed_file:
+                        change_type = "renamed"
+                    else:
+                        change_type = "modified"
+
+                    # Contar líneas
+                    additions = 0
+                    deletions = 0
+
+                    if diff.diff:
+                        try:
+                            # Intentar diferentes encodings
+                            diff_text = ""
+                            try:
+                                diff_text = diff.diff.decode('utf-8')
+                            except UnicodeDecodeError:
+                                try:
+                                    diff_text = diff.diff.decode('latin-1')
+                                except:
+                                    diff_text = diff.diff.decode('utf-8', errors='ignore')
+
+                            if diff_text:
+                                lines = diff_text.split('\n')
+                                for line in lines:
+                                    if line.startswith('+') and not line.startswith('+++'):
+                                        additions += 1
+                                    elif line.startswith('-') and not line.startswith('---'):
+                                        deletions += 1
+                        except Exception as e:
+                            print(f"Warning: Could not process diff for {diff.a_path or diff.b_path}: {e}")
+                            # Usar estimaciones básicas
+                            if change_type == "added":
+                                additions = 1
+                            elif change_type == "deleted":
+                                deletions = 1
+                            else:
+                                additions = 1
+                                deletions = 1
+
+                    total_additions += additions
+                    total_deletions += deletions
+
+                    file_path = diff.a_path or diff.b_path or "unknown"
+
+                    files.append(ComparisonFile(
+                        path=file_path,
+                        change_type=change_type,
+                        additions=additions,
+                        deletions=deletions,
+                        old_path=diff.a_path if diff.renamed_file else None
+                    ))
+
+                except Exception as e:
+                    print(f"Error processing diff item: {e}")
+                    continue
+                
+            # Crear resumen
+            summary = f"{len(files)} files changed"
+            if total_additions > 0:
+                summary += f", {total_additions} insertions(+)"
+            if total_deletions > 0:
+                summary += f", {total_deletions} deletions(-)"
+
+            return BranchComparison(
+                branch_name=clean_branch_name,
+                base_branch="master",
+                repository=repo_name,
+                total_files=len(files),
+                total_additions=total_additions,
+                total_deletions=total_deletions,
+                files=files,
+                summary=summary
+            )
+
+        except Exception as e:
+            raise Exception(f"Failed to compare branches: {str(e)}")
+
+    def fetch_all_remote_branches(self, project_path: str) -> Dict[str, any]:
+        """Hace fetch de todas las ramas remotas de ambos repositorios"""
+        try:
+            validation = self.validate_repositories_for_branches(project_path)
+            if not validation["valid"]:
+                return {
+                    "success": False,
+                    "message": validation["message"],
+                    "fetched_repos": []
+                }
+            
+            fetched_repos = []
+            errors = []
+            
+            repo_folder_map = {
+                'content': 'outputs-dimensions-content',
+                'dimensions': 'outputs-dimensions'
+            }
+            
+            for repo_name, available in validation["repositories"].items():
+                if available:
+                    try:
+                        repo_folder = repo_folder_map[repo_name]
+                        repo_path = os.path.join(project_path, repo_folder)
+                        repo = git.Repo(repo_path)
+                        
+                        # Hacer fetch
+                        repo.remotes.origin.fetch()
+                        fetched_repos.append(repo_folder)
+                        print(f"Successfully fetched {repo_folder}")
+                        
+                    except Exception as e:
+                        error_msg = f"{repo_folder_map[repo_name]} fetch failed: {str(e)}"
+                        errors.append(error_msg)
+                        print(f"Error: {error_msg}")
+            
+            if fetched_repos:
+                return {
+                    "success": True,
+                    "message": f"Successfully fetched {len(fetched_repos)} repositories",
+                    "fetched_repos": fetched_repos,
+                    "errors": errors if errors else None
+                }
+            else:
+                return {
+                    "success": False,
+                    "message": "No repositories could be fetched",
+                    "fetched_repos": [],
+                    "errors": errors
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"Fetch operation failed: {str(e)}",
+                "fetched_repos": []
+            }
+
+    def get_repository_status(self, project_path: str) -> Dict[str, RepositoryStatus]:
+        """Obtiene el estado actual de ambos repositorios"""
+        status = {}
+        
+        repos = {
+            "content": "outputs-dimensions-content",
+            "dimensions": "outputs-dimensions"
+        }
+        
+        for repo_name, repo_folder in repos.items():
+            repo_path = os.path.join(project_path, repo_folder)
+            
+            try:
+                if not os.path.exists(repo_path):
+                    status[repo_name] = RepositoryStatus(
+                        exists=False,
+                        is_git_repo=False
+                    )
+                    continue
+                
+                if not os.path.exists(os.path.join(repo_path, ".git")):
+                    status[repo_name] = RepositoryStatus(
+                        exists=True,
+                        is_git_repo=False
+                    )
+                    continue
+                
+                repo = git.Repo(repo_path)
+                
+                # Obtener rama actual
+                current_branch = None
+                try:
+                    current_branch = repo.active_branch.name
+                except:
+                    try:
+                        current_branch = repo.head.ref.name if repo.head.ref else None
+                    except:
+                        current_branch = None
+                
+                # Verificar estado
+                is_dirty = False
+                has_untracked = False
+                try:
+                    is_dirty = repo.is_dirty()
+                    has_untracked = len(repo.untracked_files) > 0
+                except:
+                    pass
+                
+                # Último commit
+                last_commit_hash = None
+                last_commit_date = None
+                try:
+                    last_commit = repo.head.commit
+                    last_commit_hash = last_commit.hexsha[:8]
+                    last_commit_date = last_commit.committed_datetime
+                except:
+                    pass
+                
+                # URL remota
+                remote_url = None
+                try:
+                    remote_url = repo.remotes.origin.url
+                except:
+                    pass
+                
+                status[repo_name] = RepositoryStatus(
+                    exists=True,
+                    is_git_repo=True,
+                    current_branch=current_branch,
+                    has_uncommitted_changes=is_dirty,
+                    has_untracked_files=has_untracked,
+                    is_clean=not is_dirty and not has_untracked,
+                    last_commit_hash=last_commit_hash,
+                    last_commit_date=last_commit_date,
+                    remote_url=remote_url
+                )
+                
+            except Exception as e:
+                print(f"Error getting status for {repo_name}: {e}")
+                status[repo_name] = RepositoryStatus(
+                    exists=True,
+                    is_git_repo=False,
+                    current_branch=None
+                )
+        
+        return status
+
+    # ================================
+    # MÉTODOS PARA FILE DIFF VIEWER
+    # ================================
     
     def get_file_diff(self, project_path: str, repo_name: str, branch_name: str, file_path: str) -> FileDiff:
         """
         Obtiene las diferencias detalladas de un archivo específico entre una rama y master
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content' o 'dimensions'
-            branch_name: Nombre de la rama
-            file_path: Ruta del archivo a comparar
         """
         try:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
+            # Mapeo correcto de repositorios
+            repo_folder_map = {
+                'content': 'outputs-dimensions-content',
+                'dimensions': 'outputs-dimensions'
+            }
+            
+            if repo_name not in repo_folder_map:
+                raise Exception(f"Invalid repository name: {repo_name}")
+            
+            repo_folder = repo_folder_map[repo_name]
+            repo_path = os.path.join(project_path, repo_folder)
             
             if not os.path.exists(repo_path):
-                raise Exception(f"Repository {repo_name} not found")
+                raise Exception(f"Repository {repo_folder} not found")
             
             repo = git.Repo(repo_path)
             
             # Obtener referencias
-            master_ref = repo.heads.master
+            try:
+                master_ref = repo.remotes.origin.refs.master
+            except:
+                master_ref = repo.heads.master
+            
             clean_branch_name = branch_name.replace('origin/', '')
             
             try:
@@ -768,8 +999,6 @@ class GitService:
                     for line in lines:
                         if line.startswith('@@'):
                             # Header de ubicación del chunk
-                            # Extraer números de línea del formato @@ -old_start,old_count +new_start,new_count @@
-                            import re
                             match = re.match(r'@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@', line)
                             if match:
                                 old_line_num = int(match.group(1))
@@ -851,15 +1080,7 @@ class GitService:
             raise Exception(f"Failed to get file diff: {str(e)}")
 
     def get_multiple_file_diffs(self, project_path: str, repo_name: str, branch_name: str, file_paths: List[str]) -> List[FileDiff]:
-        """
-        Obtiene las diferencias de múltiples archivos de forma eficiente
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content' o 'dimensions'
-            branch_name: Nombre de la rama
-            file_paths: Lista de rutas de archivos
-        """
+        """Obtiene las diferencias de múltiples archivos de forma eficiente"""
         results = []
         
         for file_path in file_paths:
@@ -885,17 +1106,15 @@ class GitService:
         return results
 
     def get_file_content_at_commit(self, project_path: str, repo_name: str, commit_sha: str, file_path: str) -> str:
-        """
-        Obtiene el contenido de un archivo en un commit específico
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content' o 'dimensions'
-            commit_sha: SHA del commit
-            file_path: Ruta del archivo
-        """
+        """Obtiene el contenido de un archivo en un commit específico"""
         try:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
+            repo_folder_map = {
+                'content': 'outputs-dimensions-content',
+                'dimensions': 'outputs-dimensions'
+            }
+            
+            repo_folder = repo_folder_map[repo_name]
+            repo_path = os.path.join(project_path, repo_folder)
             repo = git.Repo(repo_path)
             
             commit = repo.commit(commit_sha)
@@ -907,16 +1126,15 @@ class GitService:
             return f"Error reading file: {str(e)}"
 
     def get_branch_file_tree(self, project_path: str, repo_name: str, branch_name: str) -> Dict[str, any]:
-        """
-        Obtiene el árbol de archivos de una rama específica
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content' o 'dimensions'
-            branch_name: Nombre de la rama
-        """
+        """Obtiene el árbol de archivos de una rama específica"""
         try:
-            repo_path = os.path.join(project_path, f"outputs-dimensions-{repo_name}")
+            repo_folder_map = {
+                'content': 'outputs-dimensions-content',
+                'dimensions': 'outputs-dimensions'
+            }
+            
+            repo_folder = repo_folder_map[repo_name]
+            repo_path = os.path.join(project_path, repo_folder)
             repo = git.Repo(repo_path)
             
             clean_branch_name = branch_name.replace('origin/', '')
@@ -966,11 +1184,6 @@ class GitService:
         """
         Obtiene una comparación detallada completa entre una rama y master
         Incluye: resumen, archivos cambiados, y diffs detallados
-        
-        Args:
-            project_path: Ruta del workspace
-            repo_name: 'content' o 'dimensions'
-            branch_name: Nombre de la rama
         """
         try:
             # Obtener comparación básica
@@ -1006,4 +1219,4 @@ class GitService:
             }
             
         except Exception as e:
-            raise Exception(f"Failed to get detailed comparison: {str(e)}")
+            raise Exception(f"Failed to get detailed comparison: {str(e)}")    
