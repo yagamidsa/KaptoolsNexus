@@ -1124,6 +1124,9 @@ async def test_create_structure():
 # ================================
 # MDD DUPLICATE OPERATIONS
 # ================================
+# backend/main.py - ENDPOINT ACTUALIZADO PARA DUPLICACIÓN REAL MDD ÚNICAMENTE
+
+# En main.py, reemplazar el endpoint duplicate_mdd_files:
 
 @app.post("/data/duplicate-mdd")
 async def duplicate_mdd_files(
@@ -1133,9 +1136,14 @@ async def duplicate_mdd_files(
     duplicate_count: int = Form(..., description="Number of times to duplicate"),
     workspace_path: str = Form(..., description="Target workspace directory")
 ):
-    """Endpoint para duplicar archivos MDD/DDF"""
+    """
+    🔥 ENDPOINT CORREGIDO - Duplicación de archivos MDD/DDF con datos REALES
+    
+    CORRECCIÓN PRINCIPAL: Ahora pasa ambos archivos (MDD y DDF) al servicio
+    para obtener el conteo real de registros.
+    """
     logger.info("=" * 50)
-    logger.info("🚀 STARTING MDD DUPLICATION ENDPOINT")
+    logger.info("🚀 STARTING MDD DUPLICATION ENDPOINT - REAL DATA MODE")
     logger.info(f"📁 MDD File: {mdd_file.filename}")
     logger.info(f"📁 DDF File: {ddf_file.filename}")
     logger.info(f"🔢 Duplicate Count: {duplicate_count}")
@@ -1240,29 +1248,6 @@ async def duplicate_mdd_files(
         
         logger.info(f"✅ Workspace valid and writable: {workspace_path}")
         
-        # VALIDACIÓN DE TAMAÑO DE ARCHIVOS
-        try:
-            mdd_content = await mdd_file.read()
-            await mdd_file.seek(0)  # Reset file pointer
-            
-            ddf_content = await ddf_file.read()
-            await ddf_file.seek(0)  # Reset file pointer
-            
-            if len(mdd_content) == 0:
-                raise HTTPException(status_code=400, detail="MDD file is empty")
-            
-            if len(ddf_content) == 0:
-                raise HTTPException(status_code=400, detail="DDF file is empty")
-            
-            logger.info(f"✅ File sizes: MDD={len(mdd_content)} bytes, DDF={len(ddf_content)} bytes")
-            
-        except Exception as e:
-            logger.error(f"❌ Error reading file contents: {str(e)}")
-            raise HTTPException(
-                status_code=400,
-                detail=f"Error reading uploaded files: {str(e)}"
-            )
-        
         # CREAR ARCHIVOS TEMPORALES
         temp_mdd_path = None
         temp_ddf_path = None
@@ -1291,6 +1276,41 @@ async def duplicate_mdd_files(
             
             logger.info("✅ Temporary files created successfully")
             
+            # 🔥 CORRECCIÓN PRINCIPAL: Validar archivos con datos reales ANTES de procesar
+            logger.info("🔍 Validating files with real data reader...")
+            
+            # Crear archivos temporales con nombres correctos para validación
+            temp_dir_for_validation = tempfile.mkdtemp()
+            try:
+                # Copiar con nombres originales para validación
+                validation_mdd_path = os.path.join(temp_dir_for_validation, mdd_file.filename)
+                validation_ddf_path = os.path.join(temp_dir_for_validation, ddf_file.filename)
+
+                shutil.copy2(temp_mdd_path, validation_mdd_path)
+                shutil.copy2(temp_ddf_path, validation_ddf_path)
+
+                # Importar la función de validación actualizada
+                from services.mdd_service import validate_mdd_ddf_files
+
+                # Validar con nombres originales para obtener conteo real
+                validation = validate_mdd_ddf_files(validation_mdd_path, validation_ddf_path)
+
+            finally:
+                # Limpiar directorio temporal de validación
+                shutil.rmtree(temp_dir_for_validation, ignore_errors=True)
+            
+            if not validation['valid']:
+                logger.error(f"❌ File validation failed: {validation['error']}")
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid MDD/DDF files: {validation['error']}"
+                )
+            
+            real_record_count = validation['record_count']
+            logger.info(f"📊 VALIDATED - Real record count: {real_record_count}")
+            logger.info(f"📁 MDD size: {validation['mdd_size']:,} bytes")
+            logger.info(f"📁 DDF size: {validation['ddf_size']:,} bytes")
+            
             # VERIFICAR QUE EL SERVICIO MDD EXISTE
             if not hasattr(mdd_service, 'process_duplicate_mdd'):
                 logger.error("❌ MDD service method not found")
@@ -1299,12 +1319,13 @@ async def duplicate_mdd_files(
                     detail="MDD service process_duplicate_mdd method not available"
                 )
             
-            logger.info("🔄 Calling MDD service...")
+            logger.info("🔄 Calling MDD service with REAL data...")
             
-            # LLAMAR AL SERVICIO MDD
+            # 🔥 CORRECCIÓN CRÍTICA: Llamar al servicio con AMBOS archivos temporales
+            # El servicio corregido usará estos archivos para obtener el conteo real
             result = await mdd_service.process_duplicate_mdd(
                 mdd_file_path=temp_mdd_path,
-                ddf_file_path=temp_ddf_path,
+                ddf_file_path=temp_ddf_path,  # ← CRÍTICO: Pasar el DDF también
                 duplicate_count=duplicate_count,
                 workspace_path=workspace_path,
                 original_mdd_filename=original_mdd_filename
@@ -1317,6 +1338,8 @@ async def duplicate_mdd_files(
             
             if result["success"]:
                 logger.info(f"🎉 SUCCESS: {result.get('output_file', 'Unknown')}")
+                logger.info(f"📊 Original records: {result.get('original_records', 'Unknown')}")
+                logger.info(f"📊 Total records: {result.get('total_records', 'Unknown')}")
                 
                 return {
                     "success": True,
@@ -1328,14 +1351,14 @@ async def duplicate_mdd_files(
                         "base_name": result["base_name"],
                         "workspace": workspace_path,
                         "file_size": result.get("file_size", 0),
-                        "original_records": result.get("original_records", "Unknown"),
-                        "total_records": result.get("total_records", "Unknown"),
+                        "original_records": result.get("original_records", real_record_count),
+                        "total_records": result.get("total_records", real_record_count * duplicate_count),
                         "record_multiplier": result.get("record_multiplier", duplicate_count)
                     },
                     "processing_logs": result["logs"],
                     "dms_output": result.get("dms_output", ""),
                     "details": result.get("details", ""),
-                    "record_summary": f"Original: {result.get('original_records', 'Unknown')} records → Final: {result.get('total_records', 'Unknown')} records (x{duplicate_count} multiplier)"
+                    "record_summary": f"Original: {result.get('original_records', real_record_count)} records → Final: {result.get('total_records', real_record_count * duplicate_count)} records (×{duplicate_count} multiplier)"
                 }
             else:
                 logger.error(f"💥 MDD SERVICE FAILED: {result.get('error', 'Unknown error')}")
@@ -1383,18 +1406,39 @@ async def duplicate_mdd_files(
             detail=f"Top level error: {str(e)}"
         )
 
+
 @app.get("/data/duplicate-mdd/status")
 async def get_mdd_duplication_status():
-    """Endpoint para verificar el estado del servicio de duplicación MDD"""
+    """
+    🔥 ENDPOINT ACTUALIZADO - Estado del servicio de duplicación REAL MDD
+    """
     if not mdd_service:
-        raise HTTPException(status_code=503, detail="MDD service not available")
+        raise HTTPException(
+            status_code=503, 
+            detail={
+                "error": "MDD service not available",
+                "mode": "SERVICE_UNAVAILABLE"
+            }
+        )
 
     try:
         status = mdd_service.get_service_status()
 
         return {
             "success": True,
-            "status": status
+            "status": status,
+            "mode": "REAL_DUPLICATION_ONLY",
+            "capabilities": {
+                "simulation_mode": False,
+                "real_duplication": status.get("dms_available", False),
+                "max_duplicates": status.get("max_duplicates", 600),
+                "requires_dms": True
+            },
+            "service_health": {
+                "operational": status.get("dms_available", False),
+                "dms_required": True,
+                "fallback_available": False
+            }
         }
 
     except Exception as e:
@@ -1404,8 +1448,11 @@ async def get_mdd_duplication_status():
             detail=f"Could not check service status: {str(e)}"
         )
 
+
 def cleanup_temp_files_mdd(mdd_path: str, ddf_path: str):
-    """Función helper para limpiar archivos temporales"""
+    """
+    🧹 FUNCIÓN HELPER ACTUALIZADA - Limpieza de archivos temporales
+    """
     logger.info("🧹 Starting cleanup of temporary files...")
     
     try:
@@ -1427,6 +1474,79 @@ def cleanup_temp_files_mdd(mdd_path: str, ddf_path: str):
         logger.warning(f"🧹 ❌ Could not clean temp DDF {ddf_path}: {str(e)}")
     
     logger.info("🧹 Cleanup completed")
+
+
+# 🔥 ENDPOINTS DE TEST ACTUALIZADOS
+
+@app.get("/test/mdd")
+async def test_mdd_service():
+    """Test MDD service availability - SOLO DUPLICACIÓN REAL"""
+    if not mdd_service:
+        raise HTTPException(status_code=503, detail="MDD service not available")
+        
+    try:
+        status = mdd_service.get_service_status()
+        
+        return {
+            "message": "MDD REAL duplication service test",
+            "service_status": "operational" if status.get("dms_available") else "dms_required",
+            "mode": "REAL_DUPLICATION_ONLY",
+            "dms_available": status["dms_available"],
+            "dms_version": status.get("dms_version"),
+            "max_duplicates": status["max_duplicates"],
+            "simulation_mode": False,
+            "requirements": "DMS (Data Management System) required",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"MDD service test failed: {str(e)}")
+
+
+@app.get("/test/mdd-capabilities")  
+async def test_mdd_capabilities():
+    """Test endpoint para verificar capacidades de duplicación REAL"""
+    
+    if not mdd_service:
+        return {
+            "available": False,
+            "error": "MDD service not configured"
+        }
+    
+    try:
+        status = mdd_service.get_service_status()
+        
+        return {
+            "service_name": status.get("service_name", "MDD Service"),
+            "version": status.get("version", "Unknown"),
+            "available": True,
+            "mode": "REAL_DUPLICATION_ONLY",
+            "capabilities": {
+                "real_duplication": status.get("dms_available", False),
+                "simulation_mode": False,
+                "max_duplicates": status.get("max_duplicates", 600),
+                "requires_dms": True,
+                "timeout_minutes": 45,
+                "supports_zip": True,
+                "record_counting": True,
+                "unique_serials": True
+            },
+            "dms_info": {
+                "available": status.get("dms_available", False),
+                "version": status.get("dms_version"),
+                "required": True,
+                "message": status.get("dms_message", "")
+            },
+            "performance": status.get("performance_specs", {}),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        return {
+            "available": False,
+            "error": f"Service test failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
 
 # ================================
 # PRODUCT OPERATIONS
@@ -1639,7 +1759,556 @@ async def debug_form_data(
     }
 
 
+# ================================
+# ODIN CHUNKS PROCESSOR - BACKEND FINAL SIN ERRORES
+# COPIA TODO ESTO AL FINAL DE main.py
+# ================================
 
+def read_file_with_encoding_simple(file_path):
+    """Lee archivo detectando UTF-16 o UTF-8"""
+    with open(file_path, 'rb') as f:
+        content = f.read()
+    
+    # Detectar UTF-16 por BOM
+    if content.startswith(b'\xff\xfe'):
+        return content.decode('utf-16-le').replace('\ufeff', '')
+    elif content.startswith(b'\xfe\xff'):
+        return content.decode('utf-16-be').replace('\ufeff', '')
+    else:
+        return content.decode('utf-8', errors='ignore')
+
+def find_chunks_simple(template_chunks_path, variable_name):
+    """Encuentra chunks - VERSIÓN SIMPLE"""
+    excluded_folders = {
+        'Banners_Include_Set1', 'Banners_Include_Set2', 'CM_Edits', 'CM_Manipulation', 
+        'CM_Metadata', 'ES_Metadata', 'ES_OnNextCase', 'IA_Lists', 'IA_Metadata', 
+        'IA_OnNextCase', 'LinkDBManipulation', 'LinkDBMetadata', 'TEMP_eVal_CreateSPSS', 
+        'Trim_Edits', 'Trim_Manipulation', 'Trim_Metadata'
+    }
+    
+    existing_chunks = []
+    
+    try:
+        all_folders = [f for f in os.listdir(template_chunks_path) 
+                      if os.path.isdir(os.path.join(template_chunks_path, f)) 
+                      and f not in excluded_folders]
+        
+        logger.info(f"📁 Scanning {len(all_folders)} folders for variable: {variable_name}")
+        
+        for folder in all_folders:
+            folder_path = os.path.join(template_chunks_path, folder)
+            
+            try:
+                all_files = [f for f in os.listdir(folder_path) if f.endswith('.mrs')]
+                
+                for filename in all_files:
+                    file_basename = os.path.splitext(filename)[0]
+                    
+                    if file_basename.lower() == variable_name.lower():
+                        file_path = os.path.join(folder_path, filename)
+                        
+                        try:
+                            # Leer con encoding correcto
+                            real_content = read_file_with_encoding_simple(file_path)
+                            
+                            if real_content.strip():
+                                existing_chunks.append({
+                                    "folder": folder,
+                                    "path": f"outputs-dimensions-content\\Template_Chunks\\{folder}",
+                                    "fileName": file_basename,
+                                    "fileExt": "mrs",
+                                    "content": real_content,
+                                    "file_path": file_path
+                                })
+                                logger.info(f"✅ Found chunk: {folder}/{filename}")
+                                break
+                                
+                        except Exception as e:
+                            logger.error(f"❌ Error reading {file_path}: {str(e)}")
+                            continue
+                            
+            except Exception as e:
+                logger.warning(f"⚠️ Could not scan folder {folder}: {str(e)}")
+                continue
+        
+        return existing_chunks
+        
+    except Exception as e:
+        logger.error(f"💥 Error scanning folders: {str(e)}")
+        return []
+
+def find_next_question_simple(lines, start_index):
+    """Encuentra la siguiente línea *QUESTION"""
+    for i in range(start_index + 1, len(lines)):
+        if lines[i].strip().startswith('*QUESTION'):
+            return i
+    return -1
+
+def generate_structure_simple(existing_chunks, variable_name):
+    """Genera estructura para chunks"""
+    if not existing_chunks:
+        return ""
+    
+    structure = f"**{variable_name}\n** Notes:\n**\t- Data processor..: CHUNKS"
+    
+    for chunk in existing_chunks:
+        structure += "\n**\t                    kap_output_chunk_start"
+        structure += f"\n**\t                    path:{chunk['path']}"
+        structure += f"\n**\t                    fileName:{chunk['fileName']}"
+        structure += f"\n**\t                    fileExt:{chunk['fileExt']}"
+        structure += "\n**\t                    'content:David"
+        
+        # Mantener saltos de línea exactos
+        content_lines = chunk['content'].split('\n')
+        for content_line in content_lines:
+            structure += f"\n**\t                    {content_line}"
+        
+        structure += "\n**\t                    kap_output_chunk_end"
+        structure += "\n**\t                    "
+    
+    return structure
+
+@app.post("/odin-chunks/process-file")
+async def process_odin_simple(
+    odin_file: UploadFile = File(..., description="ODIN file to process"),
+    workspace_path: str = Form(..., description="Workspace path")
+):
+    """Procesa archivo ODIN"""
+    try:
+        logger.info(f"🚀 Processing ODIN file: {odin_file.filename}")
+        
+        if not odin_file.filename or not odin_file.filename.endswith('.odin'):
+            raise HTTPException(status_code=400, detail="File must have .odin extension")
+        
+        if not workspace_path or not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail="Invalid workspace path")
+        
+        # Leer archivo ODIN
+        content_bytes = await odin_file.read()
+        
+        # Detectar encoding
+        if content_bytes.startswith(b'\xff\xfe'):
+            file_content = content_bytes.decode('utf-16-le').replace('\ufeff', '')
+            original_was_utf16 = True
+        elif content_bytes.startswith(b'\xfe\xff'):
+            file_content = content_bytes.decode('utf-16-be').replace('\ufeff', '')
+            original_was_utf16 = True
+        else:
+            file_content = content_bytes.decode('utf-8', errors='ignore')
+            original_was_utf16 = False
+        
+        lines = file_content.split('\n')
+        
+        # Encontrar DIMVAR entries
+        dimvar_entries = []
+        for i, line in enumerate(lines):
+            dimvar_match = re.search(r'DIMVAR=([^;"\s]+)', line)
+            
+            if dimvar_match:
+                variable_name = dimvar_match.group(1)
+                
+                if variable_name.endswith('.slice'):
+                    variable_name = variable_name.replace('.slice', '')
+                
+                dimvar_entries.append({
+                    "line_index": i,
+                    "variable_name": variable_name,
+                    "original_line": line.strip()
+                })
+        
+        logger.info(f"🔍 Found {len(dimvar_entries)} DIMVAR entries")
+        
+        # Verificar Template_Chunks
+        template_chunks_path = os.path.join(workspace_path, "outputs-dimensions-content", "Template_Chunks")
+        
+        if not os.path.exists(template_chunks_path):
+            raise HTTPException(status_code=404, detail="Template_Chunks folder not found")
+        
+        # Procesar variables
+        processed_lines = lines.copy()
+        total_insertions = 0
+        processing_results = []
+        
+        for dimvar in reversed(dimvar_entries):
+            variable_name = dimvar["variable_name"]
+            line_index = dimvar["line_index"]
+            
+            logger.info(f"🔧 Processing variable: {variable_name}")
+            
+            existing_chunks = find_chunks_simple(template_chunks_path, variable_name)
+            
+            if existing_chunks:
+                logger.info(f"✅ Found {len(existing_chunks)} chunks for {variable_name}")
+                
+                next_question_line = find_next_question_simple(processed_lines, line_index)
+                
+                if next_question_line != -1:
+                    chunk_structure = generate_structure_simple(existing_chunks, variable_name)
+                    structure_lines = chunk_structure.split('\n')
+                    processed_lines[next_question_line:next_question_line] = structure_lines
+                    
+                    total_insertions += 1
+                    processing_results.append({
+                        "variable_name": variable_name,
+                        "line_index": line_index,
+                        "chunks_found": len(existing_chunks),
+                        "existing_files": [f"{chunk['folder']}/{chunk['fileName']}.mrs" for chunk in existing_chunks],
+                        "status": "SUCCESS - chunks inserted"
+                    })
+                    
+                    logger.info(f"✅ Inserted chunks for {variable_name}")
+                else:
+                    processing_results.append({
+                        "variable_name": variable_name,
+                        "line_index": line_index,
+                        "chunks_found": len(existing_chunks),
+                        "status": "ERROR - no next QUESTION found"
+                    })
+            else:
+                processing_results.append({
+                    "variable_name": variable_name,
+                    "line_index": line_index,
+                    "chunks_found": 0,
+                    "status": "SKIPPED - no .mrs files found"
+                })
+                logger.warning(f"❌ No files found for {variable_name}")
+        
+        # Reconstruir archivo
+        processed_content = '\n'.join(processed_lines)
+        
+        # Preparar respuesta según encoding original
+        if original_was_utf16:
+            try:
+                # Convertir de vuelta a UTF-16 LE
+                processed_content_bytes = processed_content.encode('utf-16-le')
+                processed_content_utf16 = b'\xff\xfe' + processed_content_bytes
+                processed_content_final = processed_content_utf16.decode('utf-16-le')
+                
+                logger.info("✅ Content converted back to UTF-16 LE format")
+                
+                return {
+                    "success": True,
+                    "message": f"✅ Processed {len(dimvar_entries)} DIMVAR entries, inserted {total_insertions} chunks",
+                    "original_filename": odin_file.filename,
+                    "processed_content": processed_content_final,
+                    "encoding_info": {
+                        "original_encoding": "UTF-16 LE with BOM",
+                        "output_encoding": "UTF-16 LE with BOM",
+                        "note": "File should be saved as UTF-16 LE"
+                    },
+                    "stats": {
+                        "dimvar_count": len(dimvar_entries),
+                        "insertions_made": total_insertions,
+                        "skipped_no_files": len([r for r in processing_results if r["chunks_found"] == 0]),
+                        "original_size": len(content_bytes),
+                        "processed_size": len(processed_content_utf16)
+                    },
+                    "processing_results": processing_results
+                }
+                
+            except Exception as e:
+                logger.warning(f"⚠️ Could not convert back to UTF-16: {str(e)}")
+        
+        # UTF-8 o fallback
+        return {
+            "success": True,
+            "message": f"✅ Processed {len(dimvar_entries)} DIMVAR entries, inserted {total_insertions} chunks",
+            "original_filename": odin_file.filename,
+            "processed_content": processed_content,
+            "encoding_info": {
+                "original_encoding": "UTF-8",
+                "output_encoding": "UTF-8",
+                "note": "File should be saved as UTF-8"
+            },
+            "stats": {
+                "dimvar_count": len(dimvar_entries),
+                "insertions_made": total_insertions,
+                "skipped_no_files": len([r for r in processing_results if r["chunks_found"] == 0]),
+                "original_size": len(content_bytes),
+                "processed_size": len(processed_content)
+            },
+            "processing_results": processing_results
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"💥 Error processing ODIN file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process ODIN file: {str(e)}")
+
+@app.get("/odin-chunks/scan-chunks")
+async def scan_chunks_simple(workspace_path: str, variable_name: str):
+    """Escanea chunks para una variable"""
+    try:
+        if not workspace_path or not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail="Invalid workspace path")
+        
+        template_chunks_path = os.path.join(workspace_path, "outputs-dimensions-content", "Template_Chunks")
+        
+        if not os.path.exists(template_chunks_path):
+            raise HTTPException(status_code=404, detail="Template_Chunks folder not found")
+        
+        chunks = find_chunks_simple(template_chunks_path, variable_name)
+        
+        return {
+            "success": True,
+            "variable_name": variable_name,
+            "chunks": chunks,
+            "total_chunks": len(chunks),
+            "template_chunks_path": template_chunks_path
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"💥 Scan error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Scan failed: {str(e)}")
+
+@app.get("/odin-chunks/debug-variable")
+async def debug_variable_simple(workspace_path: str, variable_name: str):
+    """Debug para una variable específica"""
+    try:
+        template_chunks_path = os.path.join(workspace_path, "outputs-dimensions-content", "Template_Chunks")
+        
+        if not os.path.exists(template_chunks_path):
+            return {"error": "Template_Chunks folder not found"}
+        
+        chunks = find_chunks_simple(template_chunks_path, variable_name)
+        
+        debug_info = {
+            "variable_name": variable_name,
+            "template_chunks_path": template_chunks_path,
+            "chunks_found": len(chunks),
+            "chunks": []
+        }
+        
+        for chunk in chunks:
+            debug_info["chunks"].append({
+                "folder": chunk["folder"],
+                "filename": chunk["fileName"] + ".mrs",
+                "file_path": chunk["file_path"],
+                "content_preview": chunk["content"][:100] + "..." if len(chunk["content"]) > 100 else chunk["content"]
+            })
+        
+        return debug_info
+        
+    except Exception as e:
+        return {"error": f"Debug failed: {str(e)}"}
+
+@app.get("/odin-chunks/test")
+async def test_odin_simple():
+    """Test endpoint"""
+    return {
+        "service": "ODIN Chunks Processor",
+        "version": "FINAL-1.0",
+        "status": "operational",
+        "encoding": "UTF-16/UTF-8 detection",
+        "endpoints": [
+            "/odin-chunks/process-file",
+            "/odin-chunks/scan-chunks",
+            "/odin-chunks/debug-variable",
+            "/odin-chunks/test"
+        ],
+        "timestamp": datetime.now().isoformat()
+    }
+
+# ================================
+# FIN - BACKEND FINAL COMPLETO
+# ================================
+
+
+@app.get("/test/mdd-service-version")
+async def test_mdd_service_version():
+    """Test para verificar qué versión del servicio se está usando"""
+    try:
+        if not mdd_service:
+            return {"error": "MDD service not available"}
+        
+        # Verificar si tiene el método nuevo
+        has_real_reader = hasattr(mdd_service, '_count_records_in_mdd')
+        
+        # Verificar si la función validate está disponible
+        has_validate_function = False
+        try:
+            from services.mdd_service import validate_mdd_ddf_files
+            has_validate_function = True
+        except ImportError:
+            has_validate_function = False
+        
+        # Verificar versión del servicio
+        status = mdd_service.get_service_status()
+        
+        return {
+            "service_loaded": True,
+            "has_real_reader": has_real_reader,
+            "has_validate_function": has_validate_function,
+            "service_status": status,
+            "version": status.get("version", "unknown"),
+            "mode": status.get("mode", "unknown"),
+            "original_mdd_reader_available": hasattr(mdd_service, '_count_records_in_mdd'),
+            "mdd_record_reader_class_available": 'MDDRecordReader' in str(type(mdd_service)),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        return {
+            "error": f"Service test failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
+
+@app.get("/debug/mdd-reader-test")
+async def debug_mdd_reader_test():
+    """Debug específico para el MDDRecordReader"""
+    try:
+        # Verificar qué versión del servicio está activa
+        from services.mdd_service import MDDRecordReader, validate_mdd_ddf_files
+        
+        debug_info = {
+            "mdd_service_available": mdd_service is not None,
+            "mdd_record_reader_available": True,
+            "validate_function_available": True,
+            "service_status": None,
+            "reader_test": None
+        }
+        
+        if mdd_service:
+            debug_info["service_status"] = mdd_service.get_service_status()
+        
+        # Test con archivos temporales vacíos para ver qué pasa
+        with tempfile.NamedTemporaryFile(suffix='.mdd', delete=False) as temp_mdd:
+            temp_mdd.write(b"fake mdd content with 5 records")
+            temp_mdd_path = temp_mdd.name
+        
+        with tempfile.NamedTemporaryFile(suffix='.ddf', delete=False) as temp_ddf:
+            temp_ddf.write(b"fake ddf content")
+            temp_ddf_path = temp_ddf.name
+        
+        try:
+            reader = MDDRecordReader()
+            
+            # Test individual de métodos
+            debug_info["reader_test"] = {
+                "ddf_read_attempt": None,
+                "mdd_parse_attempt": None,
+                "adodb_attempt": None,
+                "final_count": None,
+                "error": None
+            }
+            
+            try:
+                ddf_count = reader._read_ddf_record_count(temp_ddf_path)
+                debug_info["reader_test"]["ddf_read_attempt"] = ddf_count
+            except Exception as e:
+                debug_info["reader_test"]["ddf_read_attempt"] = f"Error: {str(e)}"
+            
+            try:
+                mdd_count = reader._parse_mdd_metadata(temp_mdd_path)
+                debug_info["reader_test"]["mdd_parse_attempt"] = mdd_count
+            except Exception as e:
+                debug_info["reader_test"]["mdd_parse_attempt"] = f"Error: {str(e)}"
+            
+            try:
+                adodb_count = reader._count_via_adodb(temp_mdd_path, temp_ddf_path)
+                debug_info["reader_test"]["adodb_attempt"] = adodb_count
+            except Exception as e:
+                debug_info["reader_test"]["adodb_attempt"] = f"Error: {str(e)}"
+            
+            try:
+                final_count = reader.get_real_record_count(temp_mdd_path, temp_ddf_path)
+                debug_info["reader_test"]["final_count"] = final_count
+            except Exception as e:
+                debug_info["reader_test"]["error"] = str(e)
+            
+        finally:
+            # Limpiar archivos temporales
+            os.unlink(temp_mdd_path)
+            os.unlink(temp_ddf_path)
+        
+        return debug_info
+        
+    except Exception as e:
+        return {
+            "error": f"Debug test failed: {str(e)}",
+            "traceback": str(e)
+        }
+
+
+@app.get("/debug/mdd-file-path-trace")
+async def debug_mdd_file_path_trace():
+    """Debuggear exactamente qué archivos está leyendo el sistema"""
+    import tempfile
+    import shutil
+    
+    # Crear archivo de prueba con exactamente 5 registros
+    with tempfile.NamedTemporaryFile(suffix='.mdd', delete=False) as temp_mdd:
+        mdd_content = b"""<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+<datasources>
+<connection>
+<filename>test.ddf</filename>
+<recordcount>5</recordcount>
+</connection>
+</datasources>
+</metadata>"""
+        temp_mdd.write(mdd_content)
+        temp_mdd_path = temp_mdd.name
+    
+    with tempfile.NamedTemporaryFile(suffix='.ddf', delete=False) as temp_ddf:
+        # Exactamente 5 líneas de datos
+        ddf_content = b"record1_data_here____\nrecord2_data_here____\nrecord3_data_here____\nrecord4_data_here____\nrecord5_data_here____\n"
+        temp_ddf.write(ddf_content)
+        temp_ddf_path = temp_ddf.name
+    
+    try:
+        from services.mdd_service import MDDRecordReader
+        
+        reader = MDDRecordReader()
+        
+        # Test cada método individual
+        debug_result = {
+            "file_paths": {
+                "mdd_path": temp_mdd_path,
+                "ddf_path": temp_ddf_path,
+                "mdd_size": os.path.getsize(temp_mdd_path),
+                "ddf_size": os.path.getsize(temp_ddf_path)
+            },
+            "method_results": {}
+        }
+        
+        # Test método 1: DDF
+        try:
+            ddf_result = reader._read_ddf_record_count(temp_ddf_path)
+            debug_result["method_results"]["ddf_method"] = ddf_result
+        except Exception as e:
+            debug_result["method_results"]["ddf_method"] = f"ERROR: {str(e)}"
+        
+        # Test método 2: MDD metadata
+        try:
+            mdd_result = reader._parse_mdd_metadata(temp_mdd_path)
+            debug_result["method_results"]["mdd_method"] = mdd_result
+        except Exception as e:
+            debug_result["method_results"]["mdd_method"] = f"ERROR: {str(e)}"
+        
+        # Test método 3: ADODB
+        try:
+            adodb_result = reader._count_via_adodb(temp_mdd_path, temp_ddf_path)
+            debug_result["method_results"]["adodb_method"] = adodb_result
+        except Exception as e:
+            debug_result["method_results"]["adodb_method"] = f"ERROR: {str(e)}"
+        
+        # Test método final
+        try:
+            final_result = reader.get_real_record_count(temp_mdd_path, temp_ddf_path)
+            debug_result["method_results"]["final_result"] = final_result
+        except Exception as e:
+            debug_result["method_results"]["final_result"] = f"ERROR: {str(e)}"
+        
+        return debug_result
+        
+    finally:
+        # Limpiar
+        os.unlink(temp_mdd_path)
+        os.unlink(temp_ddf_path)
 
 if __name__ == "__main__":
     print("🚀 Starting KapTools Nexus API...")
