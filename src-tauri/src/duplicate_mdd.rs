@@ -261,9 +261,6 @@ impl MddFileInfo {
         let metadata = std::fs::metadata(mdd_path)?;
         let file_size = metadata.len();
         
-        // Estimación básica: asumir ~200 bytes por record promedio
-        // Esto debería refinarse según el formato real del archivo
-        let estimated_record_size = 200;
         let estimated_records = (file_size / estimated_record_size) as u32;
         
         Ok(estimated_records.max(1))

@@ -28,13 +28,13 @@ try:
     from services.product_service import ProductService
     from services.git_service import GitService
     from services.azure_service import AzureService
-    from services.mdd_service import MDDService
+    from mdd_real_service import mdd_real_service
     
     # Inicializar servicios
     product_service = ProductService()
     git_service = GitService()
     azure_service = AzureService()
-    mdd_service = MDDService()
+    mdd_service = mdd_real_service
     
     SERVICES_AVAILABLE = True
     print("✅ All services imported successfully")
@@ -1290,7 +1290,7 @@ async def duplicate_mdd_files(
                 shutil.copy2(temp_ddf_path, validation_ddf_path)
 
                 # Importar la función de validación actualizada
-                from services.mdd_service import validate_mdd_ddf_files
+                from mdd_real_service import validate_mdd_ddf_files
 
                 # Validar con nombres originales para obtener conteo real
                 validation = validate_mdd_ddf_files(validation_mdd_path, validation_ddf_path)
@@ -1312,7 +1312,7 @@ async def duplicate_mdd_files(
             logger.info(f"📁 DDF size: {validation['ddf_size']:,} bytes")
             
             # VERIFICAR QUE EL SERVICIO MDD EXISTE
-            if not hasattr(mdd_service, 'process_duplicate_mdd'):
+            if not hasattr(mdd_service, 'process_duplicate_mdd_real'):
                 logger.error("❌ MDD service method not found")
                 raise HTTPException(
                     status_code=503,
@@ -1323,7 +1323,7 @@ async def duplicate_mdd_files(
             
             # 🔥 CORRECCIÓN CRÍTICA: Llamar al servicio con AMBOS archivos temporales
             # El servicio corregido usará estos archivos para obtener el conteo real
-            result = await mdd_service.process_duplicate_mdd(
+            result = await mdd_service.process_duplicate_mdd_real(
                 mdd_file_path=temp_mdd_path,
                 ddf_file_path=temp_ddf_path,  # ← CRÍTICO: Pasar el DDF también
                 duplicate_count=duplicate_count,

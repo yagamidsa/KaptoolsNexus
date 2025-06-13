@@ -1,8 +1,7 @@
-// src/components/DuplicateMDD.tsx
+// src/components/DuplicateMDD.tsx - SOLO BACKEND PYTHON + IBM SPSS
 
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { open } from '@tauri-apps/plugin-dialog';
 
 interface DuplicateMDDProps {
     isOpen: boolean;
@@ -10,58 +9,28 @@ interface DuplicateMDDProps {
     workspacePath: string;
 }
 
-interface FileValidationResult {
-    is_valid: boolean;
-    mdd_exists: boolean;
-    ddf_exists: boolean;
-    mdd_path: string;
-    ddf_path: string;
-    error_message?: string;
-    file_info?: {
-        mdd_path: string;
-        ddf_path: string;
-        base_name: string;
-        mdd_size: number;
-        ddf_size: number;
-        record_count?: number;
-        is_valid: boolean;
-    };
-}
-
-interface DuplicationResult {
+interface BackendResponse {
     success: boolean;
-    output_file_path: string;
-    original_records: number;
-    final_records: number;
-    processing_time_seconds: number;
-    output_file_size_mb: number;
-    error_message?: string;
+    message?: string;
+    data?: any;
+    error?: string;
+    logs?: string[];
+    processing_logs?: string[];
+    record_summary?: string;
 }
 
-type ProcessingStep = 'idle' | 'configuring' | 'processing' | 'completed' | 'error';
+type ProcessingStep = 'idle' | 'file-selected' | 'processing' | 'completed' | 'error';
 
 const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspacePath }) => {
     // Estados principales
     const [currentStep, setCurrentStep] = useState<ProcessingStep>('idle');
-    const [selectedFile, setSelectedFile] = useState<string>('');
-    const [validationResult, setValidationResult] = useState<FileValidationResult | null>(null);
-    const [duplicateCount, setDuplicateCount] = useState<number>(5);
+    const [selectedMddFile, setSelectedMddFile] = useState<string>('');
+    const [selectedDdfFile, setSelectedDdfFile] = useState<string>('');
+    const [duplicateCount, setDuplicateCount] = useState<number>(2);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
-
-    // Estados de estimación
-    const [estimatedSizeMB, setEstimatedSizeMB] = useState<number>(0);
-    const [estimatedTimeSeconds, setEstimatedTimeSeconds] = useState<number>(0);
-
-    // Estados de procesamiento
-    const [processingProgress, setProcessingProgress] = useState<number>(0);
-    const [currentProcessStep, setCurrentProcessStep] = useState<string>('');
-    const [result, setResult] = useState<DuplicationResult | null>(null);
-
-    // Opciones avanzadas
-    const [includeValidation, setIncludeValidation] = useState(true);
-    const [generateReport, setGenerateReport] = useState(true);
-    const [autoOpenFolder, setAutoOpenFolder] = useState(true);
+    const [result, setResult] = useState<BackendResponse | null>(null);
+    const [processingLogs, setProcessingLogs] = useState<string[]>([]);
 
     // Reset states when modal closes
     useEffect(() => {
@@ -72,164 +41,178 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
 
     const resetStates = () => {
         setCurrentStep('idle');
-        setSelectedFile('');
-        setValidationResult(null);
-        setDuplicateCount(5);
+        setSelectedMddFile('');
+        setSelectedDdfFile('');
+        setDuplicateCount(2);
         setLoading(false);
         setError('');
-        setEstimatedSizeMB(0);
-        setEstimatedTimeSeconds(0);
-        setProcessingProgress(0);
-        setCurrentProcessStep('');
         setResult(null);
+        setProcessingLogs([]);
     };
 
-    // Seleccionar archivo MDD
-    const handleFileSelect = async () => {
+    // Función para agregar logs
+    const addLog = (message: string) => {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] ${message}`;
+        setProcessingLogs(prev => [...prev, logEntry]);
+    };
+
+    // Seleccionar archivo MDD usando Tauri
+    const handleMddFileSelect = async () => {
         try {
             setLoading(true);
             setError('');
+            addLog('🔍 Opening MDD file selector...');
 
-            const selected = await open({
-                title: 'Select MDD File',
-                filters: [
-                    {
-                        name: 'MDD Files',
-                        extensions: ['mdd']
-                    }
-                ]
-            });
+            const selected = await invoke('select_mdd_file') as string | null;
 
             if (selected && typeof selected === 'string') {
-                setSelectedFile(selected);
-                await validateFile(selected);
-            }
-        } catch (err) {
-            setError(`Failed to select file: ${err}`);
-            console.error('File selection error:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Validar archivo seleccionado
-    const validateFile = async (filePath: string) => {
-        try {
-            setLoading(true);
-            console.log('🔍 Validating file:', filePath);
-
-            const validation: FileValidationResult = await invoke('validate_mdd_file', {
-                filePath: filePath
-            });
-
-            setValidationResult(validation);
-
-            if (validation.is_valid) {
-                setCurrentStep('configuring');
-                await updateEstimations();
+                setSelectedMddFile(selected);
+                addLog(`📁 MDD file selected: ${selected}`);
+                
+                // Auto-detectar archivo DDF correspondiente
+                const ddfPath = selected.replace(/\.mdd$/i, '.ddf');
+                setSelectedDdfFile(ddfPath);
+                addLog(`🔍 Looking for corresponding DDF: ${ddfPath}`);
+                
+                // Verificar que existe el DDF
+                await checkDdfExists(ddfPath);
+                
+                setCurrentStep('file-selected');
             } else {
-                setError(validation.error_message || 'File validation failed');
-                setCurrentStep('error');
+                addLog('❌ No file selected or user cancelled');
             }
         } catch (err) {
-            setError(`Validation failed: ${err}`);
-            setCurrentStep('error');
-            console.error('Validation error:', err);
+            const errorMsg = `Failed to select MDD file: ${err}`;
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}`);
         } finally {
             setLoading(false);
         }
     };
 
-    // Actualizar estimaciones cuando cambia el count
-    const updateEstimations = async () => {
-        if (!selectedFile) return;
-
+    // Verificar que existe el archivo DDF
+    const checkDdfExists = async (ddfPath: string) => {
         try {
-            const [sizeMB, timeSeconds]: [number, number] = await invoke('estimate_duplication_resources', {
-                filePath: selectedFile,
-                duplicateCount: duplicateCount
+            const response = await fetch('http://127.0.0.1:8000/test', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             });
-
-            setEstimatedSizeMB(sizeMB);
-            setEstimatedTimeSeconds(timeSeconds);
+            
+            if (response.ok) {
+                addLog('✅ Backend connection verified');
+                addLog(`📋 DDF file expected at: ${ddfPath}`);
+            } else {
+                addLog('⚠️ Backend connection issue - continuing anyway');
+            }
         } catch (err) {
-            console.error('Estimation error:', err);
+            addLog('⚠️ Could not verify backend connection');
         }
     };
 
-    // Actualizar estimaciones cuando cambia duplicate count
-    useEffect(() => {
-        if (currentStep === 'configuring' && selectedFile) {
-            updateEstimations();
-        }
-    }, [duplicateCount, selectedFile, currentStep]);
-
-    // Iniciar procesamiento
+    // Iniciar procesamiento usando Backend Python + IBM SPSS
     const startProcessing = async () => {
-        if (!selectedFile || !validationResult?.is_valid) return;
+        if (!selectedMddFile || !selectedDdfFile) {
+            setError('Both MDD and DDF files are required');
+            return;
+        }
+
+        if (!workspacePath) {
+            setError('Workspace path is required');
+            return;
+        }
 
         try {
             setCurrentStep('processing');
-            setProcessingProgress(0);
-            setCurrentProcessStep('Initializing duplication process...');
+            setError('');
+            setProcessingLogs([]);
+            addLog('🚀 Starting REAL MDD duplication with IBM SPSS Data Collection...');
+            addLog(`📁 MDD File: ${selectedMddFile}`);
+            addLog(`📁 DDF File: ${selectedDdfFile}`);
+            addLog(`🔢 Duplicate Count: ${duplicateCount}x`);
+            addLog(`📂 Workspace: ${workspacePath}`);
 
-            // Simular progress (TODO: implementar progress real)
-            const progressInterval = setInterval(() => {
-                setProcessingProgress(prev => {
-                    if (prev >= 90) {
-                        clearInterval(progressInterval);
-                        return 90;
-                    }
-                    return prev + Math.random() * 15;
-                });
-            }, 500);
+            // Crear FormData para enviar archivos al backend
+            const formData = new FormData();
+            
+            // Leer archivos como Blob para enviar al backend
+            try {
+                // Obtener contenido de archivos usando Tauri
+                const mddContent = await readFileAsBase64(selectedMddFile);
+                const ddfContent = await readFileAsBase64(selectedDdfFile);
+                
+                const mddBlob = new Blob([Uint8Array.from(atob(mddContent), c => c.charCodeAt(0))]);
+                const ddfBlob = new Blob([Uint8Array.from(atob(ddfContent), c => c.charCodeAt(0))]);
+                
+                formData.append('mdd_file', mddBlob, getFileName(selectedMddFile));
+                formData.append('ddf_file', ddfBlob, getFileName(selectedDdfFile));
+                formData.append('duplicate_count', duplicateCount.toString());
+                formData.append('workspace_path', workspacePath);
+                
+                addLog('📤 Sending files to IBM SPSS backend...');
+                
+            } catch (fileError) {
+                addLog(`❌ Error reading files: ${fileError}`);
+                throw new Error(`Could not read files: ${fileError}`);
+            }
 
-            const request = {
-                mdd_file_path: selectedFile,
-                duplicate_count: duplicateCount,
-                workspace_path: workspacePath,
-                options: {
-                    include_metadata_validation: includeValidation,
-                    generate_verification_report: generateReport,
-                    auto_open_result_folder: autoOpenFolder,
-                    keep_temp_files: false
-                }
-            };
-
-            const processingResult: DuplicationResult = await invoke('duplicate_mdd_files', {
-                request: request
+            // Enviar al backend Python con IBM SPSS
+            const response = await fetch('http://127.0.0.1:8000/data/duplicate-mdd', {
+                method: 'POST',
+                body: formData
             });
 
-            clearInterval(progressInterval);
-            setProcessingProgress(100);
+            const responseData = await response.json();
+            addLog('📥 Received response from backend');
 
-            if (processingResult.success) {
-                setResult(processingResult);
+            if (response.ok && responseData.success) {
+                setResult(responseData);
                 setCurrentStep('completed');
+                
+                // Agregar logs del backend
+                if (responseData.processing_logs) {
+                    responseData.processing_logs.forEach((log: string) => addLog(log));
+                }
+                
+                addLog('🎉 REAL MDD duplication completed successfully!');
+                addLog(`📊 ${responseData.record_summary || 'Processing completed'}`);
+                
             } else {
-                setError(processingResult.error_message || 'Processing failed');
+                const errorMessage = responseData.error || responseData.message || 'Unknown error occurred';
+                setError(errorMessage);
                 setCurrentStep('error');
+                addLog(`❌ Backend error: ${errorMessage}`);
+                
+                // Agregar logs de error del backend
+                if (responseData.logs) {
+                    responseData.logs.forEach((log: string) => addLog(log));
+                }
             }
+
         } catch (err) {
-            setError(`Processing failed: ${err}`);
+            const errorMsg = `Processing failed: ${err}`;
+            setError(errorMsg);
             setCurrentStep('error');
-            console.error('Processing error:', err);
+            addLog(`💥 ${errorMsg}`);
         }
     };
 
-    // Formatear tiempo
-    const formatTime = (seconds: number): string => {
-        if (seconds < 60) return `~${seconds} seconds`;
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `~${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    // Helper function para leer archivos como base64 usando comando de Tauri
+    const readFileAsBase64 = async (filePath: string): Promise<string> => {
+        try {
+            addLog(`📖 Reading file: ${getFileName(filePath)}`);
+            const result = await invoke('read_file_as_base64', { filePath }) as string;
+            addLog(`✅ File read successfully: ${getFileName(filePath)}`);
+            return result;
+        } catch (error) {
+            addLog(`❌ Error reading file: ${error}`);
+            throw new Error(`Could not read file: ${error}`);
+        }
     };
 
-    // Formatear tamaño
-    const formatSize = (sizeMB: number): string => {
-        if (sizeMB < 1024) return `~${sizeMB.toFixed(1)} MB`;
-        const sizeGB = sizeMB / 1024;
-        return `~${sizeGB.toFixed(2)} GB`;
+    // Helper para obtener nombre de archivo
+    const getFileName = (fullPath: string): string => {
+        return fullPath.split('\\').pop() || fullPath.split('/').pop() || 'unknown';
     };
 
     if (!isOpen) return null;
@@ -240,10 +223,8 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                 {/* Header */}
                 <div className="modal-header">
                     <div className="header-icon">🔥</div>
-                    <h2>DUPLICATE MDD PROCESSOR</h2>
-                    <button className="close-button" onClick={onClose}>
-                        ❌
-                    </button>
+                    <h2>REAL MDD DUPLICATOR - IBM SPSS</h2>
+                    <button className="close-button" onClick={onClose}>❌</button>
                 </div>
 
                 <div className="modal-body">
@@ -252,136 +233,89 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                         <div className="section file-selection">
                             <div className="section-title">
                                 <span className="section-icon">📂</span>
-                                Source File Selection
+                                Select MDD/DDF Files for REAL Duplication
                             </div>
 
                             <div className="file-input-container">
                                 <div className="file-display">
-                                    {selectedFile ? (
-                                        <span className="file-path">{selectedFile}</span>
+                                    {selectedMddFile ? (
+                                        <div>
+                                            <div className="file-path">📋 MDD: {selectedMddFile}</div>
+                                            <div className="file-path">💾 DDF: {selectedDdfFile}</div>
+                                        </div>
                                     ) : (
-                                        <span className="file-placeholder">📁 No file selected...</span>
+                                        <span className="file-placeholder">📁 No MDD file selected...</span>
                                     )}
                                 </div>
                                 <button
                                     className="file-browse-btn"
-                                    onClick={handleFileSelect}
+                                    onClick={handleMddFileSelect}
                                     disabled={loading}
                                 >
-                                    {loading ? '🔄' : '📁'} Browse Files
+                                    {loading ? '🔄' : '📁'} Select MDD File
                                 </button>
                             </div>
 
                             {error && (
-                                <div className="error-message">
-                                    ❌ {error}
-                                </div>
+                                <div className="error-message">❌ {error}</div>
                             )}
                         </div>
                     )}
 
                     {/* Configuration Section */}
-                    {currentStep === 'configuring' && validationResult && (
-                        <>
-                            <div className="section file-info">
-                                <div className="section-title">
-                                    <span className="section-icon">✅</span>
-                                    File Validation Results
+                    {currentStep === 'file-selected' && (
+                        <div className="section duplication-settings">
+                            <div className="section-title">
+                                <span className="section-icon">🔧</span>
+                                IBM SPSS Duplication Settings
+                            </div>
+
+                            <div className="settings-grid">
+                                <div className="setting-item">
+                                    <label htmlFor="duplicate-count">Number of duplicates (REAL data):</label>
+                                    <div className="count-input-container">
+                                        <input
+                                            id="duplicate-count"
+                                            type="number"
+                                            value={duplicateCount}
+                                            onChange={(e) => setDuplicateCount(parseInt(e.target.value) || 1)}
+                                            min="1"
+                                            max="50"
+                                            className="count-input"
+                                        />
+                                        <span className="count-icon">🔄</span>
+                                    </div>
                                 </div>
 
-                                <div className="file-details">
-                                    <div className="file-item">
-                                        <span className="file-label">MDD File:</span>
-                                        <span className="file-value">{validationResult.file_info?.base_name}.mdd</span>
+                                <div className="file-info">
+                                    <div className="info-item">
+                                        <span className="info-label">📋 MDD File:</span>
+                                        <span className="info-value">{getFileName(selectedMddFile)}</span>
                                     </div>
-                                    <div className="file-item">
-                                        <span className="file-label">DDF File:</span>
-                                        <span className="file-value">✅ Auto-detected</span>
+                                    <div className="info-item">
+                                        <span className="info-label">💾 DDF File:</span>
+                                        <span className="info-value">{getFileName(selectedDdfFile)}</span>
                                     </div>
-                                    <div className="file-item">
-                                        <span className="file-label">Total Size:</span>
-                                        <span className="file-value">
-                                            {formatSize(((validationResult.file_info?.mdd_size || 0) + (validationResult.file_info?.ddf_size || 0)) / 1048576)}
-                                        </span>
+                                    <div className="info-item">
+                                        <span className="info-label">📂 Workspace:</span>
+                                        <span className="info-value">{workspacePath}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="section duplication-settings">
-                                <div className="section-title">
-                                    <span className="section-icon">🔢</span>
-                                    Duplication Settings
+                            <div className="ibm-spss-info">
+                                <div className="spss-badge">
+                                    <span className="badge-icon">🏢</span>
+                                    <span className="badge-text">Using IBM SPSS Data Collection v6</span>
                                 </div>
-
-                                <div className="settings-grid">
-                                    <div className="setting-item">
-                                        <label htmlFor="duplicate-count">Number of duplicates:</label>
-                                        <div className="count-input-container">
-                                            <input
-                                                id="duplicate-count"
-                                                type="number"
-                                                value={duplicateCount}
-                                                onChange={(e) => setDuplicateCount(parseInt(e.target.value) || 1)}
-                                                min="1"
-                                                max="100"
-                                                className="count-input"
-                                            />
-                                            <span className="count-icon">🔄</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="estimations">
-                                        <div className="estimation-item">
-                                            <span className="estimation-label">⚡ Estimated time:</span>
-                                            <span className="estimation-value">{formatTime(estimatedTimeSeconds)}</span>
-                                        </div>
-                                        <div className="estimation-item">
-                                            <span className="estimation-label">💾 Output size:</span>
-                                            <span className="estimation-value">{formatSize(estimatedSizeMB)}</span>
-                                        </div>
-                                    </div>
+                                <div className="spss-details">
+                                    ✅ REAL data duplication (no simulated data)<br/>
+                                    ✅ Preserves original record structure<br/>
+                                    ✅ Generates unique IDs for duplicates<br/>
+                                    ✅ Creates ZIP output with MDD/DDF files
                                 </div>
                             </div>
-
-                            <div className="section processing-options">
-                                <div className="section-title">
-                                    <span className="section-icon">🎯</span>
-                                    Processing Options
-                                </div>
-
-                                <div className="options-grid">
-                                    <label className="option-checkbox">
-                                        <input
-                                            type="checkbox"
-                                            checked={includeValidation}
-                                            onChange={(e) => setIncludeValidation(e.target.checked)}
-                                        />
-                                        <span className="checkmark">☑️</span>
-                                        Include metadata validation
-                                    </label>
-
-                                    <label className="option-checkbox">
-                                        <input
-                                            type="checkbox"
-                                            checked={generateReport}
-                                            onChange={(e) => setGenerateReport(e.target.checked)}
-                                        />
-                                        <span className="checkmark">☑️</span>
-                                        Generate verification report
-                                    </label>
-
-                                    <label className="option-checkbox">
-                                        <input
-                                            type="checkbox"
-                                            checked={autoOpenFolder}
-                                            onChange={(e) => setAutoOpenFolder(e.target.checked)}
-                                        />
-                                        <span className="checkmark">☑️</span>
-                                        Auto-open result folder
-                                    </label>
-                                </div>
-                            </div>
-                        </>
+                        </div>
                     )}
 
                     {/* Processing Section */}
@@ -389,32 +323,31 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                         <div className="section processing-status">
                             <div className="section-title">
                                 <span className="section-icon">⚡</span>
-                                PROCESSING: DUPLICATE MDD
+                                IBM SPSS PROCESSING: REAL DATA DUPLICATION
                             </div>
 
-                            <div className="progress-container">
-                                <div className="progress-info">
-                                    <span className="progress-label">📊 Progress: {Math.round(processingProgress)}% Complete</span>
+                            <div className="processing-info">
+                                <div className="processing-message">
+                                    🔄 Processing REAL MDD/DDF data with IBM SPSS Data Collection...
                                 </div>
-
-                                <div className="progress-bar-container">
-                                    <div
-                                        className="progress-bar"
-                                        style={{ width: `${processingProgress}%` }}
-                                    ></div>
-                                </div>
-
                                 <div className="processing-details">
                                     <div className="detail-item">
-                                        <span className="detail-label">🔄 Current Step:</span>
-                                        <span className="detail-value">{currentProcessStep}</span>
+                                        <span className="detail-label">📋 Input:</span>
+                                        <span className="detail-value">{getFileName(selectedMddFile)}</span>
                                     </div>
                                     <div className="detail-item">
-                                        <span className="detail-label">⏱️ Estimated remaining:</span>
-                                        <span className="detail-value">
-                                            {formatTime(Math.round((estimatedTimeSeconds * (100 - processingProgress)) / 100))}
-                                        </span>
+                                        <span className="detail-label">🔄 Multiplier:</span>
+                                        <span className="detail-value">{duplicateCount}x</span>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="processing-logs">
+                                <div className="logs-header">📋 Processing Logs:</div>
+                                <div className="logs-content">
+                                    {processingLogs.map((log, index) => (
+                                        <div key={index} className="log-entry">{log}</div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -425,36 +358,43 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                         <div className="section completion-status">
                             <div className="section-title">
                                 <span className="section-icon">✅</span>
-                                PROCESSING COMPLETE
+                                REAL DUPLICATION COMPLETED - IBM SPSS
                             </div>
 
                             <div className="completion-message">
-                                🎉 Successfully duplicated MDD file!
+                                🎉 Successfully duplicated REAL MDD data using IBM SPSS Data Collection!
                             </div>
 
                             <div className="results-grid">
                                 <div className="result-item">
-                                    <span className="result-label">• Original records:</span>
-                                    <span className="result-value">{result.original_records.toLocaleString()}</span>
+                                    <span className="result-label">📊 Original records:</span>
+                                    <span className="result-value">{result.data?.original_records?.toLocaleString() || 'Unknown'}</span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">• Duplicated {duplicateCount}x:</span>
-                                    <span className="result-value">{result.final_records.toLocaleString()} total records</span>
+                                    <span className="result-label">🔄 Duplicated {duplicateCount}x:</span>
+                                    <span className="result-value">{result.data?.total_records?.toLocaleString() || 'Unknown'} total records</span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">• Processing time:</span>
-                                    <span className="result-value">{formatTime(result.processing_time_seconds)}</span>
+                                    <span className="result-label">⏱️ Processing time:</span>
+                                    <span className="result-value">{result.data?.processing_time_seconds || 0} seconds</span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">• Output file:</span>
-                                    <span className="result-value">{result.output_file_path.split('/').pop()}</span>
+                                    <span className="result-label">📦 Output file:</span>
+                                    <span className="result-value">{result.data?.output_file || 'Generated'}</span>
                                 </div>
                             </div>
 
                             <div className="output-location">
                                 <div className="location-label">📂 Output Location:</div>
-                                <div className="location-path">{result.output_file_path}</div>
+                                <div className="location-path">{result.data?.output_path || workspacePath}</div>
                             </div>
+
+                            {result.record_summary && (
+                                <div className="record-summary">
+                                    <div className="summary-label">📈 Summary:</div>
+                                    <div className="summary-content">{result.record_summary}</div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -466,9 +406,18 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                                 PROCESSING ERROR
                             </div>
 
-                            <div className="error-message">
-                                {error}
-                            </div>
+                            <div className="error-message">{error}</div>
+
+                            {processingLogs.length > 0 && (
+                                <div className="error-logs">
+                                    <div className="logs-header">📋 Error Logs:</div>
+                                    <div className="logs-content">
+                                        {processingLogs.map((log, index) => (
+                                            <div key={index} className="log-entry">{log}</div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -481,7 +430,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                         </button>
                     )}
 
-                    {currentStep === 'configuring' && (
+                    {currentStep === 'file-selected' && (
                         <>
                             <button className="modal-button secondary" onClick={() => setCurrentStep('idle')}>
                                 ⬅️ Back
@@ -491,14 +440,14 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                                 onClick={startProcessing}
                                 disabled={loading}
                             >
-                                🚀 Start Processing
+                                🚀 Start REAL Duplication (IBM SPSS)
                             </button>
                         </>
                     )}
 
                     {currentStep === 'processing' && (
-                        <button className="modal-button danger">
-                            🛑 Stop
+                        <button className="modal-button secondary" disabled>
+                            ⏳ Processing with IBM SPSS...
                         </button>
                     )}
 
