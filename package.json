@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "build-backend": "cd backend && python -m PyInstaller main.py --onefile --console --name=kaptools-backend --distpath=../src-tauri/binaries --noconfirm --clean",
+    "build-app": "npm run build && npm run build-backend && tauri build",
+    "build-debug": "npm run build && npm run build-backend && tauri build --debug",
+    "dev-tauri": "tauri dev"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",

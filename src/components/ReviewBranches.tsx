@@ -59,7 +59,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
-    const [repositoryFilter, setRepositoryFilter] = useState<'both' | 'content' | 'dimensions'>('both');
+    const [repositoryFilter, setRepositoryFilter] = useState<'both' | 'content' | 'dimensions'>('content');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<'date' | 'author' | 'name' | 'behind'>('date');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -104,13 +104,13 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
         try {
             console.log('🔍 Validating repositories for workspace:', workspacePath);
-            
+
             // 🔥 FIX 1: Mejorar la validación de repositorios
             const validateRes = await fetch(`http://127.0.0.1:8000/git/validate-repositories?project_path=${encodeURIComponent(workspacePath)}`);
-            
+
             if (!validateRes.ok) {
                 console.error('❌ Validation request failed:', validateRes.status, validateRes.statusText);
-                
+
                 if (validateRes.status === 404) {
                     setError('Backend endpoint not found. Please check if the backend is running and updated.');
                 } else {
@@ -158,7 +158,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
             // 🔥 FIX 5: Mejorar la carga de ramas
             console.log('🔍 Loading branches with filter:', repositoryFilter);
-            
+
             const branchesRes = await fetch(
                 `http://127.0.0.1:8000/git/branches?project_path=${encodeURIComponent(workspacePath)}&repo=${repositoryFilter}&limit=20`
             );
@@ -198,7 +198,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
         try {
             console.log('🔄 Checking out branch:', branch.display_name, 'in repository:', branch.repository);
-            
+
             const response = await fetch(`http://127.0.0.1:8000/git/checkout?project_path=${encodeURIComponent(workspacePath)}&repo_name=${branch.repository}&branch_name=${encodeURIComponent(branch.display_name)}`, {
                 method: 'POST',
             });
@@ -227,7 +227,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
         try {
             console.log('📊 Comparing branch:', branch.display_name, 'with master in repository:', branch.repository);
-            
+
             const response = await fetch(
                 `http://127.0.0.1:8000/git/compare?project_path=${encodeURIComponent(workspacePath)}&repo_name=${branch.repository}&branch_name=${encodeURIComponent(branch.display_name)}`
             );
@@ -396,8 +396,8 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         const renderUnifiedView = () => {
             if (!fileDiff.diff_lines || fileDiff.diff_lines.length === 0) {
                 return (
-                    <div className="diff-empty-state">
-                        <div className="empty-icon">📄</div>
+                    <div className="diff-rb-empty-state">
+                        <div className="rb-empty-icon">📄</div>
                         <h3>No differences found</h3>
                         <p>This file appears to be identical or binary.</p>
                     </div>
@@ -466,7 +466,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                     <div className="diff-panel">
                         <div className="diff-panel-header old">
                             <span className="header-label">Original (master)</span>
-                            <span className="header-info">-{selectedFile.deletions} deletions</span>
+                            <span className="rb-header-info">-{selectedFile.deletions} deletions</span>
                         </div>
                         <div
                             className="diff-panel-content"
@@ -517,7 +517,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                     <div className="diff-panel">
                         <div className="diff-panel-header new">
                             <span className="header-label">Modified ({selectedBranch?.display_name})</span>
-                            <span className="header-info">+{selectedFile.additions} additions</span>
+                            <span className="rb-header-info">+{selectedFile.additions} additions</span>
                         </div>
                         <div
                             className="diff-panel-content"
@@ -589,20 +589,18 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                 ✕
                             </button>
                         </div>
-                        
-                        <div className="file-diff-header-bottom">
+
+                        <div className="file-diff-header-center">
                             <span className={`change-type-badge ${getChangeTypeColor(selectedFile.change_type)}`}>
                                 {selectedFile.change_type.toUpperCase()}
                             </span>
-                            <div className="file-diff-actions">
-                                <span className="file-diff-stats">
-                                    {selectedFile.additions > 0 && (
-                                        <span className="additions">+{selectedFile.additions} additions</span>
-                                    )}
-                                    {selectedFile.deletions > 0 && (
-                                        <span className="deletions">-{selectedFile.deletions} deletions</span>
-                                    )}
-                                </span>
+                            <div className="file-diff-stats">
+                                {selectedFile.additions > 0 && (
+                                    <span className="additions">+{selectedFile.additions} additions</span>
+                                )}
+                                {selectedFile.deletions > 0 && (
+                                    <span className="deletions">-{selectedFile.deletions} deletions</span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -645,12 +643,12 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         <div className="review-branches-container">
             {/* Header */}
             <div className="branches-header">
-                <div className="header-left">
-                    <div className="header-icon">
+                <div className="rb-header-left">
+                    <div className="rb-header-icon">
                         🌿
                     </div>
-                    <div className="header-info">
-                        <h1 className="header-title">Review Branches</h1>
+                    <div className="rb-header-info">
+                        <h1 className="rb-header-title">Review Branches</h1>
                         <p className="header-subtitle">Manage Git branches across microservices</p>
                     </div>
                 </div>
@@ -660,16 +658,17 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                         onClick={handleRefresh}
                         disabled={loading}
                         className="action-button refresh-button"
+                        title="Refresh branches"
                     >
                         <span className={`refresh-icon ${loading ? 'spinning' : ''}`}>🔄</span>
-                        {!isMobile && 'Refresh'}
                     </button>
 
                     <button
                         onClick={onClose}
                         className="action-button rb-close-button"
+                        title="Close Review Branches"
                     >
-                        ✕ {!isMobile && 'Close'}
+                        ✕
                     </button>
                 </div>
             </div>
@@ -697,14 +696,14 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
                     {/* Search */}
                     <div className="search-group">
-                        <div className="search-input-container">
-                            <span className="search-icon">🔍</span>
+                        <div className="rb-search-input-container">
+                            <span className="rb-search-icon">🔍</span>
                             <input
                                 type="text"
                                 placeholder={isMobile ? "Search..." : "Search branches, authors, or commits..."}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
+                                className="rb-search-input"
                             />
                         </div>
                     </div>
@@ -738,14 +737,14 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
             {/* Status Messages */}
             {error && (
-                <div className="status-message error-message">
+                <div className="status-message rb-error-message">
                     <span className="status-icon">❌</span>
                     {error}
                 </div>
             )}
 
             {success && (
-                <div className="status-message success-message">
+                <div className="status-message rb-success-message">
                     <span className="status-icon">✅</span>
                     {success}
                 </div>
@@ -770,12 +769,17 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
             <div className="branches-table-container">
                 {loading ? (
                     <div className="loading-state">
-                        <span className="rb-loading-spinner">⚡</span>
-                        <span>Loading branches...</span>
+                        <div className="rb-loading-spinner">
+                            <div className="loading-spinner-container">
+                                <div className="spinner-ring"></div>
+                            </div>
+                            <div className="loading-text">Loading branches</div>
+                            <div className="loading-subtext">Fetching latest Git information...</div>
+                        </div>
                     </div>
                 ) : filteredAndSortedBranches.length === 0 ? (
-                    <div className="empty-state">
-                        <span className="empty-icon">🌿</span>
+                    <div className="rb-empty-state">
+                        <span className="rb-empty-icon">🌿</span>
                         <h3>No branches found</h3>
                         <p>Try adjusting your filters or refresh to get the latest branches</p>
                     </div>
@@ -812,7 +816,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
                                     <div className="table-cell author-cell">
                                         <div className="author-info">
-                                            <span className="author-icon">👤</span>
+                                            <span className="author-icon">👨‍💻</span>
                                             <span className="author-name">{branch.author}</span>
                                         </div>
                                     </div>
@@ -853,20 +857,20 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                             <button
                                                 onClick={() => handleCheckout(branch)}
                                                 disabled={loading || branch.is_current}
-                                                className="table-action-button checkout-button"
+                                                className="table-rb-action-button checkout-button"
                                                 title="Checkout Branch"
                                             >
-                                                <span className="action-icon">⬇️</span>
+
                                                 {!isMobile && 'Checkout'}
                                             </button>
 
                                             <button
                                                 onClick={() => handleCompare(branch)}
                                                 disabled={loading}
-                                                className="table-action-button compare-button"
+                                                className="table-rb-action-button compare-button"
                                                 title="Compare with Master"
                                             >
-                                                <span className="action-icon">📊</span>
+
                                                 {!isMobile && 'Compare'}
                                             </button>
                                         </div>
@@ -885,7 +889,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 }}>
                     <div className="comparison-modal">
                         <div className="rb-modal-header">
-                            <div className="modal-title">
+                            <div className="rb-modal-title">
                                 <span className="modal-icon">📊</span>
                                 <h3>Branch Comparison</h3>
                             </div>
@@ -906,23 +910,20 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                     <span className="base-branch">{comparison.base_branch}</span>
                                     <span className="repo-name">({comparison.repository})</span>
                                 </div>
-                                <div className="comparison-summary">
-                                    {comparison.summary}
-                                </div>
                             </div>
 
                             <div className="comparison-stats">
-                                <div className="stat-item">
-                                    <span className="stat-value">{comparison.total_files}</span>
-                                    <span className="stat-label">Files Changed</span>
+                                <div className="rb-stat-item">
+                                    <span className="rb-stat-value">{comparison.total_files}</span>
+                                    <span className="rb-stat-label">Files Changed</span>
                                 </div>
-                                <div className="stat-item additions">
-                                    <span className="stat-value">+{comparison.total_additions}</span>
-                                    <span className="stat-label">Additions</span>
+                                <div className="rb-stat-item additions">
+                                    <span className="rb-stat-value">+{comparison.total_additions}</span>
+                                    <span className="rb-stat-label">Additions</span>
                                 </div>
-                                <div className="stat-item deletions">
-                                    <span className="stat-value">-{comparison.total_deletions}</span>
-                                    <span className="stat-label">Deletions</span>
+                                <div className="rb-stat-item deletions">
+                                    <span className="rb-stat-value">-{comparison.total_deletions}</span>
+                                    <span className="rb-stat-label">Deletions</span>
                                 </div>
                             </div>
 
@@ -965,7 +966,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
 
             {/* Loading overlay para file diff */}
             {loadingFileDiff && (
-                <div className="loading-overlay">
+                <div className="rb-loading-overlay">
                     <div className="rb-loading-spinner">
                         <span className="spinner"></span>
                         <span>Loading file diff...</span>

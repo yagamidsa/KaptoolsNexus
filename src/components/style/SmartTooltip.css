@@ -1,0 +1,371 @@
+/* 🔥 SmartTooltip.css - COPIAR COMPLETO A src/styles/SmartTooltip.css */
+
+/* 🎯 SISTEMA DE TOOLTIPS INTELIGENTES - SIN CONFLICTOS */
+
+/* Base del contenedor de tooltip inteligente */
+.smart-tooltip {
+    position: fixed;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    pointer-events: none;
+    max-width: min(280px, 90vw);
+    min-width: 200px;
+}
+
+/* Tooltip visible */
+.smart-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+/* Contenido del tooltip */
+.smart-tooltip-content {
+    background: linear-gradient(135deg, rgba(26, 29, 58, 0.98), rgba(37, 42, 74, 0.98));
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Header del tooltip */
+.tooltip-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.tooltip-header strong {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Detalle del tooltip */
+.tooltip-detail {
+    font-size: 11px;
+    opacity: 0.9;
+    margin-top: 6px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Flecha del tooltip */
+.smart-tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+}
+
+/* 🔥 POSICIONAMIENTO INTELIGENTE */
+
+/* Tooltip arriba */
+.smart-tooltip-top {
+    transform-origin: center bottom;
+}
+
+.smart-tooltip-top .smart-tooltip-arrow {
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-top: 8px solid rgba(37, 42, 74, 0.98);
+    border-bottom: none;
+}
+
+/* Tooltip abajo */
+.smart-tooltip-bottom {
+    transform-origin: center top;
+}
+
+.smart-tooltip-bottom .smart-tooltip-arrow {
+    bottom: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-bottom: 8px solid rgba(37, 42, 74, 0.98);
+    border-top: none;
+}
+
+/* Tooltip izquierda */
+.smart-tooltip-left {
+    transform-origin: right center;
+}
+
+.smart-tooltip-left .smart-tooltip-arrow {
+    top: 50%;
+    left: 100%;
+    margin-top: -8px;
+    border-left: 8px solid rgba(37, 42, 74, 0.98);
+    border-right: none;
+}
+
+/* Tooltip derecha */
+.smart-tooltip-right {
+    transform-origin: left center;
+}
+
+.smart-tooltip-right .smart-tooltip-arrow {
+    top: 50%;
+    right: 100%;
+    margin-top: -8px;
+    border-right: 8px solid rgba(37, 42, 74, 0.98);
+    border-left: none;
+}
+
+/* 🎨 VARIANTES DE COLOR POR TIPO */
+
+/* Success (ready) */
+.smart-tooltip-success .smart-tooltip-content {
+    background: linear-gradient(135deg, rgba(0, 255, 135, 0.1), rgba(108, 92, 231, 0.2));
+    border-color: rgba(0, 255, 135, 0.4);
+    color: #00ff87;
+    box-shadow:
+        0 8px 32px rgba(0, 255, 135, 0.2),
+        0 0 0 1px rgba(0, 255, 135, 0.1),
+        inset 0 1px 0 rgba(0, 255, 135, 0.1);
+}
+
+.smart-tooltip-success .smart-tooltip-arrow {
+    border-top-color: rgba(0, 255, 135, 0.1) !important;
+    border-bottom-color: rgba(0, 255, 135, 0.1) !important;
+    border-left-color: rgba(0, 255, 135, 0.1) !important;
+    border-right-color: rgba(0, 255, 135, 0.1) !important;
+}
+
+/* Warning */
+.smart-tooltip-warning .smart-tooltip-content {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(255, 107, 157, 0.2));
+    border-color: rgba(251, 191, 36, 0.4);
+    color: #fbbf24;
+    box-shadow:
+        0 8px 32px rgba(251, 191, 36, 0.2),
+        0 0 0 1px rgba(251, 191, 36, 0.1),
+        inset 0 1px 0 rgba(251, 191, 36, 0.1);
+}
+
+.smart-tooltip-warning .smart-tooltip-arrow {
+    border-top-color: rgba(251, 191, 36, 0.1) !important;
+    border-bottom-color: rgba(251, 191, 36, 0.1) !important;
+    border-left-color: rgba(251, 191, 36, 0.1) !important;
+    border-right-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+/* Error */
+.smart-tooltip-error .smart-tooltip-content {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 127, 0.2));
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    box-shadow:
+        0 8px 32px rgba(239, 68, 68, 0.2),
+        0 0 0 1px rgba(239, 68, 68, 0.1),
+        inset 0 1px 0 rgba(239, 68, 68, 0.1);
+}
+
+.smart-tooltip-error .smart-tooltip-arrow {
+    border-top-color: rgba(239, 68, 68, 0.1) !important;
+    border-bottom-color: rgba(239, 68, 68, 0.1) !important;
+    border-left-color: rgba(239, 68, 68, 0.1) !important;
+    border-right-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Info */
+.smart-tooltip-info .smart-tooltip-content {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(255, 107, 157, 0.1));
+    border-color: rgba(108, 92, 231, 0.3);
+    color: #a0a3bd;
+    box-shadow:
+        0 8px 32px rgba(108, 92, 231, 0.2),
+        0 0 0 1px rgba(108, 92, 231, 0.1),
+        inset 0 1px 0 rgba(108, 92, 231, 0.1);
+}
+
+.smart-tooltip-info .smart-tooltip-arrow {
+    border-top-color: rgba(108, 92, 231, 0.1) !important;
+    border-bottom-color: rgba(108, 92, 231, 0.1) !important;
+    border-left-color: rgba(108, 92, 231, 0.1) !important;
+    border-right-color: rgba(108, 92, 231, 0.1) !important;
+}
+
+/* 🎯 ICONOS ESPECÍFICOS */
+.tooltip-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.tooltip-icon.success {
+    color: #00ff87;
+    filter: drop-shadow(0 0 4px rgba(0, 255, 135, 0.5));
+}
+
+.tooltip-icon.warning {
+    color: #fbbf24;
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+}
+
+.tooltip-icon.error {
+    color: #ef4444;
+    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5));
+}
+
+.tooltip-icon.info {
+    color: #6c5ce7;
+    filter: drop-shadow(0 0 4px rgba(108, 92, 231, 0.5));
+}
+
+/* 🔥 RESPONSIVE OPTIMIZATIONS */
+@media (max-width: 1200px) {
+    .smart-tooltip {
+        max-width: min(260px, 85vw);
+        min-width: 180px;
+    }
+
+    .smart-tooltip-content {
+        font-size: 11px;
+        padding: 10px 14px;
+    }
+
+    .tooltip-header strong {
+        font-size: 12px;
+    }
+
+    .tooltip-detail {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .smart-tooltip {
+        max-width: min(220px, 80vw);
+        min-width: 160px;
+    }
+
+    .smart-tooltip-content {
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+
+    .smart-tooltip-arrow {
+        border-width: 6px;
+    }
+
+    .smart-tooltip-top .smart-tooltip-arrow,
+    .smart-tooltip-bottom .smart-tooltip-arrow {
+        margin-left: -6px;
+    }
+
+    .smart-tooltip-left .smart-tooltip-arrow,
+    .smart-tooltip-right .smart-tooltip-arrow {
+        margin-top: -6px;
+    }
+
+    .tooltip-header {
+        gap: 6px;
+    }
+
+    .tooltip-header strong {
+        font-size: 11px;
+    }
+
+    .tooltip-detail {
+        font-size: 9px;
+        margin-top: 4px;
+    }
+
+    .tooltip-icon {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .smart-tooltip {
+        max-width: min(180px, 70vw);
+        min-width: 140px;
+    }
+
+    .smart-tooltip-content {
+        font-size: 9px;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+
+    .smart-tooltip-arrow {
+        border-width: 5px;
+    }
+
+    .smart-tooltip-top .smart-tooltip-arrow,
+    .smart-tooltip-bottom .smart-tooltip-arrow {
+        margin-left: -5px;
+    }
+
+    .smart-tooltip-left .smart-tooltip-arrow,
+    .smart-tooltip-right .smart-tooltip-arrow {
+        margin-top: -5px;
+    }
+
+    .tooltip-header strong {
+        font-size: 10px;
+    }
+
+    .tooltip-detail {
+        font-size: 8px;
+    }
+
+    .tooltip-icon {
+        font-size: 11px;
+    }
+}
+
+/* 🔥 ANIMACIONES Y EFECTOS */
+
+/* Glow effect */
+.smart-tooltip.visible .smart-tooltip-content {
+    animation: smart-tooltip-glow 2s ease infinite alternate;
+}
+
+@keyframes smart-tooltip-glow {
+    from {
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    to {
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(108, 92, 231, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            0 0 20px rgba(108, 92, 231, 0.3);
+    }
+}
+
+/* 🎯 PREVENIR CONFLICTOS CON CSS EXISTENTE */
+
+/* Asegurar que no interfiera con otros tooltips */
+.smart-tooltip {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif !important;
+}
+
+/* Evitar que sea afectado por transformaciones de contenedores padre */
+.smart-tooltip * {
+    box-sizing: border-box;
+}
+
+/* Asegurar z-index superior */
+.smart-tooltip {
+    z-index: 99999 !important;
+}

@@ -22,6 +22,25 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
+tauri-plugin-http = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+thiserror = "1"
+byteorder = "1.5"
 
+tauri-plugin-shell = "2"
+# Para procesamiento de archivos
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Para compresión/descompresión ZIP
+zip = "0.6"
+
+# Para manipulación de paths cross-platform
+path-absolutize = "3.0"
+
+
+[features]
+# This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

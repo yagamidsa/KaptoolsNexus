@@ -203,7 +203,7 @@
     z-index: 2000;
 }
 
-.dock-app.hovered .app-particles {
+.dock-app.dock-hovered .app-particles {
     opacity: 1;
 }
 

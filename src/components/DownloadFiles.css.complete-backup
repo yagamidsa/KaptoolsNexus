@@ -1,0 +1,1431 @@
+/* src/components/DownloadFiles.css */
+
+.df-download-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 29, 58, 0.8);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: backdrop-appear 0.3s ease-out;
+    padding: 20px;
+}
+
+@keyframes backdrop-appear {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(12px);
+    }
+}
+
+.download-modal {
+    background: rgba(37, 42, 74, 0.95);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(108, 92, 231, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    width: 100%;
+    max-width: 480px;
+    animation: modal-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    position: relative;
+}
+
+@keyframes modal-appear {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.download-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid rgba(108, 92, 231, 0.2);
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(255, 107, 157, 0.05));
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(255, 107, 157, 0.1));
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: icon-glow 3s ease infinite alternate;
+}
+
+@keyframes icon-glow {
+    from {
+        box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
+    }
+
+    to {
+        box-shadow: 0 0 30px rgba(255, 107, 157, 0.4);
+    }
+}
+
+.header-text h2 {
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    background: linear-gradient(135deg, #ffffff, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-text p {
+    color: #a0a3bd;
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.df-close-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(108, 92, 231, 0.1);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    color: #a0a3bd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.df-close-button:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+.download-modal-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.content-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d, #00ff87);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 15px rgba(108, 92, 231, 1)) drop-shadow(0 0 25px rgba(255, 107, 157, 0.8)) drop-shadow(0 0 35px rgba(108, 92, 231, 0.6));
+    animation: label-super-glow 2s ease infinite alternate;
+    text-shadow: 0 0 20px rgba(108, 92, 231, 0.8);
+}
+
+@keyframes label-super-glow {
+    from {
+        background-position: 0% 50%;
+        filter: drop-shadow(0 0 15px rgba(108, 92, 231, 1)) drop-shadow(0 0 25px rgba(255, 107, 157, 0.8)) drop-shadow(0 0 35px rgba(108, 92, 231, 0.6));
+    }
+
+    to {
+        background-position: 100% 50%;
+        filter: drop-shadow(0 0 25px rgba(255, 107, 157, 1)) drop-shadow(0 0 35px rgba(108, 92, 231, 0.9)) drop-shadow(0 0 45px rgba(0, 255, 135, 0.7));
+    }
+}
+
+.label-icon {
+    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 15px rgba(245, 158, 11, 0.6));
+    animation: icon-yellow-glow 2s ease infinite alternate;
+}
+
+@keyframes icon-yellow-glow {
+    from {
+        filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 15px rgba(245, 158, 11, 0.6));
+    }
+
+    to {
+        filter: drop-shadow(0 0 15px rgba(251, 191, 36, 1)) drop-shadow(0 0 25px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 35px rgba(251, 191, 36, 0.6));
+    }
+}
+
+.cyber-input,
+.cyber-select {
+    padding: 14px 16px;
+    background: rgba(26, 29, 58, 0.8);
+    border: 2px solid rgba(108, 92, 231, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.cyber-input:focus,
+.cyber-select:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    background: rgba(26, 29, 58, 0.9);
+    box-shadow:
+        0 0 0 3px rgba(108, 92, 231, 0.1),
+        0 6px 20px rgba(108, 92, 231, 0.2);
+    transform: translateY(-1px);
+}
+
+.cyber-input::placeholder {
+    color: rgba(160, 163, 189, 0.6);
+}
+
+.cyber-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(26, 29, 58, 0.4);
+    border-color: rgba(108, 92, 231, 0.1);
+}
+
+.cyber-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c5ce7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+.cyber-select option {
+    background: #252a4a;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.cyber-select option:hover {
+    background: rgba(108, 92, 231, 0.6);
+    color: #ffffff;
+}
+
+.cyber-select option:checked {
+    background: #6c5ce7;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Token checkbox styles */
+.token-checkbox {
+    margin-top: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #a0a3bd;
+    font-weight: 500;
+}
+
+.cyber-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(108, 92, 231, 0.3);
+    border-radius: 4px;
+    background: rgba(26, 29, 58, 0.8);
+    cursor: pointer;
+    position: relative;
+    appearance: none;
+    transition: all 0.3s ease;
+}
+
+.cyber-checkbox:checked {
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    border-color: #6c5ce7;
+}
+
+.cyber-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.cyber-checkbox:hover {
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1);
+}
+
+.checkbox-text {
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d, #00ff87);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 12px rgba(108, 92, 231, 1)) drop-shadow(0 0 20px rgba(255, 107, 157, 0.8)) drop-shadow(0 0 30px rgba(108, 92, 231, 0.6));
+    font-weight: 600;
+    animation: checkbox-super-glow 2s ease infinite alternate;
+}
+
+@keyframes checkbox-super-glow {
+    from {
+        background-position: 0% 50%;
+        filter: drop-shadow(0 0 12px rgba(108, 92, 231, 1)) drop-shadow(0 0 20px rgba(255, 107, 157, 0.8)) drop-shadow(0 0 30px rgba(108, 92, 231, 0.6));
+    }
+
+    to {
+        background-position: 100% 50%;
+        filter: drop-shadow(0 0 20px rgba(255, 107, 157, 1)) drop-shadow(0 0 30px rgba(108, 92, 231, 0.9)) drop-shadow(0 0 40px rgba(0, 255, 135, 0.7));
+    }
+}
+
+.workspace-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(108, 92, 231, 0.1);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.info-icon {
+    color: #6c5ce7;
+    display: flex;
+    align-items: center;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.info-label {
+    color: #a0a3bd;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-path {
+    color: #ffffff;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    word-break: break-all;
+}
+
+.download-modal-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px 24px;
+    border-top: 1px solid rgba(108, 92, 231, 0.1);
+    background: rgba(37, 42, 74, 0.3);
+}
+
+.modal-button {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-button.secondary {
+    background: rgba(160, 163, 189, 0.1);
+    border: 1px solid rgba(160, 163, 189, 0.3);
+    color: #a0a3bd;
+}
+
+.modal-button.secondary:hover:not(:disabled) {
+    background: rgba(160, 163, 189, 0.2);
+    border-color: #a0a3bd;
+    transform: translateY(-1px);
+}
+
+.modal-button.primary {
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    border: none;
+    color: white;
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+}
+
+.modal-button.primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
+    background: linear-gradient(135deg, #a29bfe, #fd79a8);
+}
+
+.modal-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none ;
+}
+
+.df-loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* PROGRESS OVERLAY - Versión mejorada y más realista */
+.df-progress-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 29, 58, 0.98);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 16px;
+    animation: overlay-appear 0.5s ease-out;
+}
+
+@keyframes overlay-appear {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(20px);
+    }
+}
+
+.progress-modal {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: progress-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes progress-appear {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.progress-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(255, 107, 157, 0.1));
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c5ce7;
+    animation: icon-pulse 2s ease infinite;
+}
+
+@keyframes icon-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(255, 107, 157, 0.4);
+    }
+}
+
+.progress-title {
+    flex: 1;
+    text-align: left;
+}
+
+.progress-title h3 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    background: linear-gradient(135deg, #ffffff, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.progress-title p {
+    color: #a0a3bd;
+    font-size: 12px;
+    margin: 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.progress-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.progress-bar-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.progress-bar-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(26, 29, 58, 0.8);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6c5ce7 0%, #ff6b9d 50%, #00ff87 100%);
+    background-size: 200% 100%;
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: progress-flow 2s ease infinite;
+    position: relative;
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.6);
+}
+
+@keyframes progress-flow {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+    animation: progress-shine 2s ease infinite;
+}
+
+@keyframes progress-shine {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+.progress-percentage {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 45px;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+}
+
+.progress-step {
+    color: #a0a3bd;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: step-glow 2s ease infinite alternate;
+}
+
+@keyframes step-glow {
+    from {
+        color: #a0a3bd;
+    }
+
+    to {
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+}
+
+.success-message {
+    background: rgba(0, 255, 135, 0.1);
+    border: 1px solid rgba(0, 255, 135, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    animation: success-appear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes success-appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.success-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    animation: success-bounce 1s ease infinite alternate;
+}
+
+@keyframes success-bounce {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-5px);
+    }
+}
+
+.success-text h4 {
+    color: #00ff87;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.success-text p {
+    color: #a0a3bd;
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.success-text code {
+    background: rgba(26, 29, 58, 0.8);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    color: #ffffff;
+    display: block;
+    margin: 8px 0;
+    word-break: break-all;
+}
+
+.success-details {
+    font-size: 12px ;
+    color: #00ff87 ;
+    font-weight: 600;
+    margin-top: 12px ;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    animation: error-appear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes error-appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.error-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    animation: error-shake 0.5s ease infinite alternate;
+}
+
+@keyframes error-shake {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-2px);
+    }
+}
+
+.error-text h4 {
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.error-text p {
+    color: #a0a3bd;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.progress-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    width: 100%;
+}
+
+/* Validación de errores */
+.form-group.error .cyber-input {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+}
+
+.error-text-validation {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* Responsive para progress modal */
+@media (max-width: 640px) {
+    .progress-modal {
+        padding: 24px;
+    }
+
+    .progress-header {
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .progress-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .progress-title h3 {
+        font-size: 1.1rem;
+    }
+
+    .progress-title p {
+        font-size: 11px;
+    }
+
+    .progress-actions {
+        flex-direction: column;
+        margin-top: 24px;
+    }
+}
+
+/* Responsive general */
+@media (max-width: 640px) {
+    .download-modal {
+        margin: 10px;
+        max-width: none;
+    }
+
+    .download-modal-header {
+        padding: 20px 20px 16px;
+    }
+
+    .header-content {
+        gap: 12px;
+    }
+
+    .header-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .header-text h2 {
+        font-size: 1.2rem;
+    }
+
+    .download-modal-content {
+        padding: 20px;
+    }
+
+    .download-modal-actions {
+        flex-direction: column;
+        padding: 16px 20px 20px;
+    }
+
+    .form-label {
+        font-size: 11px;
+    }
+
+    .cyber-input,
+    .cyber-select {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .workspace-info {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .info-path {
+        font-size: 11px;
+    }
+}
+
+/* Mejoras adicionales */
+.df-download-modal-backdrop::-webkit-scrollbar {
+    display: none;
+}
+
+.df-download-modal-backdrop {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Animaciones de entrada más suaves */
+.form-group {
+    animation: form-appear 0.6s ease;
+    animation-fill-mode: both;
+}
+
+.form-group:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.form-group:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.form-group:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.form-group:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+@keyframes form-appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados de hover mejorados */
+.cyber-input:hover:not(:disabled),
+.cyber-select:hover:not(:disabled) {
+    border-color: rgba(108, 92, 231, 0.4);
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.1);
+}
+
+/* Mejor feedback visual para elementos deshabilitados */
+.cyber-input:disabled:hover,
+.cyber-select:disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(108, 92, 231, 0.1);
+}
+
+/* Efectos de focus mejorados */
+.cyber-input:focus-visible,
+.cyber-select:focus-visible {
+    outline: 2px solid rgba(108, 92, 231, 0.5);
+    outline-offset: 2px;
+}
+
+/* Transiciones suaves para todos los elementos interactivos */
+* {
+    transition: background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+/* Estados de loading mejorados */
+.modal-button.primary:disabled {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.5), rgba(255, 107, 157, 0.5));
+    box-shadow: none;
+}
+
+/* Efectos de partículas para el progreso */
+.progress-bar-track::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(108, 92, 231, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 50%, rgba(255, 107, 157, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 60% 50%, rgba(0, 255, 135, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(108, 92, 231, 0.1) 0%, transparent 50%);
+    animation: particles-move 3s ease infinite;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+@keyframes particles-move {
+
+    0%,
+    100% {
+        transform: translateX(0);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateX(10px);
+        opacity: 0.8;
+    }
+}
+
+/* Efectos de glassmorphism mejorados */
+.download-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 16px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Mejores gradientes para los botones */
+.modal-button.primary {
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-button.primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            transparent 100%);
+    transition: left 0.6s ease;
+}
+
+.modal-button.primary:hover:not(:disabled)::before {
+    left: 100%;
+}
+
+/* Animaciones de loading más atractivas */
+@keyframes loading-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+.modal-button.primary:disabled .df-loading-spinner {
+    animation: spin 1s linear infinite, loading-pulse 2s ease infinite;
+}
+
+/* Mejores sombras para depth */
+.form-group:hover .cyber-input:not(:disabled),
+.form-group:hover .cyber-select:not(:disabled) {
+    box-shadow:
+        0 4px 12px rgba(108, 92, 231, 0.15),
+        0 0 0 1px rgba(108, 92, 231, 0.1);
+}
+
+/* Estados de validación más claros */
+.form-group.success .cyber-input {
+    border-color: #00ff87;
+    box-shadow: 0 0 0 2px rgba(0, 255, 135, 0.1);
+}
+
+.form-group.success .form-label {
+    color: #00ff87;
+}
+
+.success-text-validation {
+    color: #00ff87;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.success-text-validation::before {
+    content: '✓';
+    font-weight: bold;
+}
+
+.error-text-validation::before {
+    content: '⚠';
+    font-weight: bold;
+}
+
+/* Animaciones de entrada escalonadas para el formulario */
+.download-modal-content.animate-in .form-group {
+    animation: slide-in-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation-fill-mode: both;
+}
+
+.download-modal-content.animate-in .form-group:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.download-modal-content.animate-in .form-group:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.download-modal-content.animate-in .form-group:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.download-modal-content.animate-in .form-group:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.download-modal-content.animate-in .workspace-info {
+    animation-delay: 0.5s;
+}
+
+@keyframes slide-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mejor feedback para elementos clickeables */
+.df-close-button:active {
+    transform: rotate(90deg) scale(0.95);
+}
+
+.modal-button:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
+}
+
+.cyber-checkbox:active {
+    transform: scale(0.95);
+}
+
+/* Mejores estilos para tooltips si los necesitas */
+.tooltip {
+    position: relative;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 29, 58, 0.95);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-8px);
+}
+
+/* Estilos para el estado de carga del modal */
+.download-modal.loading {
+    pointer-events: none;
+}
+
+.download-modal.loading .download-modal-content {
+    filter: blur(2px);
+    opacity: 0.5;
+}
+
+/* Animaciones de salida */
+.download-modal.closing {
+    animation: modal-disappear 0.3s ease-out forwards;
+}
+
+@keyframes modal-disappear {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+}
+
+.download-modal-backdrop.closing {
+    animation: backdrop-disappear 0.3s ease-out forwards;
+}
+
+@keyframes backdrop-disappear {
+    from {
+        opacity: 1;
+        backdrop-filter: blur(12px);
+    }
+
+    to {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+}
+
+/* Efectos de hover mejorados para labels */
+.form-label:hover {
+    cursor: default;
+    animation-play-state: paused;
+}
+
+/* Mejor spacing y typography */
+.header-text h2 {
+    line-height: 1.2;
+}
+
+.progress-title h3 {
+    line-height: 1.3;
+}
+
+.success-text h4,
+.error-text h4 {
+    line-height: 1.3;
+}
+
+/* Dark mode friendly (si lo necesitas) */
+@media (prefers-color-scheme: dark) {
+    .download-modal {
+        background: rgba(20, 23, 41, 0.98);
+        border-color: rgba(108, 92, 231, 0.4);
+    }
+
+    .cyber-input,
+    .cyber-select {
+        background: rgba(15, 18, 35, 0.9);
+    }
+}
+
+/* Accesibilidad mejorada */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms ;
+        animation-iteration-count: 1 ;
+        transition-duration: 0.01ms ;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .download-modal {
+        border: 2px solid #ffffff;
+    }
+
+    .cyber-input,
+    .cyber-select {
+        border-width: 2px;
+    }
+
+    .modal-button {
+        border-width: 2px;
+    }
+}
+
+/* Print styles (por si acaso) */
+@media print {
+    .df-download-modal-backdrop {
+        display: none;
+    }
+}
+
+/* Estilos para pantallas muy pequeñas */
+@media (max-width: 360px) {
+    .download-modal {
+        margin: 5px;
+        border-radius: 12px;
+    }
+
+    .download-modal-header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .df-close-button {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+    }
+
+    .download-modal-content {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .download-modal-actions {
+        padding: 16px;
+    }
+
+    .progress-modal {
+        padding: 20px;
+    }
+
+    .progress-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* Estilos para landscape móvil */
+@media (max-height: 500px) and (orientation: landscape) {
+    .download-modal {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .progress-modal {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+}
+
+/* Mejores estilos de scroll para el modal */
+.download-modal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.download-modal::-webkit-scrollbar-track {
+    background: rgba(26, 29, 58, 0.3);
+    border-radius: 3px;
+}
+
+.download-modal::-webkit-scrollbar-thumb {
+    background: rgba(108, 92, 231, 0.5);
+    border-radius: 3px;
+}
+
+.download-modal::-webkit-scrollbar-thumb:hover {
+    background: rgba(108, 92, 231, 0.7);
+}
+
+/* Estados de focus mejorados para navegación por teclado */
+.modal-button:focus-visible {
+    outline: 2px solid #6c5ce7;
+    outline-offset: 2px;
+}
+
+.df-close-button:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+}
+
+.cyber-checkbox:focus-visible {
+    outline: 2px solid #6c5ce7;
+    outline-offset: 2px;
+}
+
+/* Efectos de performance optimizados */
+.download-modal,
+.df-progress-overlay {
+    will-change: transform, opacity;
+}
+
+.progress-bar-fill {
+    will-change: width;
+}
+
+.df-loading-spinner {
+    will-change: transform;
+}
+
+/* Estilos finales para mejor UX */
+.download-modal-content {
+    scroll-behavior: smooth;
+}
+
+body:has(.download-modal-backdrop) {
+    overflow: hidden;
+}
+
+/* Estados adicionales para interacciones */
+.form-group.loading .cyber-input,
+.form-group.loading .cyber-select {
+    pointer-events: none;
+    opacity: 0.7;
+    background: rgba(26, 29, 58, 0.6);
+}
+
+/* Animación final de completado */
+.progress-complete {
+    animation: progress-celebration 1s ease-out;
+}
+
+@keyframes progress-celebration {
+    0% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.05);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+
+    75% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

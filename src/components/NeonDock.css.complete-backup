@@ -1,0 +1,787 @@
+/* Botón Toggle - Se oculta cuando está expandido */
+.dock-toggle {
+    position: fixed;
+    left: 16px;
+    top: 20px;
+    z-index: 1001;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(26, 29, 58, 0.95);
+    border: 2px solid rgba(108, 92, 231, 0.5);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(20px);
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.dock-toggle:hover {
+    transform: scale(1.1);
+    border-color: #6c5ce7;
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(108, 92, 231, 0.5);
+}
+
+/* Ocultar el botón toggle cuando el dock está expandido */
+.dock-toggle.expanded {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+.toggle-icon {
+    font-size: 20px;
+    background: linear-gradient(45deg, #6c5ce7, #ff6b9d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+.toggle-label {
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Overlay para cerrar */
+.dock-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+}
+
+/* Dock Container */
+.neon-dock {
+    position: fixed;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-100%);
+    z-index: 1000;
+    width: 80px;
+    pointer-events: auto;
+    transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    opacity: 0;
+}
+
+.neon-dock.expanded {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+}
+
+.neon-dock.collapsed {
+    pointer-events: none;
+}
+
+.dock-container {
+    background: rgba(26, 29, 58, 0.95);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 20px;
+    padding: 16px 8px;
+    backdrop-filter: blur(20px);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    max-height: 85vh;
+    /* Limitar altura máxima */
+    overflow-y: auto;
+    /* Scroll si es necesario */
+}
+
+.dock-container:hover {
+    border-color: rgba(108, 92, 231, 0.5);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(108, 92, 231, 0.1);
+}
+
+/* Scrollbar personalizado para el dock */
+.dock-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dock-container::-webkit-scrollbar-track {
+    background: rgba(26, 29, 58, 0.3);
+    border-radius: 2px;
+}
+
+.dock-container::-webkit-scrollbar-thumb {
+    background: rgba(108, 92, 231, 0.5);
+    border-radius: 2px;
+}
+
+.dock-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(108, 92, 231, 0.7);
+}
+
+/* Header */
+.dock-header {
+    margin-bottom: 16px;
+    text-align: center;
+    position: relative;
+}
+
+.dock-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.dock-icon {
+    font-size: 20px;
+    background: linear-gradient(45deg, #6c5ce7, #ff6b9d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dock-text {
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Apps Container */
+.dock-apps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Reducido de 12px a 8px */
+    align-items: center;
+}
+
+/* Individual App - OPTIMIZADO PARA PORTÁTILES */
+.dock-app {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(37, 42, 74, 0.6);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: visible;
+    backdrop-filter: blur(10px);
+    z-index: 1;
+}
+
+.dock-app:hover {
+    transform: scale(1.05);
+    /* Reducido de 1.1 a 1.05 para menos movimiento */
+    border-color: var(--app-color);
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.3),
+        /* Reducido */
+        0 0 15px var(--app-color);
+    /* Reducido */
+    z-index: 2000;
+}
+
+.dock-app.hovered .app-particles {
+    opacity: 1;
+}
+
+/* App Icon */
+.app-icon {
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+    z-index: 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-icon svg {
+    width: 100%;
+    height: 100%;
+    filter:
+        drop-shadow(0 0 6px var(--app-color)) drop-shadow(0 0 10px var(--app-color)) brightness(1.2) saturate(1.3);
+    transition: all 0.3s ease;
+}
+
+.dock-app:hover .app-icon {
+    transform: scale(1.1);
+    /* Reducido de 1.2 a 1.1 */
+}
+
+.dock-app:hover .app-icon svg {
+    filter:
+        drop-shadow(0 0 12px var(--app-color)) drop-shadow(0 0 20px var(--app-color)) drop-shadow(0 0 30px var(--app-color)) brightness(1.4) saturate(1.5);
+}
+
+/* 🔥 TOOLTIPS CORREGIDOS */
+.app-tooltip {
+    position: fixed;
+    left: calc(100% + 20px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-30px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 9999;
+    scale: 0.7;
+    white-space: nowrap;
+}
+
+.tooltip-content {
+    background: linear-gradient(135deg,
+            rgba(15, 15, 25, 0.98) 0%,
+            rgba(25, 25, 35, 0.95) 100%);
+    border: 2px solid var(--app-color);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.9),
+        0 0 40px var(--app-color),
+        0 0 80px rgba(108, 92, 231, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    min-width: 240px;
+    max-width: 320px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tooltip-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+            transparent,
+            var(--app-color),
+            transparent);
+    opacity: 0.9;
+}
+
+.tooltip-title {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg,
+            #ffffff 0%,
+            var(--app-color) 50%,
+            #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 15px var(--app-color));
+    text-shadow: 0 0 25px var(--app-color);
+}
+
+.tooltip-description {
+    color: rgba(180, 183, 200, 0.95);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    opacity: 0.95;
+}
+
+.tooltip-arrow {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid var(--app-color);
+    filter: drop-shadow(-6px 0 12px rgba(0, 0, 0, 0.7));
+}
+
+.dock-app:hover .app-tooltip {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(-50%) translateX(0) !important;
+    scale: 1 !important;
+    transition-delay: 0.1s;
+}
+
+.dock-app {
+    position: relative;
+    overflow: visible;
+}
+
+.dock-app:hover {
+    z-index: 2000;
+}
+
+/* Glow Effect */
+.app-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    background: radial-gradient(circle, var(--app-color) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.dock-app:hover .app-glow {
+    opacity: 0.08;
+    /* Reducido para menos distracción */
+}
+
+/* Particles Effect - REDUCIDO */
+.app-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 2px;
+    /* Reducido de 3px a 2px */
+    height: 2px;
+    background: var(--app-color);
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.dock-app:hover .particle {
+    animation: particle-float 1.2s ease-out infinite;
+    /* Más rápido */
+}
+
+.particle-1 {
+    top: 15%;
+    left: 25%;
+    animation-delay: 0s;
+}
+
+.particle-2 {
+    top: 25%;
+    right: 25%;
+    animation-delay: 0.15s;
+}
+
+.particle-3 {
+    bottom: 35%;
+    left: 15%;
+    animation-delay: 0.3s;
+}
+
+.particle-4 {
+    bottom: 25%;
+    right: 35%;
+    animation-delay: 0.45s;
+}
+
+@keyframes particle-float {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0);
+    }
+
+    50% {
+        opacity: 0.8;
+        /* Reducido */
+        transform: translateY(-15px) scale(1);
+        /* Menos movimiento */
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-30px) scale(0);
+    }
+}
+
+/* Footer */
+.dock-footer {
+    margin-top: 12px;
+    /* Reducido de 16px a 12px */
+    text-align: center;
+}
+
+.dock-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    /* Reducido */
+    color: #a0a3bd;
+    font-size: 7px;
+    /* Reducido */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-dot {
+    width: 5px;
+    /* Reducido */
+    height: 5px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #00ff87, #6c5ce7);
+    box-shadow: 0 0 8px rgba(108, 92, 231, 0.6);
+    animation: status-pulse 2s ease infinite alternate;
+}
+
+@keyframes status-pulse {
+    from {
+        box-shadow: 0 0 8px rgba(108, 92, 231, 0.6);
+    }
+
+    to {
+        box-shadow: 0 0 15px rgba(108, 92, 231, 0.8);
+    }
+}
+
+/* Click Effect */
+.dock-app:active {
+    transform: scale(1.02);
+    /* Reducido */
+    transition: transform 0.1s ease;
+}
+
+/* 💻 OPTIMIZACIONES ESPECÍFICAS PARA PORTÁTILES */
+
+/* Laptops estándar: 1366x768, 1440x900, 1600x900 */
+@media (max-width: 1600px) and (max-height: 1000px) {
+    .dock-toggle {
+        width: 50px;
+        height: 50px;
+        left: 12px;
+        top: 16px;
+    }
+
+    .toggle-icon {
+        font-size: 18px;
+    }
+
+    .toggle-label {
+        font-size: 7px;
+    }
+
+    .neon-dock {
+        left: 12px;
+        width: 70px;
+    }
+
+    .dock-container {
+        padding: 12px 6px;
+        max-height: 80vh;
+        /* Menos altura en portátiles */
+        border-radius: 16px;
+    }
+
+    .dock-apps {
+        gap: 6px;
+        /* Menos espacio entre apps */
+    }
+
+    .dock-app {
+        width: 48px;
+        /* Más pequeño */
+        height: 48px;
+        border-radius: 14px;
+    }
+
+    .app-icon {
+        width: 20px;
+        /* Más pequeño */
+        height: 20px;
+    }
+
+    .dock-header {
+        margin-bottom: 12px;
+    }
+
+    .dock-icon {
+        font-size: 16px;
+    }
+
+    .dock-text {
+        font-size: 9px;
+    }
+
+    /* Tooltips más compactos */
+    .tooltip-content {
+        min-width: 200px;
+        max-width: 260px;
+        padding: 12px 16px;
+    }
+
+    .tooltip-title {
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .tooltip-description {
+        font-size: 11px;
+    }
+
+    .dock-toggle.expanded {
+        opacity: 0;
+        transform: scale(0.6);
+        pointer-events: none;
+    }
+}
+
+/* Laptops pequeños: 1280x720, 1366x768 */
+@media (max-width: 1400px) and (max-height: 800px) {
+    .dock-toggle {
+        width: 45px;
+        height: 45px;
+        left: 10px;
+        top: 12px;
+    }
+
+    .toggle-icon {
+        font-size: 16px;
+    }
+
+    .neon-dock {
+        left: 10px;
+        width: 65px;
+    }
+
+    .dock-container {
+        padding: 10px 5px;
+        max-height: 75vh;
+        border-radius: 14px;
+    }
+
+    .dock-apps {
+        gap: 5px;
+        /* Muy poco espacio */
+    }
+
+    .dock-app {
+        width: 44px;
+        /* Aún más pequeño */
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .app-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .dock-header {
+        margin-bottom: 10px;
+    }
+
+    .dock-footer {
+        margin-top: 10px;
+    }
+
+    .status-dot {
+        width: 4px;
+        height: 4px;
+    }
+
+    .dock-status {
+        font-size: 6px;
+        gap: 2px;
+    }
+
+    /* Tooltips aún más compactos */
+    .tooltip-content {
+        min-width: 180px;
+        max-width: 220px;
+        padding: 10px 14px;
+    }
+
+    .tooltip-title {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .tooltip-description {
+        font-size: 10px;
+    }
+
+    .tooltip-arrow {
+        left: -10px;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-right: 10px solid var(--app-color);
+    }
+}
+
+/* Pantallas regulares: Desktop */
+@media (min-width: 1600px) {
+
+    /* Mantener tamaños originales para desktop */
+    .dock-container {
+        max-height: 90vh;
+    }
+}
+
+/* Tablets */
+@media (max-width: 1200px) and (min-width: 769px) {
+    .neon-dock {
+        left: 8px;
+        width: 70px;
+    }
+
+    .dock-container {
+        padding: 12px 6px;
+        max-height: 80vh;
+    }
+
+    .dock-app {
+        width: 50px;
+        height: 50px;
+    }
+
+    .app-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .dock-toggle {
+        width: 50px;
+        height: 50px;
+        left: 12px;
+    }
+
+    .toggle-icon {
+        font-size: 18px;
+    }
+
+    .dock-toggle.expanded {
+        opacity: 0;
+        transform: scale(0.5);
+        pointer-events: none;
+    }
+
+    .tooltip-content {
+        min-width: 200px;
+        max-width: 250px;
+        padding: 12px 16px;
+    }
+
+    .tooltip-title {
+        font-size: 14px;
+    }
+
+    .tooltip-description {
+        font-size: 11px;
+    }
+
+    .dock-app:hover .app-tooltip {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .dock-toggle {
+        width: 45px;
+        height: 45px;
+        left: 8px;
+        top: 16px;
+    }
+
+    .toggle-icon {
+        font-size: 16px;
+    }
+
+    .toggle-label {
+        font-size: 7px;
+    }
+
+    .neon-dock {
+        left: 8px;
+        width: 65px;
+    }
+
+    .dock-app {
+        width: 45px;
+        height: 45px;
+    }
+
+    .app-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .dock-toggle.expanded {
+        opacity: 0;
+        transform: scale(0.3);
+        pointer-events: none;
+        visibility: hidden;
+    }
+
+    .tooltip-content {
+        min-width: 180px;
+        max-width: 220px;
+        padding: 10px 14px;
+        border: 3px solid var(--app-color);
+    }
+
+    .tooltip-title {
+        font-size: 13px;
+    }
+
+    .tooltip-description {
+        font-size: 10px;
+    }
+
+    .dock-app:hover .app-tooltip,
+    .dock-app:active .app-tooltip,
+    .dock-app:focus .app-tooltip {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(-50%) translateX(0) !important;
+        z-index: 9999 !important;
+    }
+
+    .dock-overlay {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(3px);
+    }
+}
+
+/* 🔧 DEBUGGING */
+.tooltip-debug {
+    background: red !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}

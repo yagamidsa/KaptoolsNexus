@@ -1,4 +1,4 @@
-// src/App.tsx - COMPLETO CON TOOLTIPS RESPONSIVOS
+// src/App.tsx - COMPLETO CON SMART TOOLTIPS IMPLEMENTADOS
 
 import { useState, useEffect } from "react";
 import HolographicButton from "./components/HolographicButton";
@@ -10,6 +10,10 @@ import ProductData from './components/ProductData';
 import DuplicateMDD from './components/DuplicateMDD';
 import CreateStructure from './components/CreateStructure';
 import ShortcutsNexus from './components/ShorcutsNexus';
+import { SmartTooltipWrapper } from './components/SmartTooltipWrapper';
+import './components/style/SmartTooltip.css';
+import QChunksProcessor from './components/QChunksProcessor';
+import { open } from '@tauri-apps/plugin-dialog';
 import "./App.css";
 
 interface MenuItem {
@@ -42,6 +46,7 @@ function App() {
   const [showDuplicateMDDModal, setShowDuplicateMDDModal] = useState(false);
   const [showCreateStructureModal, setShowCreateStructureModal] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
+  const [showQChunksModal, setShowQChunksModal] = useState(false);
 
   // 🔥 ESTADO DE VALIDACIÓN DEL WORKSPACE
   const [workspaceValidation, setWorkspaceValidation] = useState<WorkspaceValidation>({
@@ -53,14 +58,6 @@ function App() {
 
   const menuItems: MenuItem[] = [
     // Git Operations
-    {
-      id: 'clone-develop',
-      label: 'Clone Repos (Develop)',
-      desc: 'Deploy microservices develop',
-      icon: '🌿',
-      category: 'GIT OPERATIONS',
-      requiresWorkspace: true
-    },
     {
       id: 'clone-master',
       label: 'Clone Repos (Master)',
@@ -85,7 +82,8 @@ function App() {
       label: 'Download Files',
       desc: 'BEE, CeV and Link',
       icon: '☁️',
-      category: 'AZURE TOOLS'
+      category: 'AZURE TOOLS',
+      requiresWorkspace: true  // 🔥 ARREGLADO: Requiere workspace
     },
     {
       id: 'product-data',
@@ -130,6 +128,14 @@ function App() {
       category: 'UTILITIES'
     },
     {
+      id: 'q-chunks-processor',
+      label: 'ODIN Chunks Processor',
+      desc: 'Process .odin files and generate chunks',
+      icon: '⚙️',
+      category: 'UTILITIES',
+      requiresWorkspace: true
+    },
+    {
       id: 'shortcuts',
       label: 'Quantum Shortcuts',
       desc: 'Divine portal matrix',
@@ -150,16 +156,17 @@ function App() {
         icon: '✅',
         message: `Ready to execute`,
         detail: `${item.desc}`,
-        type: 'success'
+        type: 'success' as const
       };
     }
 
+    
     if (item.requiresWorkspace && !isWorkspaceSelected) {
       return {
         icon: '📁',
         message: `Requires workspace selection`,
         detail: 'Select workspace folder first',
-        type: 'warning'
+        type: 'warning' as const
       };
     }
 
@@ -168,7 +175,7 @@ function App() {
         icon: '🌿',
         message: `Requires microservices`,
         detail: 'Clone microservices first',
-        type: 'error'
+        type: 'error' as const
       };
     }
 
@@ -176,7 +183,7 @@ function App() {
       icon: 'ℹ️',
       message: `${item.desc}`,
       detail: 'Click to execute',
-      type: 'info'
+      type: 'info' as const
     };
   };
 
@@ -234,23 +241,37 @@ function App() {
     }
   };
 
+
+
+  const debugCommands = async () => {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const commands = await invoke('list_commands');
+      console.log('Available commands:', commands);
+      setResponse(`Available commands: ${JSON.stringify(commands)}`);
+    } catch (error) {
+      setResponse(`Debug error: ${error}`);
+    }
+  };
+
+  <button onClick={debugCommands}>Debug Commands</button>
   const selectWorkspaceFolder = async () => {
     try {
-      setResponse("🔍 Opening native folder selector...");
+      setResponse("🔍 Opening folder selector...");
 
       const { invoke } = await import('@tauri-apps/api/core');
       const selectedPath = await invoke('select_folder') as string | null;
 
-      if (selectedPath) {
+      if (selectedPath && selectedPath.trim() !== '') {
         setWorkspacePath(selectedPath);
         setResponse(`📁 Workspace folder selected:\n📁 ${selectedPath}\n🔄 Validating...`);
         console.log('Selected workspace:', selectedPath);
       } else {
-        setResponse("❌ No folder selected - User cancelled or dialog closed");
+        setResponse("❌ No folder selected - User cancelled");
       }
     } catch (error) {
       console.error('Error opening folder selector:', error);
-      setResponse(`❌ Folder selector error\n💡 Please try again or use quick paths\n\nError details: ${error}`);
+      setResponse(`❌ Folder selector error: ${error}`);
     }
   };
 
@@ -375,9 +396,7 @@ function App() {
     setSelectedItem(itemId);
 
     // Handle Git operations
-    if (itemId === 'clone-develop') {
-      await cloneMicroservices('develop');
-    } else if (itemId === 'clone-master') {
+    if (itemId === 'clone-master') {
       await cloneMicroservices('master');
     } else if (itemId === 'review-branches') {
       setActiveView('review-branches');
@@ -389,10 +408,7 @@ function App() {
       setShowProductDataModal(true);
       setResponse(`📦 Opening Product Data Inspector...\n📂 Ready to analyze product metadata`);
     } else if (itemId === 'azure-download') {
-      if (!isWorkspaceSelected) {
-        setResponse('❌ Must select workspace first');
-        return;
-      }
+      // 🔥 ARREGLADO: Esta validación ya no es necesaria porque isMenuItemEnabled la maneja
       setShowDownloadModal(true);
       setResponse(`☁️ Opening Azure Download Center...\n📂 Target: ${workspacePath}`);
     }
@@ -404,6 +420,9 @@ function App() {
     } else if (itemId === 'create-structure') {
       setShowCreateStructureModal(true);
       setResponse(`🏗️ Opening Project Structure Creator...\n📂 Workspace: ${workspacePath}\n🌿 Microservices: ${workspaceValidation.existing_repos.join(', ')}\n⚡ Ready to deploy quantum architecture`);
+    } else if (itemId === 'q-chunks-processor') {
+      setShowQChunksModal(true);
+      setResponse(`⚙️ Opening ODIN Chunks Processor...\n📂 Workspace: ${workspacePath}\n🔧 Ready to process .odin files and generate Template_Chunks structure`);
     }
 
     // Handler Shortcuts:
@@ -457,25 +476,24 @@ function App() {
                   placeholder="Selected folder path will appear here..."
                 />
 
-                {/* 🔥 BOTÓN SELECT FOLDER CON TOOLTIP */}
-                <div className="cyber-tooltip tooltip-info">
+                {/* 🔥 BOTÓN SELECT FOLDER CON SMART TOOLTIP */}
+                <SmartTooltipWrapper
+                  content={{
+                    icon: '📁',
+                    message: 'Select Workspace',
+                    detail: 'Open native folder picker to choose your workspace directory',
+                    type: 'info'
+                  }}
+                  enabled={true}
+                  delay={300}
+                >
                   <button
                     className="input-button"
                     onClick={selectWorkspaceFolder}
                   >
                     📁 Select Folder
                   </button>
-                  <div className="tooltip-content">
-                    <span className="tooltip-icon info">📁</span>
-                    <div>
-                      <strong>Select Workspace</strong>
-                      <br />
-                      Open native folder picker to choose your workspace directory
-                      <br />
-                      <small>💡 Choose a folder where microservices will be cloned</small>
-                    </div>
-                  </div>
-                </div>
+                </SmartTooltipWrapper>
 
                 <div className="input-scanner"></div>
               </div>
@@ -501,8 +519,17 @@ function App() {
 
             {/* Quick Action Buttons */}
             <div className="action-matrix">
-              {/* 🔥 BOTÓN TEST API CON TOOLTIP */}
-              <div className="cyber-tooltip tooltip-info">
+              {/* 🔥 BOTÓN TEST API CON SMART TOOLTIP */}
+              <SmartTooltipWrapper
+                content={{
+                  icon: '🔗',
+                  message: 'Neural Link Test',
+                  detail: 'Test connection to backend API server on port 8000',
+                  type: 'info'
+                }}
+                enabled={true}
+                delay={300}
+              >
                 <HolographicButton
                   onClick={testAPI}
                   variant="secondary"
@@ -510,20 +537,21 @@ function App() {
                 >
                   Neural Link Test
                 </HolographicButton>
-                <div className="tooltip-content">
-                  <span className="tooltip-icon info">🔗</span>
-                  <div>
-                    <strong>Neural Link Test</strong>
-                    <br />
-                    Test connection to the backend API server
-                    <br />
-                    <small>🎯 Connects to port 8000</small>
-                  </div>
-                </div>
-              </div>
+              </SmartTooltipWrapper>
 
-              {/* 🔥 BOTÓN OPEN WORKSPACE CON TOOLTIP */}
-              <div className={`cyber-tooltip ${!isWorkspaceSelected ? 'tooltip-warning' : 'tooltip-success'}`}>
+              {/* 🔥 BOTÓN OPEN WORKSPACE CON SMART TOOLTIP */}
+              <SmartTooltipWrapper
+                content={{
+                  icon: !isWorkspaceSelected ? '⚠️' : '✅',
+                  message: 'Open Workspace',
+                  detail: !isWorkspaceSelected
+                    ? 'Select a workspace folder first'
+                    : `Open workspace in File Explorer`,
+                  type: !isWorkspaceSelected ? 'warning' : 'success'
+                }}
+                enabled={true}
+                delay={300}
+              >
                 <HolographicButton
                   onClick={openWorkspaceFolder}
                   variant="primary"
@@ -532,26 +560,7 @@ function App() {
                 >
                   Open Workspace
                 </HolographicButton>
-                <div className="tooltip-content">
-                  <span className={`tooltip-icon ${!isWorkspaceSelected ? 'warning' : 'success'}`}>
-                    {!isWorkspaceSelected ? '⚠️' : '✅'}
-                  </span>
-                  <div>
-                    <strong>Open Workspace</strong>
-                    <br />
-                    {!isWorkspaceSelected
-                      ? 'Select a workspace folder first'
-                      : `Open workspace in File Explorer`
-                    }
-                    {isWorkspaceSelected && (
-                      <>
-                        <br />
-                        <small>📂 Path: {workspacePath}</small>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+              </SmartTooltipWrapper>
             </div>
 
             {/* Response Terminal */}
@@ -608,7 +617,7 @@ function App() {
             )}
           </div>
 
-          {/* 🔥 PANEL LATERAL DE MENU CON TOOLTIPS RESPONSIVOS */}
+          {/* 🔥 PANEL LATERAL DE MENU CON SMART TOOLTIPS */}
           <aside className="main-menu">
             <div className="menu-header">
               <div className="menu-icon">⚡</div>
@@ -625,13 +634,12 @@ function App() {
                     const enabled = isMenuItemEnabled(item);
                     const tooltipContent = getTooltipContent(item, enabled);
 
-                    // 🔥 DETERMINAR CLASE DE TOOLTIP CON POSICIONAMIENTO PARA MENÚ LATERAL
-                    let tooltipClass = `cyber-tooltip tooltip-${tooltipContent.type}`;
-
                     return (
-                      <div
+                      <SmartTooltipWrapper
                         key={item.id}
-                        className={tooltipClass}
+                        content={tooltipContent}
+                        enabled={true}
+                        delay={400}
                       >
                         <div
                           className={`menu-item ${selectedItem === item.id ? 'active' : ''} ${!enabled ? 'disabled' : ''}`}
@@ -644,46 +652,27 @@ function App() {
                           </div>
                           <div className="item-status">
                             <div className={`status-indicator ${selectedItem === item.id ? 'active' :
-                                enabled ? 'ready' : 'disabled'
+                              enabled ? 'ready' : 'disabled'
                               }`}></div>
                           </div>
-                        </div>
 
-                        {/* 🔥 TOOLTIP CONTENT RESPONSIVO */}
-                        <div className="tooltip-content multiline">
-                          <div>
-                            <span className={`tooltip-icon ${tooltipContent.type}`}>
-                              {tooltipContent.icon}
-                            </span>
-                            <strong>{item.label}</strong>
-                          </div>
-                          <div>
-                            {tooltipContent.message}
-                            {tooltipContent.detail && (
-                              <>
-                                <br />
-                                <em>💡 {tooltipContent.detail}</em>
-                              </>
-                            )}
-
-                            {/* 🔥 REQUIREMENTS BADGES */}
-                            {(item.requiresWorkspace || item.requiresMicroservices) && (
-                              <div className="item-requirements">
-                                {item.requiresWorkspace && (
-                                  <span className={`req-badge ${isWorkspaceSelected ? 'met' : 'unmet'}`}>
-                                    📁 Workspace
-                                  </span>
-                                )}
-                                {item.requiresMicroservices && (
-                                  <span className={`req-badge ${workspaceValidation.has_microservices ? 'met' : 'unmet'}`}>
-                                    🌿 Microservices
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                          {/* 🔥 REQUIREMENTS BADGES VISIBLE */}
+                          {(item.requiresWorkspace || item.requiresMicroservices) && (
+                            <div className="item-requirements">
+                              {item.requiresWorkspace && (
+                                <span className={`req-badge ${isWorkspaceSelected ? 'met' : 'unmet'}`}>
+                                  📁
+                                </span>
+                              )}
+                              {item.requiresMicroservices && (
+                                <span className={`req-badge ${workspaceValidation.has_microservices ? 'met' : 'unmet'}`}>
+                                  🌿
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      </SmartTooltipWrapper>
                     );
                   })}
               </div>
@@ -767,6 +756,15 @@ function App() {
         workspacePath={workspacePath}
       />
 
+      <QChunksProcessor
+        isOpen={showQChunksModal}
+        onClose={() => {
+          setShowQChunksModal(false);
+          setSelectedItem('');
+          setResponse('⚙️ ODIN Chunks Processor closed');
+        }}
+        workspacePath={workspacePath}
+      />
       <ShortcutsNexus
         isOpen={showShortcutsModal}
         onClose={() => {

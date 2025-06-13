@@ -33,7 +33,7 @@
 /* ================================
    BACKDROP PRINCIPAL CENTRADO
    ================================ */
-.download-modal-backdrop,
+.cs-download-modal-backdrop,
 .create-structure-modal {
     position: fixed;
     top: 0;
@@ -69,7 +69,7 @@
 /* ================================
    MODAL PRINCIPAL CENTRADO
    ================================ */
-.download-modal,
+.cs-download-modal,
 .create-structure-container {
     background: var(--gradient-primary);
     border: 1px solid rgba(246, 173, 85, 0.2);
@@ -101,8 +101,8 @@
 }
 
 /* Animación de salida */
-.download-modal.closing,
-.create-structure-container.closing {
+.cs-download-modal.cs-closing,
+.create-structure-container.cs-closing {
     animation: modalExit 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
 }
 
@@ -118,8 +118,8 @@
     }
 }
 
-.download-modal-backdrop.closing,
-.create-structure-modal.closing {
+.cs-download-modal-backdrop.cs-closing,
+.create-structure-modal.cs-closing {
     animation: backdropExit 0.3s ease-out forwards;
 }
 
@@ -136,7 +136,7 @@
 }
 
 /* Borde sutil animado */
-.download-modal::before,
+.cs-download-modal::before,
 .create-structure-container::before {
     content: '';
     position: absolute;
@@ -164,7 +164,7 @@
 /* ================================
    HEADER PROFESIONAL
    ================================ */
-.download-modal-header,
+.cs-download-modal-header,
 .modal-header {
     display: flex;
     align-items: center;
@@ -175,14 +175,14 @@
     position: relative;
 }
 
-.header-content {
+.cs-header-content {
     display: flex;
     align-items: center;
     gap: 16px;
     flex: 1;
 }
 
-.header-icon {
+.cs-header-icon {
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -212,7 +212,7 @@
 }
 
 .header-text h2,
-.modal-title {
+.cs-modal-title {
     color: #ffffff;
     font-size: 1.25rem;
     font-weight: 700;
@@ -230,7 +230,7 @@
     font-weight: 500;
 }
 
-.download-modal .close-button {
+.cs-download-modal .cs-close-button {
     width: 36px;
     height: 36px;
     border-radius: 8px;
@@ -246,7 +246,7 @@
     font-weight: 500;
 }
 
-.download-modal .close-button:hover {
+.cs-download-modal .cs-close-button:hover {
     background: rgba(252, 129, 129, 0.15);
     border-color: rgba(252, 129, 129, 0.4);
     color: #fc8181;
@@ -256,7 +256,7 @@
 /* ================================
    CONTENIDO SCROLLABLE
    ================================ */
-.download-modal-content {
+.cs-download-modal-content {
     padding: 24px 28px;
     display: flex;
     flex-direction: column;
@@ -266,25 +266,25 @@
     transition: all 0.3s ease;
 }
 
-.download-modal-content::-webkit-scrollbar {
+.cs-download-modal-content::-webkit-scrollbar {
     width: 6px;
 }
 
-.download-modal-content::-webkit-scrollbar-track {
+.cs-download-modal-content::-webkit-scrollbar-track {
     background: rgba(45, 55, 72, 0.3);
     border-radius: 3px;
 }
 
-.download-modal-content::-webkit-scrollbar-thumb {
+.cs-download-modal-content::-webkit-scrollbar-thumb {
     background: var(--gradient-accent);
     border-radius: 3px;
 }
 
-.download-modal-content::-webkit-scrollbar-thumb:hover {
+.cs-download-modal-content::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-400) 100%);
 }
 
-.content-hidden {
+.cs-content-hidden {
     opacity: 0.4;
     pointer-events: none;
     filter: blur(1px);
@@ -293,7 +293,7 @@
 /* ================================
    WORKSPACE INFO CARD
    ================================ */
-.workspace-info {
+.cs-workspace-info {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -306,7 +306,7 @@
 }
 
 .workspace-title,
-.info-label {
+.cs-info-label {
     color: var(--gold-400);
     font-weight: 600;
     font-size: 11px;
@@ -316,7 +316,7 @@
 }
 
 .workspace-path,
-.info-path {
+.cs-info-path {
     color: #ffffff;
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 12px;
@@ -327,14 +327,14 @@
     border-left: 3px solid var(--gold-400);
 }
 
-.info-icon {
+.cs-info-icon {
     color: var(--blue-400);
     display: flex;
     align-items: center;
     font-size: 18px;
 }
 
-.info-text {
+.cs-info-text {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -344,9 +344,9 @@
 /* ================================
    FORM GROUPS PROFESIONALES
    ================================ */
-.form-group,
+.cs-form-group,
 .file-section,
-.input-group {
+.cs-input-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -354,22 +354,22 @@
     animation-fill-mode: both;
 }
 
-.form-group:nth-child(1),
+.cs-form-group:nth-child(1),
 .file-section:nth-child(1) {
     animation-delay: 0.1s;
 }
 
-.form-group:nth-child(2),
+.cs-form-group:nth-child(2),
 .file-section:nth-child(2) {
     animation-delay: 0.15s;
 }
 
-.form-group:nth-child(3),
+.cs-form-group:nth-child(3),
 .file-section:nth-child(3) {
     animation-delay: 0.2s;
 }
 
-.form-group:nth-child(4),
+.cs-form-group:nth-child(4),
 .file-section:nth-child(4) {
     animation-delay: 0.25s;
 }
@@ -386,7 +386,7 @@
     }
 }
 
-.form-label,
+.cs-form-label,
 .file-label,
 .input-label {
     display: flex;
@@ -399,7 +399,7 @@
     letter-spacing: 0.5px;
 }
 
-.label-icon {
+.cs-label-icon {
     color: var(--gold-400);
     font-size: 14px;
 }
@@ -407,8 +407,8 @@
 /* ================================
    INPUTS Y SELECTS PROFESIONALES
    ================================ */
-.cyber-input,
-.cyber-select,
+.cs-cyber-input,
+.cs-cyber-select,
 .project-input {
     padding: 14px 16px;
     background: rgba(15, 22, 41, 0.8);
@@ -421,14 +421,14 @@
     backdrop-filter: blur(8px);
 }
 
-.cyber-input::placeholder,
+.cs-cyber-input::placeholder,
 .project-input::placeholder {
     color: var(--navy-500);
     font-style: normal;
 }
 
-.cyber-input:focus,
-.cyber-select:focus,
+.cs-cyber-input:focus,
+.cs-cyber-select:focus,
 .project-input:focus {
     outline: none;
     border-color: var(--gold-400);
@@ -439,14 +439,14 @@
     transform: translateY(-1px);
 }
 
-.cyber-input:hover:not(:disabled),
-.cyber-select:hover:not(:disabled),
+.cs-cyber-input:hover:not(:disabled),
+.cs-cyber-select:hover:not(:disabled),
 .project-input:hover:not(:disabled) {
     border-color: rgba(246, 173, 85, 0.4);
     box-shadow: var(--shadow-md);
 }
 
-.cyber-input:disabled,
+.cs-cyber-input:disabled,
 .project-input:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -486,7 +486,7 @@
     border-color: var(--green-400);
 }
 
-.file-icon {
+.cs-file-icon {
     font-size: 36px;
     margin-bottom: 12px;
     display: block;
@@ -522,11 +522,11 @@
 /* ================================
    CHECKBOX PROFESIONAL
    ================================ */
-.token-checkbox {
+.cs-token-checkbox {
     margin-top: 10px;
 }
 
-.checkbox-label {
+.cs-checkbox-label {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -537,11 +537,11 @@
     transition: all 0.3s ease;
 }
 
-.checkbox-label:hover {
+.cs-checkbox-label:hover {
     color: #ffffff;
 }
 
-.cyber-checkbox {
+.cs-cyber-checkbox {
     width: 18px;
     height: 18px;
     border: 1.5px solid rgba(113, 128, 150, 0.4);
@@ -553,12 +553,12 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cyber-checkbox:checked {
+.cs-cyber-checkbox:checked {
     background: var(--gradient-accent);
     border-color: var(--gold-400);
 }
 
-.cyber-checkbox:checked::after {
+.cs-cyber-checkbox:checked::after {
     content: '✓';
     position: absolute;
     top: 50%;
@@ -569,12 +569,12 @@
     font-weight: bold;
 }
 
-.cyber-checkbox:hover {
+.cs-cyber-checkbox:hover {
     border-color: var(--gold-400);
     box-shadow: 0 0 0 2px rgba(246, 173, 85, 0.1);
 }
 
-.checkbox-text {
+.cs-checkbox-text {
     user-select: none;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -584,7 +584,7 @@
 /* ================================
    BOTONES PROFESIONALES
    ================================ */
-.download-modal-actions,
+.cs-download-modal-actions,
 .actions-container {
     display: flex;
     gap: 12px;
@@ -593,8 +593,8 @@
     background: rgba(15, 22, 41, 0.3);
 }
 
-.modal-button,
-.action-button {
+.cs-modal-button,
+.cs-action-button {
     flex: 1;
     padding: 14px 20px;
     border-radius: 10px;
@@ -613,15 +613,15 @@
     overflow: hidden;
 }
 
-.modal-button.secondary,
-.action-button.cancel-button {
+.cs-modal-button.cs-secondary,
+.cs-action-button.cancel-button {
     background: rgba(113, 128, 150, 0.2);
     border: 1px solid rgba(113, 128, 150, 0.3);
     color: var(--navy-500);
 }
 
-.modal-button.secondary:hover:not(:disabled),
-.action-button.cancel-button:hover:not(:disabled) {
+.cs-modal-button.cs-secondary:hover:not(:disabled),
+.cs-action-button.cancel-button:hover:not(:disabled) {
     background: rgba(113, 128, 150, 0.3);
     border-color: rgba(113, 128, 150, 0.5);
     color: #ffffff;
@@ -629,16 +629,16 @@
     box-shadow: var(--shadow-md);
 }
 
-.modal-button.primary,
-.action-button.primary-button {
+.cs-modal-button.cs-primary,
+.cs-action-button.cs-primary-button {
     background: var(--gradient-accent);
     color: var(--navy-900);
     font-weight: 700;
     box-shadow: var(--shadow-glow);
 }
 
-.modal-button.primary:hover:not(:disabled),
-.action-button.primary-button:hover:not(:disabled) {
+.cs-modal-button.cs-primary:hover:not(:disabled),
+.cs-action-button.cs-primary-button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow:
         0 0 25px rgba(246, 173, 85, 0.4),
@@ -646,15 +646,15 @@
     background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-400) 100%);
 }
 
-.modal-button:disabled,
-.action-button:disabled {
+.cs-modal-button:disabled,
+.cs-action-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none ;
     box-shadow: none ;
 }
 
-.loading-spinner {
+.cs-loading-spinner {
     width: 16px;
     height: 16px;
     border: 2px solid rgba(15, 22, 41, 0.3);
@@ -700,7 +700,7 @@
     }
 }
 
-.progress-modal {
+.cs-progress-modal {
     width: 100%;
     max-width: 400px;
     padding: 32px;
@@ -723,7 +723,7 @@
     }
 }
 
-.progress-header {
+.cs-progress-header {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -731,7 +731,7 @@
     width: 100%;
 }
 
-.progress-icon {
+.cs-progress-icon {
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -758,7 +758,7 @@
     }
 }
 
-.progress-title {
+.cs-progress-title {
     flex: 1;
     text-align: left;
 }
@@ -781,7 +781,7 @@
     font-family: 'SF Mono', 'Monaco', monospace;
 }
 
-.progress-content {
+.cs-progress-content {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -794,7 +794,7 @@
 
 /* Contenedor principal del progress */
 .progress-container,
-.progress-bar-container {
+.cs-progress-bar-container {
     position: relative;
     width: 100%;
     margin-bottom: 12px;
@@ -812,8 +812,8 @@
 }
 
 /* Track/fondo de la barra (contenedor gris) */
-.progress-bar-track,
-.progress-bar-container {
+.cs-progress-bar-track,
+.cs-progress-bar-container {
     width: 100%;
     height: 10px;
     background: rgba(45, 55, 72, 0.8);
@@ -825,8 +825,8 @@
 }
 
 /* La barra que se llena (elemento hijo) - GRADIENTE HERMOSO */
-.progress-bar,
-.progress-bar-fill {
+.cs-progress-bar,
+.cs-progress-bar-fill {
     height: 100%;
     background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 25%, #EC4899 50%, #F97316 75%, #EAB308 100%);
     border-radius: 7px;
@@ -841,8 +841,8 @@
 }
 
 /* Efecto shine encima de la barra */
-.progress-bar::after,
-.progress-bar-fill::after {
+.cs-progress-bar::after,
+.cs-progress-bar-fill::after {
     content: '';
     position: absolute;
     top: 0;
@@ -867,8 +867,8 @@
 }
 
 /* Estados de la barra */
-.progress-bar.complete,
-.progress-bar-fill.complete {
+.cs-progress-bar.cs-complete,
+.cs-progress-bar-fill.cs-complete {
     background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%);
     box-shadow:
         0 0 25px rgba(16, 185, 129, 0.5),
@@ -878,8 +878,8 @@
 /* ELIMINAMOS las animaciones automáticas que interfieren */
 /* La barra SOLO debe moverse cuando React actualiza el style={{width: `${progress}%`}} */
 
-.progress-bar-fill::after,
-.progress-bar::after {
+.cs-progress-bar-fill::after,
+.cs-progress-bar::after {
     content: '';
     position: absolute;
     top: 0;
@@ -903,7 +903,7 @@
     }
 }
 
-.progress-percentage {
+.cs-progress-percentage {
     color: #ffffff;
     font-size: 16px;
     font-weight: 700;
@@ -914,7 +914,7 @@
     background-clip: text;
 }
 
-.progress-step {
+.cs-progress-step {
     color: var(--navy-500);
     font-size: 14px;
     font-weight: 500;
@@ -935,7 +935,7 @@
 /* ================================
    MENSAJES DE ESTADO
    ================================ */
-.success-message {
+.cs-success-message {
     background: rgba(104, 211, 145, 0.1);
     border: 1px solid rgba(104, 211, 145, 0.3);
     border-radius: 12px;
@@ -944,7 +944,7 @@
     animation: messageSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.error-message {
+.cs-error-message {
     background: rgba(252, 129, 129, 0.1);
     border: 1px solid rgba(252, 129, 129, 0.3);
     border-radius: 12px;
@@ -965,8 +965,8 @@
     }
 }
 
-.success-icon,
-.error-icon {
+.cs-success-icon,
+.cs-error-icon {
     font-size: 28px;
     margin-bottom: 12px;
 }
@@ -1009,7 +1009,7 @@
 /* ================================
    LOGS CONTAINER
    ================================ */
-.logs-container {
+.cs-logs-container {
     background: rgba(15, 22, 41, 0.8);
     border: 1px solid rgba(113, 128, 150, 0.3);
     border-radius: 10px;
@@ -1021,7 +1021,7 @@
     font-size: 12px;
 }
 
-.log-entry {
+.cs-log-entry {
     margin-bottom: 4px;
     padding: 2px 0;
     animation: logSlide 0.3s ease-out;
@@ -1039,19 +1039,19 @@
     }
 }
 
-.log-entry.error {
+.cs-log-entry.cs-error {
     color: var(--red-400);
 }
 
-.log-entry.success {
+.cs-log-entry.cs-success {
     color: var(--green-400);
 }
 
-.log-entry.warning {
+.cs-log-entry.warning {
     color: var(--gold-400);
 }
 
-.log-entry.info {
+.cs-log-entry.info {
     color: #ffffff;
 }
 
@@ -1076,19 +1076,19 @@
 /* ================================
    VALIDACIÓN Y ESTADOS
    ================================ */
-.form-group.error .cyber-input,
-.form-group.error .project-input {
+.cs-form-group.cs-error .cs-cyber-input,
+.cs-form-group.cs-error .project-input {
     border-color: var(--red-400);
     box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.15);
 }
 
-.form-group.success .cyber-input,
-.form-group.success .project-input {
+.cs-form-group.cs-success .cs-cyber-input,
+.cs-form-group.cs-success .project-input {
     border-color: var(--green-400);
     box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.15);
 }
 
-.error-text-validation {
+.cs-error-text-validation {
     color: var(--red-400);
     font-size: 11px;
     margin-top: 4px;
@@ -1098,12 +1098,12 @@
     gap: 4px;
 }
 
-.error-text-validation::before {
+.cs-error-text-validation::before {
     content: '⚠';
     font-weight: bold;
 }
 
-.success-text-validation {
+.cs-success-text-validation {
     color: var(--green-400);
     font-size: 11px;
     margin-top: 4px;
@@ -1113,7 +1113,7 @@
     gap: 4px;
 }
 
-.success-text-validation::before {
+.cs-success-text-validation::before {
     content: '✓';
     font-weight: bold;
 }
@@ -1168,14 +1168,14 @@
    ================================ */
 @media (max-width: 768px) {
 
-    .download-modal,
+    .cs-download-modal,
     .create-structure-container {
         margin: 10px;
         max-width: none;
         max-height: 95vh;
     }
 
-    .download-modal-header,
+    .cs-download-modal-header,
     .modal-header {
         padding: 20px 20px 16px;
         flex-direction: column;
@@ -1183,50 +1183,50 @@
         gap: 12px;
     }
 
-    .close-button {
+    .cs-close-button {
         position: absolute;
         top: 20px;
         right: 20px;
     }
 
-    .header-content {
+    .cs-header-content {
         gap: 12px;
     }
 
-    .header-icon {
+    .cs-header-icon {
         width: 42px;
         height: 42px;
         font-size: 18px;
     }
 
     .header-text h2,
-    .modal-title {
+    .cs-modal-title {
         font-size: 1.1rem;
     }
 
-    .download-modal-content {
+    .cs-download-modal-content {
         padding: 20px;
         gap: 16px;
         max-height: calc(95vh - 180px);
     }
 
-    .download-modal-actions,
+    .cs-download-modal-actions,
     .actions-container {
         flex-direction: column;
         padding: 16px 20px 20px;
         gap: 10px;
     }
 
-    .progress-modal {
+    .cs-progress-modal {
         padding: 24px 20px;
     }
 
-    .progress-header {
+    .cs-progress-header {
         gap: 12px;
         margin-bottom: 20px;
     }
 
-    .progress-icon {
+    .cs-progress-icon {
         width: 42px;
         height: 42px;
         font-size: 18px;
@@ -1236,7 +1236,7 @@
         font-size: 1rem;
     }
 
-    .progress-actions {
+    .cs-progress-actions {
         flex-direction: column;
         margin-top: 20px;
         gap: 10px;
@@ -1246,30 +1246,30 @@
         padding: 24px 16px;
     }
 
-    .file-icon {
+    .cs-file-icon {
         font-size: 28px;
     }
 }
 
 @media (max-width: 480px) {
 
-    .download-modal-backdrop,
+    .cs-download-modal-backdrop,
     .create-structure-modal {
         padding: 5px;
     }
 
-    .download-modal,
+    .cs-download-modal,
     .create-structure-container {
         margin: 5px;
         border-radius: 12px;
     }
 
-    .download-modal-header,
+    .cs-download-modal-header,
     .modal-header {
         padding: 16px;
     }
 
-    .close-button {
+    .cs-close-button {
         top: 16px;
         right: 16px;
         width: 32px;
@@ -1277,38 +1277,38 @@
         font-size: 14px;
     }
 
-    .download-modal-content {
+    .cs-download-modal-content {
         padding: 16px;
         gap: 14px;
     }
 
-    .form-label,
+    .cs-form-label,
     .file-label,
     .input-label {
         font-size: 11px;
     }
 
-    .cyber-input,
-    .cyber-select,
+    .cs-cyber-input,
+    .cs-cyber-select,
     .project-input {
         padding: 12px 14px;
         font-size: 13px;
     }
 
-    .workspace-info {
+    .cs-workspace-info {
         padding: 12px 14px;
         font-size: 12px;
         gap: 10px;
     }
 
     .workspace-path,
-    .info-path {
+    .cs-info-path {
         font-size: 11px;
         padding: 6px 10px;
     }
 
-    .modal-button,
-    .action-button {
+    .cs-modal-button,
+    .cs-action-button {
         padding: 12px 16px;
         font-size: 12px;
     }
@@ -1317,7 +1317,7 @@
         padding: 20px 12px;
     }
 
-    .file-icon {
+    .cs-file-icon {
         font-size: 24px;
         margin-bottom: 8px;
     }
@@ -1340,21 +1340,21 @@
    ================================ */
 @media (max-height: 500px) and (orientation: landscape) {
 
-    .download-modal,
+    .cs-download-modal,
     .create-structure-container {
         max-height: 95vh;
     }
 
-    .download-modal-content {
+    .cs-download-modal-content {
         max-height: calc(95vh - 160px);
     }
 
-    .progress-modal {
+    .cs-progress-modal {
         max-height: 85vh;
         overflow-y: auto;
     }
 
-    .logs-container {
+    .cs-logs-container {
         max-height: 120px;
     }
 }
@@ -1362,14 +1362,14 @@
 /* ================================
    EFECTOS HOVER MEJORADOS
    ================================ */
-.form-group:hover .cyber-input:not(:disabled),
-.form-group:hover .cyber-select:not(:disabled),
-.form-group:hover .project-input:not(:disabled) {
+.cs-form-group:hover .cs-cyber-input:not(:disabled),
+.cs-form-group:hover .cs-cyber-select:not(:disabled),
+.cs-form-group:hover .project-input:not(:disabled) {
     box-shadow: var(--shadow-md);
 }
 
-.modal-button.primary::after,
-.action-button.primary-button::after {
+.cs-modal-button.cs-primary::after,
+.cs-action-button.cs-primary-button::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1383,33 +1383,33 @@
     transition: left 0.5s ease;
 }
 
-.modal-button.primary:hover:not(:disabled)::after,
-.action-button.primary-button:hover:not(:disabled)::after {
+.cs-modal-button.cs-primary:hover:not(:disabled)::after,
+.cs-action-button.cs-primary-button:hover:not(:disabled)::after {
     left: 100%;
 }
 
 /* ================================
    FOCUS VISIBLE PARA ACCESIBILIDAD
    ================================ */
-.modal-button:focus-visible,
-.action-button:focus-visible {
+.cs-modal-button:focus-visible,
+.cs-action-button:focus-visible {
     outline: 2px solid var(--gold-400);
     outline-offset: 2px;
 }
 
-.close-button:focus-visible {
+.cs-close-button:focus-visible {
     outline: 2px solid var(--red-400);
     outline-offset: 2px;
 }
 
-.cyber-input:focus-visible,
-.cyber-select:focus-visible,
+.cs-cyber-input:focus-visible,
+.cs-cyber-select:focus-visible,
 .project-input:focus-visible {
     outline: 2px solid var(--gold-400);
     outline-offset: 2px;
 }
 
-.cyber-checkbox:focus-visible {
+.cs-cyber-checkbox:focus-visible {
     outline: 2px solid var(--gold-400);
     outline-offset: 2px;
 }
@@ -1417,18 +1417,18 @@
 /* ================================
    OPTIMIZACIONES DE PERFORMANCE
    ================================ */
-.download-modal,
+.cs-download-modal,
 .create-structure-container,
 .progress-overlay {
     will-change: transform, opacity;
 }
 
-.progress-bar-fill,
-.progress-bar {
+.cs-progress-bar-fill,
+.cs-progress-bar {
     will-change: width;
 }
 
-.loading-spinner {
+.cs-loading-spinner {
     will-change: transform;
 }
 
@@ -1451,19 +1451,19 @@
    ================================ */
 @media (prefers-contrast: high) {
 
-    .download-modal,
+    .cs-download-modal,
     .create-structure-container {
         border: 2px solid #ffffff;
     }
 
-    .cyber-input,
-    .cyber-select,
+    .cs-cyber-input,
+    .cs-cyber-select,
     .project-input {
         border-width: 2px;
     }
 
-    .modal-button,
-    .action-button {
+    .cs-modal-button,
+    .cs-action-button {
         border-width: 2px;
     }
 }
@@ -1473,7 +1473,7 @@
    ================================ */
 @media (prefers-color-scheme: dark) {
 
-    .download-modal,
+    .cs-download-modal,
     .create-structure-container {
         background: linear-gradient(145deg,
                 rgba(10, 15, 25, 0.95) 0%,
@@ -1482,8 +1482,8 @@
         border-color: rgba(246, 173, 85, 0.3);
     }
 
-    .cyber-input,
-    .cyber-select,
+    .cs-cyber-input,
+    .cs-cyber-select,
     .project-input {
         background: rgba(5, 10, 20, 0.9);
     }
@@ -1494,7 +1494,7 @@
    ================================ */
 @media print {
 
-    .download-modal-backdrop,
+    .cs-download-modal-backdrop,
     .create-structure-modal {
         display: none;
     }
@@ -1511,19 +1511,19 @@ body:has(.create-structure-modal) {
 /* ================================
    UTILIDADES FINALES
    ================================ */
-.download-modal-content {
+.cs-download-modal-content {
     scroll-behavior: smooth;
 }
 
-.form-group.loading .cyber-input,
-.form-group.loading .cyber-select,
-.form-group.loading .project-input {
+.cs-form-group.cs-loading .cs-cyber-input,
+.cs-form-group.cs-loading .cs-cyber-select,
+.cs-form-group.cs-loading .project-input {
     pointer-events: none;
     opacity: 0.7;
     background: rgba(15, 22, 41, 0.6);
 }
 
-.progress-complete {
+.cs-progress-complete {
     animation: completeCelebration 1s ease-out;
 }
 
@@ -1578,13 +1578,13 @@ body:has(.create-structure-modal) {
 /* ================================
    ESTADOS ADICIONALES
    ================================ */
-.action-button.complete-button {
+.cs-action-button.complete-button {
     background: linear-gradient(135deg, var(--green-400) 0%, #4caf50 100%);
     color: var(--navy-900);
     box-shadow: 0 0 20px rgba(104, 211, 145, 0.3);
 }
 
-.action-button.complete-button:hover {
+.cs-action-button.complete-button:hover {
     background: linear-gradient(135deg, #4caf50 0%, var(--green-400) 100%);
     transform: translateY(-2px);
     box-shadow: 0 0 25px rgba(104, 211, 145, 0.4);
@@ -1600,7 +1600,7 @@ body:has(.create-structure-modal) {
 /* ================================
    MEJORAS FINALES DE UX
    ================================ */
-.workspace-info::before {
+.cs-workspace-info::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1624,7 +1624,7 @@ body:has(.create-structure-modal) {
     }
 }
 
-.success-details {
+.cs-success-details {
     font-size: 11px ;
     color: var(--green-400) ;
     font-weight: 600;
@@ -1634,34 +1634,34 @@ body:has(.create-structure-modal) {
 /* ================================
    ANIMACIONES DE ENTRADA ESCALONADAS
    ================================ */
-.download-modal-content.animate-in .form-group,
-.download-modal-content.animate-in .file-section,
-.download-modal-content.animate-in .input-group {
+.cs-download-modal-content.cs-animate-in .cs-form-group,
+.cs-download-modal-content.cs-animate-in .file-section,
+.cs-download-modal-content.cs-animate-in .cs-input-group {
     animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     animation-fill-mode: both;
 }
 
-.download-modal-content.animate-in .form-group:nth-child(1),
-.download-modal-content.animate-in .file-section:nth-child(1) {
+.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(1),
+.cs-download-modal-content.cs-animate-in .file-section:nth-child(1) {
     animation-delay: 0.1s;
 }
 
-.download-modal-content.animate-in .form-group:nth-child(2),
-.download-modal-content.animate-in .file-section:nth-child(2) {
+.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(2),
+.cs-download-modal-content.cs-animate-in .file-section:nth-child(2) {
     animation-delay: 0.15s;
 }
 
-.download-modal-content.animate-in .form-group:nth-child(3),
-.download-modal-content.animate-in .file-section:nth-child(3) {
+.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(3),
+.cs-download-modal-content.cs-animate-in .file-section:nth-child(3) {
     animation-delay: 0.2s;
 }
 
-.download-modal-content.animate-in .form-group:nth-child(4),
-.download-modal-content.animate-in .file-section:nth-child(4) {
+.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(4),
+.cs-download-modal-content.cs-animate-in .file-section:nth-child(4) {
     animation-delay: 0.25s;
 }
 
-.download-modal-content.animate-in .workspace-info {
+.cs-download-modal-content.cs-animate-in .cs-workspace-info {
     animation-delay: 0.3s;
 }
 

@@ -1780,3 +1780,200 @@
       margin-right: 3px !important;
     }
   }
+
+
+  /* 🔥 AGREGAR AL FINAL de tu App.css existente */
+
+/* 🚫 DESHABILITAR TOOLTIPS ANTIGUOS PARA EVITAR CONFLICTOS */
+.cyber-tooltip,
+.cyber-tooltip .tooltip-content,
+.tooltip-top,
+.tooltip-bottom,
+.tooltip-left,
+.tooltip-right {
+  display: none !important;
+}
+
+/* 🔥 REQUIREMENTS BADGES MEJORADOS */
+.item-requirements {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 3px;
+  z-index: 10;
+}
+
+.req-badge {
+  font-size: 8px;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.req-badge.met {
+  background: rgba(0, 255, 135, 0.3);
+  color: #00ff87;
+  border: 1px solid rgba(0, 255, 135, 0.5);
+  box-shadow: 0 0 6px rgba(0, 255, 135, 0.4);
+}
+
+.req-badge.unmet {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+/* 🔧 MENU ITEM ADJUSTMENTS */
+.menu-item {
+  position: relative;
+  padding-right: 40px; /* Espacio para badges */
+}
+
+/* 🎯 ASEGURAR STATUS INDICATORS CIRCULARES */
+.status-indicator {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  display: block !important;
+  position: relative !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.item-status {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 🎯 STATUS INDICATOR STATES */
+.status-indicator.ready {
+  background: #6c5ce7 !important;
+  box-shadow: 0 0 8px rgba(108, 92, 231, 0.6) !important;
+  animation: status-ready 2s ease infinite alternate !important;
+}
+
+.status-indicator.active {
+  background: #ff6b9d !important;
+  box-shadow: 0 0 8px rgba(255, 107, 157, 0.6) !important;
+  animation: status-active 1s ease infinite !important;
+}
+
+.status-indicator.disabled {
+  background: #ef4444 !important;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5) !important;
+  animation: pulse-warning 2s infinite !important;
+}
+
+/* 🎨 ANIMATIONS */
+@keyframes status-ready {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(108, 92, 231, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(108, 92, 231, 0.9);
+  }
+}
+
+@keyframes status-active {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 107, 157, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 107, 157, 0.9);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+  }
+}
+
+/* 🎯 RESPONSIVE ADJUSTMENTS */
+@media (max-width: 1024px) {
+  .menu-item {
+    padding-right: 30px;
+  }
+  
+  .item-requirements {
+    top: 6px;
+    right: 6px;
+    gap: 2px;
+  }
+  
+  .req-badge {
+    font-size: 7px;
+    min-width: 10px;
+    height: 10px;
+    padding: 1px 3px;
+  }
+  
+  .item-status {
+    right: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-item {
+    padding-right: 25px;
+    min-height: 44px; /* Más espacio táctil */
+  }
+  
+  .item-requirements {
+    position: static;
+    margin-top: 4px;
+    justify-content: flex-start;
+  }
+  
+  .item-status {
+    position: static;
+    transform: none;
+    margin-left: auto;
+  }
+}
+
+/* 🔥 EFECTOS HOVER */
+.menu-item:hover .req-badge.met {
+  background: rgba(0, 255, 135, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 135, 0.6);
+}
+
+.menu-item:hover .req-badge.unmet {
+  background: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+/* 🎯 ASEGURAR Z-INDEX CORRECTO */
+.smart-tooltip {
+  z-index: 99999 !important;
+}
+
+/* ✨ SMOOTH TRANSITIONS */
+.menu-item,
+.req-badge,
+.status-indicator {
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
