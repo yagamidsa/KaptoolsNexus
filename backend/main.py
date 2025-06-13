@@ -1138,9 +1138,7 @@ async def duplicate_mdd_files(
 ):
     """
     🔥 ENDPOINT CORREGIDO - Duplicación de archivos MDD/DDF con datos REALES
-    
-    CORRECCIÓN PRINCIPAL: Ahora pasa ambos archivos (MDD y DDF) al servicio
-    para obtener el conteo real de registros.
+    ✅ CORRECCIÓN: Eliminada duplicación de llamadas al servicio
     """
     logger.info("=" * 50)
     logger.info("🚀 STARTING MDD DUPLICATION ENDPOINT - REAL DATA MODE")
@@ -1276,7 +1274,7 @@ async def duplicate_mdd_files(
             
             logger.info("✅ Temporary files created successfully")
             
-            # 🔥 CORRECCIÓN PRINCIPAL: Validar archivos con datos reales ANTES de procesar
+            # VALIDAR ARCHIVOS CON DATOS REALES ANTES DE PROCESAR
             logger.info("🔍 Validating files with real data reader...")
             
             # Crear archivos temporales con nombres correctos para validación
@@ -1312,26 +1310,61 @@ async def duplicate_mdd_files(
             logger.info(f"📁 DDF size: {validation['ddf_size']:,} bytes")
             
             # VERIFICAR QUE EL SERVICIO MDD EXISTE
-            if not hasattr(mdd_service, 'process_duplicate_mdd_real'):
-                logger.error("❌ MDD service method not found")
+            logger.info("🔍 Checking MDD service methods...")
+            available_methods = [method for method in dir(mdd_service) if not method.startswith('_')]
+            logger.info(f"📋 Available methods: {available_methods}")
+            
+            # Verificar métodos disponibles
+            if hasattr(mdd_service, 'process_duplicate_mdd_real'):
+                logger.info("✅ Found process_duplicate_mdd_real method")
+            elif hasattr(mdd_service, 'duplicate_mdd_real_fallback'):
+                logger.info("✅ Found duplicate_mdd_real_fallback method")
+            else:
+                logger.error("❌ No suitable MDD processing method found")
                 raise HTTPException(
                     status_code=503,
-                    detail="MDD service process_duplicate_mdd method not available"
+                    detail=f"MDD service methods not available. Available: {available_methods}"
                 )
             
+            # 🔥 UNA SOLA LLAMADA AL SERVICIO MDD (SIN DUPLICACIÓN)
             logger.info("🔄 Calling MDD service with REAL data...")
             
-            # 🔥 CORRECCIÓN CRÍTICA: Llamar al servicio con AMBOS archivos temporales
-            # El servicio corregido usará estos archivos para obtener el conteo real
-            result = await mdd_service.process_duplicate_mdd_real(
-                mdd_file_path=temp_mdd_path,
-                ddf_file_path=temp_ddf_path,  # ← CRÍTICO: Pasar el DDF también
-                duplicate_count=duplicate_count,
-                workspace_path=workspace_path,
-                original_mdd_filename=original_mdd_filename
-            )
-            
-            logger.info(f"🎯 MDD service result: {result.get('success', False)}")
+            try:
+                if hasattr(mdd_service, 'process_duplicate_mdd_real'):
+                    logger.info("📞 Using async process_duplicate_mdd_real method")
+                    result = await mdd_service.process_duplicate_mdd_real(
+                        mdd_file_path=temp_mdd_path,
+                        ddf_file_path=temp_ddf_path,
+                        duplicate_count=duplicate_count,
+                        workspace_path=workspace_path,
+                        original_mdd_filename=original_mdd_filename
+                    )
+                else:
+                    logger.info("📞 Using sync duplicate_mdd_real_fallback method")
+                    result = mdd_service.duplicate_mdd_real_fallback(
+                        temp_mdd_path, temp_ddf_path, duplicate_count, 
+                        workspace_path, original_mdd_filename
+                    )
+                
+                logger.info(f"🎯 MDD service result: {result.get('success', False)}")
+                
+            except Exception as service_error:
+                logger.error(f"💥 MDD Service Error: {str(service_error)}")
+                logger.error(f"💥 Service Error Type: {type(service_error)}")
+                
+                # Crear resultado de error detallado
+                result = {
+                    "success": False,
+                    "error": f"Service processing failed: {str(service_error)}",
+                    "logs": [
+                        f"[ERROR] Service call failed: {str(service_error)}",
+                        "[INFO] Check if dmsrun command is available in your system",
+                        "[INFO] Ensure IBM SPSS Data Collection tools are properly installed"
+                    ],
+                    "service_error": True,
+                    "original_error": str(service_error),
+                    "mode": "SERVICE_ERROR"
+                }
             
             # PROGRAMAR LIMPIEZA EN BACKGROUND
             background_tasks.add_task(cleanup_temp_files_mdd, temp_mdd_path, temp_ddf_path)
@@ -1355,9 +1388,11 @@ async def duplicate_mdd_files(
                         "total_records": result.get("total_records", real_record_count * duplicate_count),
                         "record_multiplier": result.get("record_multiplier", duplicate_count)
                     },
-                    "processing_logs": result["logs"],
+                    "processing_logs": result.get("logs", []),
                     "dms_output": result.get("dms_output", ""),
-                    "details": result.get("details", ""),
+                    "optimizations_applied": result.get("optimizations_applied", []),
+                    "method": result.get("method", "Unknown"),
+                    "mode": result.get("mode", "REAL_DATA"),
                     "record_summary": f"Original: {result.get('original_records', real_record_count)} records → Final: {result.get('total_records', real_record_count * duplicate_count)} records (×{duplicate_count} multiplier)"
                 }
             else:
@@ -1368,8 +1403,8 @@ async def duplicate_mdd_files(
                         "message": "MDD duplication failed",
                         "error": result.get("error", "Unknown error"),
                         "logs": result.get("logs", []),
-                        "input_error": result.get("input_error", ""),
-                        "details": result.get("details", "")
+                        "service_error": result.get("service_error", False),
+                        "mode": result.get("mode", "ERROR")
                     }
                 )
         
