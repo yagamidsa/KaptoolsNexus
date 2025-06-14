@@ -1204,11 +1204,11 @@ async def duplicate_mdd_files(
         logger.info(f"✅ File names match: {mdd_basename}")
         
         # VALIDACIÓN DE DUPLICATE COUNT
-        if not isinstance(duplicate_count, int) or duplicate_count < 1 or duplicate_count > 50:
+        if not isinstance(duplicate_count, int) or duplicate_count < 1:
             logger.error(f"❌ Invalid duplicate count: {duplicate_count}")
             raise HTTPException(
                 status_code=400, 
-                detail=f"Duplicate count must be an integer between 1 and 50, got: {duplicate_count}"
+                detail=f"Duplicate count must be a positive integer, got: {duplicate_count}"
             )
         
         logger.info(f"✅ Duplicate count valid: {duplicate_count}")
