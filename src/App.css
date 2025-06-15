@@ -1977,3 +1977,114 @@
 .status-indicator {
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
+
+
+
+
+
+/* 🤖 COPILOT FLOATING BUTTON */
+.copilot-floating-button {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 999;
+}
+
+.copilot-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  animation: copilot-pulse 3s ease infinite;
+}
+
+.copilot-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(108, 92, 231, 0.6);
+  background: linear-gradient(135deg, #a29bfe, #fd79a8);
+}
+
+@keyframes copilot-pulse {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(255, 107, 157, 0.6);
+  }
+}
+
+@media (max-width: 768px) {
+  .copilot-floating-button {
+    top: 20px;
+    right: 20px;
+  }
+  
+  .copilot-button {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+
+/* 🤖 COPILOT 365 FLOATING BUTTON - VERSIÓN TRANSPARENTE */
+.copilot-floating-button {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 999;
+}
+
+.copilot-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: transparent; /* 🔥 FONDO TRANSPARENTE */
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none; /* 🔥 SIN SOMBRA */
+  transition: all 0.3s ease;
+  backdrop-filter: none; /* 🔥 SIN BLUR */
+  animation: none; /* 🔥 SIN ANIMACIÓN DE FONDO */
+}
+
+.copilot-button:hover {
+  transform: translateY(-3px) scale(1.1); /* 🔥 SOLO ESCALA Y MOVIMIENTO */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* 🔥 SOMBRA SUTIL SOLO EN HOVER */
+  background: rgba(255, 255, 255, 0.1); /* 🔥 FONDO MUY SUTIL EN HOVER */
+}
+
+/* 🔥 ESTILOS PARA LA IMAGEN */
+.copilot-button img {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); /* 🔥 SOMBRA AL ICONO */
+}
+
+.copilot-button:hover img {
+  transform: scale(1.1); /* 🔥 CRECER LIGERAMENTE EN HOVER */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+@media (max-width: 768px) {
+  .copilot-floating-button {
+    top: 20px;
+    right: 20px;
+  }
+  
+  .copilot-button {
+    width: 48px;
+    height: 48px;
+  }
+}

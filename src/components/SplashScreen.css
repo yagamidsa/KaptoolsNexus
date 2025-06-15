@@ -1,7 +1,9 @@
-/* src/components/SplashScreen.css */
+/* src/components/SplashScreen.css - CLASES ÚNICAS SIN CONFLICTOS */
+
+/* 🔥 TODAS LAS CLASES PREFIJO "splash-" PARA EVITAR CONFLICTOS */
 
 /* Container principal */
-.splash-container {
+.splash-screen-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -16,7 +18,7 @@
 }
 
 /* Canvas de partículas */
-.particle-canvas {
+.splash-particle-canvas {
     position: absolute;
     top: 0;
     left: 0;
@@ -27,7 +29,7 @@
 }
 
 /* Efectos de fondo */
-.background-effects {
+.splash-background-effects {
     position: absolute;
     top: 0;
     left: 0;
@@ -36,17 +38,17 @@
     pointer-events: none;
 }
 
-.gradient-overlay {
+.splash-gradient-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.1) 0%, transparent 50%);
-    animation: gradientPulse 8s ease infinite;
+    animation: splashGradientPulse 8s ease infinite;
 }
 
-.grid-pattern {
+.splash-grid-pattern {
     position: absolute;
     top: 0;
     left: 0;
@@ -56,11 +58,11 @@
         linear-gradient(rgba(108, 92, 231, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(108, 92, 231, 0.03) 1px, transparent 1px);
     background-size: 50px 50px;
-    animation: gridShift 20s linear infinite;
+    animation: splashGridShift 20s linear infinite;
 }
 
 /* Contenido principal */
-.content-container {
+.splash-content-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -71,7 +73,7 @@
 }
 
 /* Logo y título */
-.logo-section {
+.splash-logo-section {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -81,29 +83,29 @@
     transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.logo-section.visible {
+.splash-logo-section.splash-visible {
     opacity: 1;
     transform: translateY(0) scale(1);
 }
 
 /* Icono holográfico */
-.holographic-icon {
+.splash-holographic-icon {
     position: relative;
     width: 120px;
     height: 120px;
     margin-bottom: 30px;
 }
 
-.icon-core {
+.splash-icon-core {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    animation: iconFloat 6s ease infinite;
+    animation: splashIconFloat 6s ease infinite;
 }
 
-.icon-glow {
+.splash-icon-glow {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -112,10 +114,10 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(circle, rgba(108, 92, 231, 0.4), transparent);
     border-radius: 50%;
-    animation: iconGlowPulse 3s ease infinite;
+    animation: splashIconGlowPulse 3s ease infinite;
 }
 
-.icon-rings {
+.splash-icon-rings {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -124,16 +126,16 @@
     height: 100%;
 }
 
-.ring-1 {
+.splash-ring-1 {
     position: absolute;
     width: 100%;
     height: 100%;
     border: 1px solid rgba(108, 92, 231, 0.3);
     border-radius: 50%;
-    animation: ringRotate1 10s linear infinite;
+    animation: splashRingRotate1 10s linear infinite;
 }
 
-.ring-2 {
+.splash-ring-2 {
     position: absolute;
     width: 80%;
     height: 80%;
@@ -141,10 +143,10 @@
     left: 10%;
     border: 1px solid rgba(255, 107, 157, 0.2);
     border-radius: 50%;
-    animation: ringRotate2 15s linear infinite reverse;
+    animation: splashRingRotate2 15s linear infinite reverse;
 }
 
-.ring-3 {
+.splash-ring-3 {
     position: absolute;
     width: 60%;
     height: 60%;
@@ -152,11 +154,11 @@
     left: 20%;
     border: 1px solid rgba(0, 255, 135, 0.2);
     border-radius: 50%;
-    animation: ringRotate3 8s linear infinite;
+    animation: splashRingRotate3 8s linear infinite;
 }
 
 /* Título principal */
-.main-title {
+.splash-main-title {
     display: flex;
     align-items: center;
     gap: 20px;
@@ -166,27 +168,27 @@
     letter-spacing: -2px;
 }
 
-.title-main {
+.splash-title-main {
     background: linear-gradient(135deg, #ffffff 0%, #6c5ce7 30%, #ff6b9d 60%, #00ff87 100%);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: titleFlow 6s ease infinite;
+    animation: splashTitleFlow 6s ease infinite;
     position: relative;
     text-shadow: 0 0 30px rgba(108, 92, 231, 0.5);
 }
 
-.title-separator {
+.splash-title-separator {
     width: 16px;
     height: 16px;
     border-radius: 50%;
     background: conic-gradient(from 0deg, #6c5ce7, #ff6b9d, #00ff87, #6c5ce7);
-    animation: separatorSpin 4s linear infinite;
+    animation: splashSeparatorSpin 4s linear infinite;
     box-shadow: 0 0 30px rgba(108, 92, 231, 0.8);
 }
 
-.title-sub {
+.splash-title-sub {
     background: linear-gradient(135deg, #a0a3bd 0%, #6c5ce7 50%, #ff6b9d 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
@@ -196,18 +198,18 @@
     letter-spacing: 4px;
     font-weight: 700;
     text-transform: uppercase;
-    animation: titleFlow 6s ease infinite reverse;
+    animation: splashTitleFlow 6s ease infinite reverse;
 }
 
 /* Subtítulo */
-.subtitle {
+.splash-subtitle {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 20px;
 }
 
-.subtitle-text {
+.splash-subtitle-text {
     font-size: 16px;
     background: linear-gradient(90deg, #a0a3bd, #6c5ce7, #ff6b9d);
     background-size: 200% 200%;
@@ -217,23 +219,23 @@
     text-transform: uppercase;
     letter-spacing: 3px;
     font-weight: 600;
-    animation: subtitleGlow 5s ease infinite;
+    animation: splashSubtitleGlow 5s ease infinite;
 }
 
-.subtitle-dot {
+.splash-subtitle-dot {
     width: 4px;
     height: 4px;
     border-radius: 50%;
     background: #6c5ce7;
-    animation: dotPulse 2s ease infinite;
+    animation: splashDotPulse 2s ease infinite;
 }
 
 /* Versión */
-.version-container {
+.splash-version-container {
     position: relative;
 }
 
-.version-badge {
+.splash-version-badge {
     position: relative;
     background: rgba(108, 92, 231, 0.1);
     border: 1px solid rgba(108, 92, 231, 0.3);
@@ -243,7 +245,7 @@
     overflow: hidden;
 }
 
-.version-text {
+.splash-version-text {
     color: #6c5ce7;
     font-size: 12px;
     font-weight: 700;
@@ -253,44 +255,44 @@
     z-index: 2;
 }
 
-.version-glow {
+.splash-version-glow {
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.2), transparent);
-    animation: versionShine 3s ease infinite;
+    animation: splashVersionShine 3s ease infinite;
 }
 
 /* Progreso circular */
-.progress-section {
+.splash-progress-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 40px;
 }
 
-.progress-container {
+.splash-progress-container {
     position: relative;
     width: 220px;
     height: 220px;
     margin-bottom: 30px;
 }
 
-.progress-svg {
+.splash-progress-svg {
     width: 100%;
     height: 100%;
     transform: rotate(0deg);
     filter: drop-shadow(0 0 20px rgba(108, 92, 231, 0.3));
 }
 
-.progress-circle {
+.splash-progress-circle {
     transition: stroke-dashoffset 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transition-delay: 0.1s;
 }
 
-.progress-text {
+.splash-progress-text {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -301,7 +303,7 @@
     z-index: 10;
 }
 
-.progress-number {
+.splash-progress-number {
     font-size: 36px;
     font-weight: 900;
     background: linear-gradient(135deg, #ffffff, #6c5ce7, #ff6b9d);
@@ -309,18 +311,18 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: numberGlow 3s ease infinite;
+    animation: splashNumberGlow 3s ease infinite;
     font-family: monospace;
 }
 
-.progress-symbol {
+.splash-progress-symbol {
     font-size: 18px;
     font-weight: 700;
     color: #a0a3bd;
     opacity: 0.8;
 }
 
-.central-pulse {
+.splash-central-pulse {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -329,11 +331,11 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(circle, rgba(108, 92, 231, 0.1), transparent);
     border-radius: 50%;
-    animation: centralPulseAnim 3s ease infinite;
+    animation: splashCentralPulseAnim 3s ease infinite;
 }
 
 /* Anillos externos */
-.outer-rings {
+.splash-outer-rings {
     position: absolute;
     top: 0;
     left: 0;
@@ -341,17 +343,17 @@
     height: 100%;
 }
 
-.rotating-ring-1 {
+.splash-rotating-ring-1 {
     position: absolute;
     width: 100%;
     height: 100%;
     border: 1px solid rgba(108, 92, 231, 0.1);
     border-top: 1px solid rgba(108, 92, 231, 0.4);
     border-radius: 50%;
-    animation: ringRotate1 8s linear infinite;
+    animation: splashRingRotate1 8s linear infinite;
 }
 
-.rotating-ring-2 {
+.splash-rotating-ring-2 {
     position: absolute;
     width: 110%;
     height: 110%;
@@ -360,11 +362,11 @@
     border: 1px solid rgba(255, 107, 157, 0.1);
     border-bottom: 1px solid rgba(255, 107, 157, 0.3);
     border-radius: 50%;
-    animation: ringRotate2 12s linear infinite reverse;
+    animation: splashRingRotate2 12s linear infinite reverse;
 }
 
 /* Estado actual */
-.current-step {
+.splash-current-step {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -376,25 +378,25 @@
     min-height: 50px;
 }
 
-.step-icon {
+.splash-step-icon {
     font-size: 20px;
-    animation: stepIconSpin 2s ease infinite;
+    animation: splashStepIconSpin 2s ease infinite;
 }
 
-.step-text {
+.splash-step-text {
     color: #ffffff;
     font-size: 16px;
     font-weight: 500;
-    animation: stepTextGlow 3s ease infinite alternate;
+    animation: splashStepTextGlow 3s ease infinite alternate;
 }
 
 /* Panel de sistemas */
-.systems-panel {
+.splash-systems-panel {
     width: 100%;
     max-width: 500px;
 }
 
-.systems-grid {
+.splash-systems-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
@@ -405,7 +407,7 @@
     backdrop-filter: blur(20px);
 }
 
-.system-item {
+.splash-system-item {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -417,12 +419,12 @@
     transform: scale(0.9);
 }
 
-.system-item.online {
+.splash-system-item.splash-online {
     opacity: 1;
     transform: scale(1);
 }
 
-.system-indicator {
+.splash-system-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -432,11 +434,11 @@
     background: rgba(108, 92, 231, 0.2);
 }
 
-.system-item.online .system-indicator {
+.splash-system-item.splash-online .splash-system-indicator {
     background: linear-gradient(45deg, #00ff87, #6c5ce7);
 }
 
-.system-name {
+.splash-system-name {
     color: #a0a3bd;
     font-size: 11px;
     font-weight: 600;
@@ -444,201 +446,165 @@
     letter-spacing: 0.5px;
 }
 
-/* Animaciones */
-@keyframes gradientPulse {
-
-    0%,
-    100% {
+/* 🔥 ANIMACIONES CON PREFIJO ÚNICO */
+@keyframes splashGradientPulse {
+    0%, 100% {
         opacity: 0.3;
         transform: scale(1);
     }
-
     50% {
         opacity: 0.6;
         transform: scale(1.1);
     }
 }
 
-@keyframes gridShift {
+@keyframes splashGridShift {
     0% {
         transform: translate(0, 0);
     }
-
     100% {
         transform: translate(50px, 50px);
     }
 }
 
-@keyframes iconFloat {
-
-    0%,
-    100% {
+@keyframes splashIconFloat {
+    0%, 100% {
         transform: translate(-50%, -50%) translateY(0) rotate(0deg);
     }
-
     50% {
         transform: translate(-50%, -50%) translateY(-10px) rotate(180deg);
     }
 }
 
-@keyframes iconGlowPulse {
-
-    0%,
-    100% {
+@keyframes splashIconGlowPulse {
+    0%, 100% {
         background: radial-gradient(circle, rgba(108, 92, 231, 0.4), transparent);
         transform: translate(-50%, -50%) scale(1);
     }
-
     50% {
         background: radial-gradient(circle, rgba(255, 107, 157, 0.6), transparent);
         transform: translate(-50%, -50%) scale(1.2);
     }
 }
 
-@keyframes ringRotate1 {
+@keyframes splashRingRotate1 {
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
 }
 
-@keyframes ringRotate2 {
+@keyframes splashRingRotate2 {
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(-360deg);
     }
 }
 
-@keyframes ringRotate3 {
+@keyframes splashRingRotate3 {
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
 }
 
-@keyframes titleFlow {
-
-    0%,
-    100% {
+@keyframes splashTitleFlow {
+    0%, 100% {
         background-position: 0% 50%;
     }
-
     50% {
         background-position: 100% 50%;
     }
 }
 
-@keyframes separatorSpin {
+@keyframes splashSeparatorSpin {
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
 }
 
-@keyframes subtitleGlow {
-
-    0%,
-    100% {
+@keyframes splashSubtitleGlow {
+    0%, 100% {
         background-position: 0% 50%;
         filter: drop-shadow(0 0 5px rgba(108, 92, 231, 0.5));
     }
-
     50% {
         background-position: 100% 50%;
         filter: drop-shadow(0 0 15px rgba(255, 107, 157, 0.8));
     }
 }
 
-@keyframes dotPulse {
-
-    0%,
-    100% {
+@keyframes splashDotPulse {
+    0%, 100% {
         background: #6c5ce7;
         box-shadow: 0 0 5px #6c5ce7;
     }
-
     50% {
         background: #ff6b9d;
         box-shadow: 0 0 15px #ff6b9d;
     }
 }
 
-@keyframes versionShine {
+@keyframes splashVersionShine {
     0% {
         left: -100%;
     }
-
     100% {
         left: 100%;
     }
 }
 
-@keyframes numberGlow {
-
-    0%,
-    100% {
+@keyframes splashNumberGlow {
+    0%, 100% {
         background-position: 0% 50%;
         filter: drop-shadow(0 0 10px rgba(108, 92, 231, 0.8));
     }
-
     50% {
         background-position: 100% 50%;
         filter: drop-shadow(0 0 20px rgba(255, 107, 157, 1));
     }
 }
 
-@keyframes centralPulseAnim {
-
-    0%,
-    100% {
+@keyframes splashCentralPulseAnim {
+    0%, 100% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 0.3;
     }
-
     50% {
         transform: translate(-50%, -50%) scale(1.5);
         opacity: 0.1;
     }
 }
 
-@keyframes stepIconSpin {
-
-    0%,
-    100% {
+@keyframes splashStepIconSpin {
+    0%, 100% {
         transform: rotate(0deg) scale(1);
     }
-
     25% {
         transform: rotate(90deg) scale(1.1);
     }
-
     50% {
         transform: rotate(180deg) scale(1);
     }
-
     75% {
         transform: rotate(270deg) scale(1.1);
     }
 }
 
-@keyframes stepTextGlow {
+@keyframes splashStepTextGlow {
     from {
         color: #ffffff;
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     }
-
     to {
         color: #6c5ce7;
         text-shadow: 0 0 15px rgba(108, 92, 231, 0.8);
@@ -647,90 +613,96 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .progress-container {
+    .splash-progress-container {
         width: 180px;
         height: 180px;
     }
 
-    .systems-grid {
+    .splash-systems-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
         padding: 16px;
     }
 
-    .system-item {
+    .splash-system-item {
         padding: 6px 8px;
     }
 
-    .system-name {
+    .splash-system-name {
         font-size: 10px;
     }
 
-    .holographic-icon {
+    .splash-holographic-icon {
         width: 100px;
         height: 100px;
     }
 
-    .main-title {
+    .splash-main-title {
         gap: 12px;
     }
 
-    .title-separator {
+    .splash-title-separator {
         width: 12px;
         height: 12px;
     }
 }
 
 @media (max-width: 480px) {
-    .content-container {
+    .splash-content-container {
         padding: 15px;
     }
 
-    .progress-container {
+    .splash-progress-container {
         width: 160px;
         height: 160px;
     }
 
-    .progress-number {
+    .splash-progress-number {
         font-size: 28px;
     }
 
-    .progress-symbol {
+    .splash-progress-symbol {
         font-size: 14px;
     }
 
-    .systems-grid {
+    .splash-systems-grid {
         grid-template-columns: 1fr 1fr;
     }
 
-    .current-step {
+    .splash-current-step {
         padding: 10px 16px;
         flex-direction: column;
         gap: 8px;
         text-align: center;
     }
 
-    .step-text {
+    .splash-step-text {
         font-size: 14px;
     }
 }
 
+
 /* 🔥 AGREGAR ESTOS ESTILOS AL FINAL DE TU App.css */
 
-/* Estilos para el splash overlay y modal */
+/* ================================
+   SPLASH OVERLAY ÚNICO - SIN CONFLICTOS
+   ================================ */
+
+/* Overlay principal del splash */
 .splash-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(26, 29, 58, 0.95);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    animation: splashOverlayFadeIn 0.6s ease-out;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(26, 29, 58, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important; /* Z-index súper alto */
+    animation: splashOverlayFadeIn 0.6s ease-out !important;
+    overflow: hidden !important;
 }
 
 @keyframes splashOverlayFadeIn {
@@ -738,29 +710,29 @@
         opacity: 0;
         backdrop-filter: blur(0px);
     }
-
     to {
         opacity: 1;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(12px);
     }
 }
 
+/* Modal del splash */
 .splash-modal {
-    background: rgba(37, 42, 74, 0.95);
-    border: 2px solid rgba(108, 92, 231, 0.4);
-    border-radius: 20px;
-    padding: 30px;
-    backdrop-filter: blur(25px);
+    background: rgba(37, 42, 74, 0.95) !important;
+    border: 2px solid rgba(108, 92, 231, 0.4) !important;
+    border-radius: 20px !important;
+    padding: 30px !important;
+    backdrop-filter: blur(25px) !important;
     box-shadow:
         0 25px 60px rgba(0, 0, 0, 0.6),
         0 0 50px rgba(108, 92, 231, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    overflow: hidden;
-    animation: splashModalSlideIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    width: 90% !important;
+    max-width: 500px !important;
+    max-height: 80vh !important;
+    overflow: hidden !important;
+    animation: splashModalSlideIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    position: relative !important;
 }
 
 @keyframes splashModalSlideIn {
@@ -769,7 +741,6 @@
         transform: translateY(50px) scale(0.8);
         filter: blur(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -777,19 +748,52 @@
     }
 }
 
+/* Asegurar que nada interfiera */
+.splash-overlay * {
+    box-sizing: border-box !important;
+}
+
+/* Prevenir scroll del body cuando splash esté activo */
+body:has(.splash-overlay) {
+    overflow: hidden !important;
+}
+
 /* Responsive para el splash modal */
 @media (max-width: 768px) {
     .splash-modal {
-        width: 95%;
-        padding: 20px;
-        max-width: 400px;
+        width: 95% !important;
+        padding: 20px !important;
+        max-width: 400px !important;
     }
 }
 
 @media (max-width: 480px) {
     .splash-modal {
-        width: 98%;
-        padding: 15px;
-        margin: 10px;
+        width: 98% !important;
+        padding: 15px !important;
+        margin: 10px !important;
     }
 }
+
+/* Override cualquier estilo que pueda interferir */
+.splash-overlay,
+.splash-modal,
+.splash-overlay *,
+.splash-modal * {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+}
+
+.splash-overlay {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.splash-modal {
+    margin: 0 auto !important;
+    padding: 30px !important;
+}
+
+

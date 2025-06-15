@@ -1,4 +1,4 @@
-// src/App.tsx - CON SPLASH SCREEN INTEGRADO
+// src/App.tsx - VERSIÓN FINAL LIMPIA
 
 import { useState, useEffect } from "react";
 import HolographicButton from "./components/HolographicButton";
@@ -13,7 +13,7 @@ import ShortcutsNexus from './components/ShorcutsNexus';
 import { SmartTooltipWrapper } from './components/SmartTooltipWrapper';
 import './components/style/SmartTooltip.css';
 import QChunksProcessor from './components/QChunksProcessor';
-import SplashScreen from './components/SplashScreen'; // 🔥 IMPORTAR SPLASH
+import SplashScreen from './components/SplashScreen';
 import { open } from '@tauri-apps/plugin-dialog';
 import "./App.css";
 
@@ -37,22 +37,23 @@ interface WorkspaceValidation {
 function App() {
   // 🔥 ESTADO DEL SPLASH SCREEN
   const [isAppLoading, setIsAppLoading] = useState(true);
-  
+
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
   const [workspacePath, setWorkspacePath] = useState<string>('');
   const [activeView, setActiveView] = useState<'main' | 'review-branches'>('main');
 
-  // 🔥 ESTADOS DE MODALES
+  // Estados de modales
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showProductDataModal, setShowProductDataModal] = useState(false);
   const [showDuplicateMDDModal, setShowDuplicateMDDModal] = useState(false);
   const [showCreateStructureModal, setShowCreateStructureModal] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showQChunksModal, setShowQChunksModal] = useState(false);
+  const [showCopilotModal, setShowCopilotModal] = useState(false);
 
-  // 🔥 ESTADO DE VALIDACIÓN DEL WORKSPACE
+  // Estado de validación del workspace
   const [workspaceValidation, setWorkspaceValidation] = useState<WorkspaceValidation>({
     valid: false,
     has_microservices: false,
@@ -155,11 +156,12 @@ function App() {
 
   // 🔥 HANDLER PARA CUANDO TERMINE EL SPLASH
   const handleSplashComplete = () => {
+    console.log("✅ Splash screen completed!");
     setIsAppLoading(false);
     setResponse("🚀 KapTools Nexus successfully loaded!\n✨ All quantum systems online and ready");
   };
 
-  // 🔥 FUNCIÓN HELPER PARA TOOLTIPS DINÁMICOS
+  // Función helper para tooltips dinámicos
   const getTooltipContent = (item: MenuItem, enabled: boolean) => {
     if (enabled) {
       return {
@@ -170,7 +172,6 @@ function App() {
       };
     }
 
-    
     if (item.requiresWorkspace && !isWorkspaceSelected) {
       return {
         icon: '📁',
@@ -197,7 +198,7 @@ function App() {
     };
   };
 
-  // 🔥 VALIDAR WORKSPACE CUANDO CAMBIE
+  // Validar workspace cuando cambie
   useEffect(() => {
     if (isWorkspaceSelected) {
       validateWorkspace();
@@ -211,7 +212,7 @@ function App() {
     }
   }, [workspacePath]);
 
-  // 🔥 VALIDAR WORKSPACE CON EL BACKEND
+  // Validar workspace con el backend
   const validateWorkspace = async () => {
     if (!isWorkspaceSelected) return;
 
@@ -248,17 +249,6 @@ function App() {
       setResponse(`🚀 ${data.message}\n🎯 Backend is running correctly!`);
     } catch (error) {
       setResponse("❌ Error connecting to API\n💡 Start backend with: cd backend && python main.py");
-    }
-  };
-
-  const debugCommands = async () => {
-    try {
-      const { invoke } = await import('@tauri-apps/api/core');
-      const commands = await invoke('list_commands');
-      console.log('Available commands:', commands);
-      setResponse(`Available commands: ${JSON.stringify(commands)}`);
-    } catch (error) {
-      setResponse(`Debug error: ${error}`);
     }
   };
 
@@ -325,7 +315,6 @@ function App() {
 
       if (res.ok) {
         setResponse(`✅ ${data.message}\n📂 Workspace: ${data.workspace}\n🌿 Branch: ${data.branch}`);
-        // Re-validar workspace después del clone
         setTimeout(() => validateWorkspace(), 1000);
       } else {
         setResponse(`❌ Error: ${data.detail}`);
@@ -337,7 +326,7 @@ function App() {
     }
   };
 
-  // 🔥 VERIFICAR SI ITEM ESTÁ HABILITADO
+  // Verificar si item está habilitado
   const isMenuItemEnabled = (item: MenuItem): boolean => {
     if (item.requiresWorkspace && !isWorkspaceSelected) {
       return false;
@@ -350,7 +339,7 @@ function App() {
     return true;
   };
 
-  // 🔥 OBTENER MENSAJE DE ESTADO DEL ITEM
+  // Obtener mensaje de estado del item
   const getMenuItemStatusMessage = (item: MenuItem): string => {
     if (item.requiresWorkspace && !isWorkspaceSelected) {
       return "❌ Requires workspace selection";
@@ -363,7 +352,7 @@ function App() {
     return "✅ Ready";
   };
 
-  // 🔥 HANDLERS PARA CERRAR MODALES
+  // Handlers para cerrar modales
   const handleCloseReviewBranches = () => {
     setActiveView('main');
     setSelectedItem('');
@@ -388,7 +377,7 @@ function App() {
     setResponse('🏗️ Project Structure Creator closed');
   };
 
-  // 🔥 HANDLER PRINCIPAL DEL MENÚ
+  // Handler principal del menú
   const handleMenuItemClick = async (itemId: string) => {
     const item = menuItems.find(item => item.id === itemId);
     if (!item) return;
@@ -455,7 +444,6 @@ function App() {
 
     return (
       <>
-        {/* Panel de Control Principal */}
         <main className="nexus-main">
           <div className="control-panel">
             <div className="panel-header">
@@ -467,7 +455,6 @@ function App() {
               </div>
             </div>
 
-            {/* Workspace Selection */}
             <div className="input-matrix">
               <label className="input-label">
                 <span className="label-icon">📂</span>
@@ -503,7 +490,6 @@ function App() {
                 <div className="input-scanner"></div>
               </div>
 
-              {/* Workspace Status */}
               {isWorkspaceSelected && (
                 <div className="workspace-status-info">
                   <div className={`status-${workspaceValidation.has_microservices ? 'success' : 'warning'}`}>
@@ -522,7 +508,6 @@ function App() {
               </div>
             </div>
 
-            {/* Quick Action Buttons */}
             <div className="action-matrix">
               <SmartTooltipWrapper
                 content={{
@@ -566,7 +551,6 @@ function App() {
               </SmartTooltipWrapper>
             </div>
 
-            {/* Response Terminal */}
             {response && (
               <div className="response-terminal">
                 <div className="terminal-header">
@@ -589,7 +573,6 @@ function App() {
               </div>
             )}
 
-            {/* Selected Item Info */}
             {selectedItem && activeView === 'main' && (
               <div className="selected-item-info">
                 <div className="info-header">
@@ -620,7 +603,6 @@ function App() {
             )}
           </div>
 
-          {/* Panel lateral de menu */}
           <aside className="main-menu">
             <div className="menu-header">
               <div className="menu-icon">⚡</div>
@@ -685,12 +667,17 @@ function App() {
     );
   };
 
+  // 🔥 MOSTRAR SPLASH SCREEN SI ESTÁ CARGANDO
+  if (isAppLoading) {
+    return <SplashScreen onLoadingComplete={handleSplashComplete} />;
+  }
+
+  // 🔥 MOSTRAR APP PRINCIPAL CUANDO HAYA TERMINADO EL SPLASH
   return (
     <div className={`nexus-app ${activeView === 'review-branches' ? 'review-branches-mode' : ''}`}>
       <FuturisticBackground />
       <NeonDock />
 
-      {/* Header Holográfico */}
       <header className="nexus-header">
         <h1 className="nexus-title">
           <span className="title-main">KAPTOOLS</span>
@@ -707,10 +694,45 @@ function App() {
         )}
       </header>
 
-      {/* Contenido Principal Dinámico */}
+
+
+      {/* 🤖 COPILOT 365 FLOATING BUTTON */}
+      <div className="copilot-floating-button">
+        <SmartTooltipWrapper
+          content={{
+            icon: '🤖',
+            message: 'Open Microsoft Copilot 365',
+            detail: 'Launch native Microsoft Copilot application for Windows',
+            type: 'info'
+          }}
+          enabled={true}
+          delay={300}
+        >
+          <button
+            className="copilot-button"
+            onClick={async () => {
+              try {
+                const { invoke } = await import('@tauri-apps/api/core');
+                await invoke('open_copilot_365');
+                setResponse('🤖 Opening Microsoft Copilot 365...\n🌐 Launching native Windows application');
+              } catch (error) {
+                setResponse('❌ Could not open Copilot 365\n💡 Check your internet connection');
+              }
+            }}
+          >
+            <img 
+              src="https://img.icons8.com/fluency/48/microsoft-copilot.png" 
+              alt="Copilot" 
+              width="48" 
+              height="48" 
+            />
+          </button>
+        </SmartTooltipWrapper>
+      </div>
+
+
       {renderMainContent()}
 
-      {/* Footer Cyber */}
       <footer className="nexus-footer">
         <div className="footer-grid">
           <span>•</span>
@@ -728,15 +750,6 @@ function App() {
           )}
         </div>
       </footer>
-
-      {/* 🔥 SPLASH SCREEN EN RECUADRO CENTRADO */}
-      {isAppLoading && (
-        <div className="splash-overlay">
-          <div className="splash-modal">
-            <SplashScreen onLoadingComplete={handleSplashComplete} />
-          </div>
-        </div>
-      )}
 
       {/* Todos los modales */}
       <DownloadFiles
@@ -776,7 +789,7 @@ function App() {
         }}
         workspacePath={workspacePath}
       />
-      
+
       <ShortcutsNexus
         isOpen={showShortcutsModal}
         onClose={() => {
@@ -785,6 +798,49 @@ function App() {
           setResponse('🌐 Quantum Shortcuts Portal closed');
         }}
       />
+
+      {/* 🤖 COPILOT MODAL */}
+      {showCopilotModal && (
+        <div className="copilot-modal-overlay">
+          <div className="copilot-modal">
+            <div className="copilot-header">
+              <div className="copilot-header-content">
+                <div className="copilot-icon">🤖</div>
+                <div className="copilot-title">
+                  <h2>KapChat AI Assistant</h2>
+                  <p>Your quantum AI companion for KapTools</p>
+                </div>
+              </div>
+              <button
+                className="copilot-close-button"
+                onClick={() => {
+                  setShowCopilotModal(false);
+                  setResponse('🤖 KapChat AI Assistant closed');
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            <div className="copilot-content">
+              <div className="copilot-placeholder">
+                <div className="placeholder-icon">🚧</div>
+                <h3>Coming Soon</h3>
+                <p>KapChat AI Assistant is under development</p>
+                <p>This will be your intelligent companion for:</p>
+                <ul>
+                  <li>🎯 Project guidance and best practices</li>
+                  <li>🔧 Technical troubleshooting</li>
+                  <li>📊 Data analysis insights</li>
+                  <li>⚡ Workflow optimization</li>
+                  <li>🤝 Step-by-step tutorials</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

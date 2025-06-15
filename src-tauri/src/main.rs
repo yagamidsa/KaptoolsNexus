@@ -279,6 +279,42 @@ async fn read_file_as_base64(file_path: String) -> Result<String, String> {
     }
 }
 
+
+#[tauri::command]
+fn open_copilot_365() -> Result<String, String> {
+    use std::process::Command;
+    
+    // Abrir Microsoft Office Hub donde está integrado Copilot 365
+    let result = Command::new("powershell")
+        .args(&[
+            "-Command",
+            "Start-Process \"shell:AppsFolder\\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe!Microsoft.MicrosoftOfficeHub\""
+        ])
+        .output();
+    
+    match result {
+        Ok(output) => {
+            if output.status.success() {
+                Ok("Microsoft Office Hub (365 Copilot) opened successfully".to_string())
+            } else {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                Err(format!("Failed to open Office Hub: {}", stderr))
+            }
+        },
+        Err(e) => {
+            // Método de respaldo usando explorer
+            let backup_result = Command::new("explorer")
+                .args(&["shell:AppsFolder\\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe!Microsoft.MicrosoftOfficeHub"])
+                .output();
+            
+            match backup_result {
+                Ok(_) => Ok("Office Hub opened via explorer".to_string()),
+                Err(backup_e) => Err(format!("Both methods failed. PowerShell: {}, Explorer: {}", e, backup_e)),
+            }
+        }
+    }
+}
+
 fn main() {
     println!("🚀 Iniciando KapTools Nexus...");
     
@@ -296,7 +332,9 @@ fn main() {
             open_folder,
             read_file_as_base64,
             select_mdd_file,
+            open_copilot_365
         ])
         .run(tauri::generate_context!())
         .expect("Error al ejecutar Tauri");
 }
+
