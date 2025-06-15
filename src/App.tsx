@@ -14,6 +14,8 @@ import { SmartTooltipWrapper } from './components/SmartTooltipWrapper';
 import './components/style/SmartTooltip.css';
 import QChunksProcessor from './components/QChunksProcessor';
 import SplashScreen from './components/SplashScreen';
+import { useExchangeRates } from './hooks/useExchangeRates';
+import ExchangeRateDisplay from './components/ExchangeRate';
 import { open } from '@tauri-apps/plugin-dialog';
 import "./App.css";
 
@@ -61,13 +63,16 @@ function App() {
     workspace_path: ''
   });
 
+
+  const { exchangeRates } = useExchangeRates();
+
   const menuItems: MenuItem[] = [
     // Git Operations
     {
       id: 'clone-master',
       label: 'Clone Repos (Master)',
       desc: 'Deploy microservices master',
-      icon: '🏗️',
+      icon: '🔔',
       category: 'GIT OPERATIONS',
       requiresWorkspace: true
     },
@@ -75,7 +80,7 @@ function App() {
       id: 'review-branches',
       label: 'Review Branches',
       desc: 'Analyze git branches',
-      icon: '🔄',
+      icon: '🌿',
       category: 'GIT OPERATIONS',
       requiresWorkspace: true,
       requiresMicroservices: true
@@ -86,7 +91,7 @@ function App() {
       id: 'azure-download',
       label: 'Download Files',
       desc: 'BEE, CeV and Link',
-      icon: '☁️',
+      icon: '📡',
       category: 'AZURE TOOLS',
       requiresWorkspace: true
     },
@@ -94,7 +99,7 @@ function App() {
       id: 'product-data',
       label: 'Product Data',
       desc: 'Review products',
-      icon: '📦',
+      icon: '🔓',
       category: 'AZURE TOOLS'
     },
 
@@ -103,7 +108,7 @@ function App() {
       id: 'duplicate-mdd',
       label: 'Duplicate MDD',
       desc: 'Duplicate base files',
-      icon: '📋',
+      icon: '✨',
       category: 'DATA PROCESSING',
       requiresWorkspace: true
     },
@@ -122,14 +127,14 @@ function App() {
       id: 'kapchat',
       label: 'KapChat',
       desc: 'AI Support',
-      icon: '🤖',
+      icon: '🎭',
       category: 'UTILITIES'
     },
     {
       id: 'jsonpath',
       label: 'JsonPath Tool',
       desc: 'JSON query tool',
-      icon: '🔧',
+      icon: '🔗',
       category: 'UTILITIES'
     },
     {
@@ -720,11 +725,11 @@ function App() {
               }
             }}
           >
-            <img 
-              src="https://img.icons8.com/fluency/48/microsoft-copilot.png" 
-              alt="Copilot" 
-              width="48" 
-              height="48" 
+            <img
+              src="https://img.icons8.com/fluency/48/microsoft-copilot.png"
+              alt="Copilot"
+              width="48"
+              height="48"
             />
           </button>
         </SmartTooltipWrapper>
@@ -742,10 +747,12 @@ function App() {
             {isWorkspaceSelected ? `📂 ${workspacePath}` : '📂 No workspace'}
           </span>
           <span>•</span>
+          <ExchangeRateDisplay exchangeRates={exchangeRates} />
           {activeView === 'review-branches' && (
             <>
               <span className="footer-view">🌿 Review Branches Active</span>
               <span>•</span>
+
             </>
           )}
         </div>

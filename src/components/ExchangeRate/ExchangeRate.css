@@ -1,0 +1,299 @@
+/* src/components/ExchangeRate/ExchangeRate.css */
+
+/* 🔥 CONTAINER PRINCIPAL */
+.footer-exchange-rates {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 11px;
+    color: #a0a3bd;
+    padding: 0 16px;
+    border-left: 1px solid rgba(0, 255, 135, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* 💰 ICONOS DE DIVISAS NEON VERDE */
+.currency-icon-neon {
+    color: #00ff87;
+    filter:
+        drop-shadow(0 0 6px rgba(0, 255, 135, 0.8)) drop-shadow(0 0 12px rgba(0, 255, 135, 0.6)) drop-shadow(0 0 20px rgba(0, 255, 135, 0.4));
+    animation: currency-neon-pulse 3s ease infinite alternate;
+    transition: all 0.3s ease;
+}
+
+.currency-icon-neon:hover {
+    transform: scale(1.1);
+    filter:
+        drop-shadow(0 0 8px rgba(0, 255, 135, 1)) drop-shadow(0 0 16px rgba(0, 255, 135, 0.8)) drop-shadow(0 0 24px rgba(0, 255, 135, 0.6));
+}
+
+@keyframes currency-neon-pulse {
+    from {
+        filter:
+            drop-shadow(0 0 6px rgba(0, 255, 135, 0.8)) drop-shadow(0 0 12px rgba(0, 255, 135, 0.6)) drop-shadow(0 0 20px rgba(0, 255, 135, 0.4));
+    }
+
+    to {
+        filter:
+            drop-shadow(0 0 10px rgba(0, 255, 135, 1)) drop-shadow(0 0 18px rgba(0, 255, 135, 0.8)) drop-shadow(0 0 26px rgba(0, 255, 135, 0.6));
+    }
+}
+
+/* 📈📉 INDICADORES DE TENDENCIA NEON */
+.trend-indicator-neon {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+/* 🟢 TENDENCIA ALCISTA - NEON VERDE */
+.trend-neon-up {
+    color: #00ff87;
+    background: rgba(0, 255, 135, 0.08);
+    border: 1px solid rgba(0, 255, 135, 0.3);
+    box-shadow:
+        0 0 8px rgba(0, 255, 135, 0.4),
+        inset 0 1px 0 rgba(0, 255, 135, 0.2);
+    animation: trend-neon-green-glow 2.5s ease infinite alternate;
+}
+
+.trend-neon-up svg {
+    color: #00ff87;
+    filter:
+        drop-shadow(0 0 4px rgba(0, 255, 135, 0.8)) drop-shadow(0 0 8px rgba(0, 255, 135, 0.6));
+}
+
+@keyframes trend-neon-green-glow {
+    from {
+        box-shadow:
+            0 0 8px rgba(0, 255, 135, 0.4),
+            inset 0 1px 0 rgba(0, 255, 135, 0.2);
+        border-color: rgba(0, 255, 135, 0.3);
+    }
+
+    to {
+        box-shadow:
+            0 0 16px rgba(0, 255, 135, 0.7),
+            0 0 24px rgba(0, 255, 135, 0.4),
+            inset 0 1px 0 rgba(0, 255, 135, 0.4);
+        border-color: rgba(0, 255, 135, 0.6);
+    }
+}
+
+/* 🔴 TENDENCIA BAJISTA - NEON ROJO */
+.trend-neon-down {
+    color: #ff0844;
+    background: rgba(255, 8, 68, 0.08);
+    border: 1px solid rgba(255, 8, 68, 0.3);
+    box-shadow:
+        0 0 8px rgba(255, 8, 68, 0.4),
+        inset 0 1px 0 rgba(255, 8, 68, 0.2);
+    animation: trend-neon-red-glow 2.5s ease infinite alternate;
+}
+
+.trend-neon-down svg {
+    color: #ff0844;
+    filter:
+        drop-shadow(0 0 4px rgba(255, 8, 68, 0.8)) drop-shadow(0 0 8px rgba(255, 8, 68, 0.6));
+}
+
+@keyframes trend-neon-red-glow {
+    from {
+        box-shadow:
+            0 0 8px rgba(255, 8, 68, 0.4),
+            inset 0 1px 0 rgba(255, 8, 68, 0.2);
+        border-color: rgba(255, 8, 68, 0.3);
+    }
+
+    to {
+        box-shadow:
+            0 0 16px rgba(255, 8, 68, 0.7),
+            0 0 24px rgba(255, 8, 68, 0.4),
+            inset 0 1px 0 rgba(255, 8, 68, 0.4);
+        border-color: rgba(255, 8, 68, 0.6);
+    }
+}
+
+/* ➖ TENDENCIA NEUTRAL - NEON AZUL SUTIL */
+.trend-neutral-neon {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.05);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 9px;
+    font-weight: 600;
+    opacity: 0.7;
+}
+
+.trend-neutral-neon svg {
+    color: #00d4ff;
+    filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.5));
+}
+
+/* 📊 PORCENTAJE DE CAMBIO NEON */
+.change-percent-neon {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 6px currentColor;
+}
+
+/* 💎 TEXTO DE TASAS CON EFECTO NEON */
+.rate-text {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.6),
+        0 0 16px rgba(108, 92, 231, 0.4);
+    animation: rate-text-glow 4s ease infinite alternate;
+}
+
+@keyframes rate-text-glow {
+    from {
+        text-shadow:
+            0 0 8px rgba(255, 255, 255, 0.6),
+            0 0 16px rgba(108, 92, 231, 0.4);
+    }
+
+    to {
+        text-shadow:
+            0 0 12px rgba(255, 255, 255, 0.8),
+            0 0 20px rgba(108, 92, 231, 0.6),
+            0 0 28px rgba(255, 107, 157, 0.4);
+    }
+}
+
+/* 🔥 EFECTOS HOVER MEJORADOS */
+.exchange-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.rate-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.exchange-item:hover {
+    background: rgba(0, 255, 135, 0.05);
+    box-shadow:
+        0 0 12px rgba(0, 255, 135, 0.2),
+        inset 0 1px 0 rgba(0, 255, 135, 0.1);
+    transform: translateY(-1px);
+}
+
+.exchange-item:hover .trend-indicator-neon {
+    transform: scale(1.05);
+}
+
+.exchange-item:hover .trend-neon-up {
+    box-shadow:
+        0 0 20px rgba(0, 255, 135, 0.8),
+        0 0 32px rgba(0, 255, 135, 0.5),
+        inset 0 1px 0 rgba(0, 255, 135, 0.5);
+}
+
+.exchange-item:hover .trend-neon-down {
+    box-shadow:
+        0 0 20px rgba(255, 8, 68, 0.8),
+        0 0 32px rgba(255, 8, 68, 0.5),
+        inset 0 1px 0 rgba(255, 8, 68, 0.5);
+}
+
+/* ⏰ LAST UPDATED */
+.last-updated {
+    color: #a0a3bd;
+    font-size: 10px;
+    opacity: 0.7;
+    font-style: italic;
+}
+
+/* 🔄 LOADING STATE */
+.exchange-loading {
+    color: #6c5ce7;
+    font-size: 10px;
+    animation: loading-pulse 2s ease infinite;
+}
+
+@keyframes loading-pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* ❌ ERROR STATE */
+.exchange-error {
+    color: #ff0844;
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* 📱 RESPONSIVE NEON */
+@media (max-width: 768px) {
+    .footer-exchange-rates {
+        gap: 16px;
+        padding: 0 12px;
+    }
+
+    .currency-icon-neon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .trend-indicator-neon {
+        font-size: 8px;
+        padding: 1px 4px;
+    }
+
+    .trend-indicator-neon svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .change-percent-neon {
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-exchange-rates {
+        gap: 12px;
+    }
+
+    .rate-text {
+        font-size: 10px;
+    }
+
+    /* Efectos neon más sutiles en móvil para mejor rendimiento */
+    .currency-icon-neon,
+    .trend-indicator-neon {
+        animation: none;
+    }
+
+    .currency-icon-neon {
+        filter: drop-shadow(0 0 4px rgba(0, 255, 135, 0.6));
+    }
+}

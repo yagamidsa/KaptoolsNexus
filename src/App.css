@@ -852,6 +852,7 @@
     margin: 0 auto;
     font-size: 11px;
     color: #a0a3bd;
+    flex-wrap: wrap;
   }
 
   .footer-highlight {
@@ -992,10 +993,10 @@
     }
 
     .footer-grid {
-      flex-wrap: wrap;
-      gap: 8px;
-      text-align: center;
+      gap: 12px;
       font-size: 10px;
+      justify-content: flex-start;
+      padding: 0 12px;
     }
   }
 
@@ -1036,6 +1037,13 @@
       padding: 10px 14px;
       font-size: 11px;
     }
+
+    .footer-grid>span:first-child,
+    .footer-grid>span:nth-child(3),
+    .footer-grid>span:nth-child(5) {
+      display: none;
+    }
+
   }
 
   /* Garantizar que no haya scroll horizontal */
@@ -1784,307 +1792,421 @@
 
   /* 🔥 AGREGAR AL FINAL de tu App.css existente */
 
-/* 🚫 DESHABILITAR TOOLTIPS ANTIGUOS PARA EVITAR CONFLICTOS */
-.cyber-tooltip,
-.cyber-tooltip .tooltip-content,
-.tooltip-top,
-.tooltip-bottom,
-.tooltip-left,
-.tooltip-right {
-  display: none !important;
-}
-
-/* 🔥 REQUIREMENTS BADGES MEJORADOS */
-.item-requirements {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  gap: 3px;
-  z-index: 10;
-}
-
-.req-badge {
-  font-size: 8px;
-  font-weight: 600;
-  padding: 2px 4px;
-  border-radius: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 12px;
-  height: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.req-badge.met {
-  background: rgba(0, 255, 135, 0.3);
-  color: #00ff87;
-  border: 1px solid rgba(0, 255, 135, 0.5);
-  box-shadow: 0 0 6px rgba(0, 255, 135, 0.4);
-}
-
-.req-badge.unmet {
-  background: rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
-}
-
-/* 🔧 MENU ITEM ADJUSTMENTS */
-.menu-item {
-  position: relative;
-  padding-right: 40px; /* Espacio para badges */
-}
-
-/* 🎯 ASEGURAR STATUS INDICATORS CIRCULARES */
-.status-indicator {
-  width: 8px !important;
-  height: 8px !important;
-  border-radius: 50% !important;
-  flex-shrink: 0 !important;
-  aspect-ratio: 1 / 1 !important;
-  display: block !important;
-  position: relative !important;
-  transform: none !important;
-  animation: none !important;
-}
-
-.item-status {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 20px !important;
-  height: 20px !important;
-  flex-shrink: 0 !important;
-}
-
-/* 🎯 STATUS INDICATOR STATES */
-.status-indicator.ready {
-  background: #6c5ce7 !important;
-  box-shadow: 0 0 8px rgba(108, 92, 231, 0.6) !important;
-  animation: status-ready 2s ease infinite alternate !important;
-}
-
-.status-indicator.active {
-  background: #ff6b9d !important;
-  box-shadow: 0 0 8px rgba(255, 107, 157, 0.6) !important;
-  animation: status-active 1s ease infinite !important;
-}
-
-.status-indicator.disabled {
-  background: #ef4444 !important;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5) !important;
-  animation: pulse-warning 2s infinite !important;
-}
-
-/* 🎨 ANIMATIONS */
-@keyframes status-ready {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(108, 92, 231, 0.6);
+  /* 🚫 DESHABILITAR TOOLTIPS ANTIGUOS PARA EVITAR CONFLICTOS */
+  .cyber-tooltip,
+  .cyber-tooltip .tooltip-content,
+  .tooltip-top,
+  .tooltip-bottom,
+  .tooltip-left,
+  .tooltip-right {
+    display: none !important;
   }
-  50% {
-    box-shadow: 0 0 12px rgba(108, 92, 231, 0.9);
-  }
-}
 
-@keyframes status-active {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(255, 107, 157, 0.6);
+  /* 🔥 REQUIREMENTS BADGES MEJORADOS */
+  .item-requirements {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 3px;
+    z-index: 10;
   }
-  50% {
-    box-shadow: 0 0 12px rgba(255, 107, 157, 0.9);
-  }
-}
 
-@keyframes pulse-warning {
-  0%, 100% {
+  .req-badge {
+    font-size: 8px;
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .req-badge.met {
+    background: rgba(0, 255, 135, 0.3);
+    color: #00ff87;
+    border: 1px solid rgba(0, 255, 135, 0.5);
+    box-shadow: 0 0 6px rgba(0, 255, 135, 0.4);
+  }
+
+  .req-badge.unmet {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.5);
     box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
   }
-  50% {
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
-  }
-}
 
-/* 🎯 RESPONSIVE ADJUSTMENTS */
-@media (max-width: 1024px) {
+  /* 🔧 MENU ITEM ADJUSTMENTS */
   .menu-item {
-    padding-right: 30px;
+    position: relative;
+    padding-right: 40px;
+    /* Espacio para badges */
   }
-  
-  .item-requirements {
-    top: 6px;
-    right: 6px;
-    gap: 2px;
+
+  /* 🎯 ASEGURAR STATUS INDICATORS CIRCULARES */
+  .status-indicator {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    display: block !important;
+    position: relative !important;
+    transform: none !important;
+    animation: none !important;
   }
-  
-  .req-badge {
-    font-size: 7px;
-    min-width: 10px;
-    height: 10px;
-    padding: 1px 3px;
-  }
-  
+
   .item-status {
-    right: 12px;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
   }
-}
 
-@media (max-width: 768px) {
-  .menu-item {
-    padding-right: 25px;
-    min-height: 44px; /* Más espacio táctil */
+  /* 🎯 STATUS INDICATOR STATES */
+  .status-indicator.ready {
+    background: #6c5ce7 !important;
+    box-shadow: 0 0 8px rgba(108, 92, 231, 0.6) !important;
+    animation: status-ready 2s ease infinite alternate !important;
   }
-  
-  .item-requirements {
-    position: static;
-    margin-top: 4px;
-    justify-content: flex-start;
+
+  .status-indicator.active {
+    background: #ff6b9d !important;
+    box-shadow: 0 0 8px rgba(255, 107, 157, 0.6) !important;
+    animation: status-active 1s ease infinite !important;
   }
-  
-  .item-status {
-    position: static;
-    transform: none;
-    margin-left: auto;
+
+  .status-indicator.disabled {
+    background: #ef4444 !important;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.5) !important;
+    animation: pulse-warning 2s infinite !important;
   }
-}
 
-/* 🔥 EFECTOS HOVER */
-.menu-item:hover .req-badge.met {
-  background: rgba(0, 255, 135, 0.5);
-  box-shadow: 0 0 10px rgba(0, 255, 135, 0.6);
-}
+  /* 🎨 ANIMATIONS */
+  @keyframes status-ready {
 
-.menu-item:hover .req-badge.unmet {
-  background: rgba(239, 68, 68, 0.5);
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
-}
+    0%,
+    100% {
+      box-shadow: 0 0 8px rgba(108, 92, 231, 0.6);
+    }
 
-/* 🎯 ASEGURAR Z-INDEX CORRECTO */
-.smart-tooltip {
-  z-index: 99999 !important;
-}
+    50% {
+      box-shadow: 0 0 12px rgba(108, 92, 231, 0.9);
+    }
+  }
 
-/* ✨ SMOOTH TRANSITIONS */
-.menu-item,
-.req-badge,
-.status-indicator {
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
+  @keyframes status-active {
+
+    0%,
+    100% {
+      box-shadow: 0 0 8px rgba(255, 107, 157, 0.6);
+    }
+
+    50% {
+      box-shadow: 0 0 12px rgba(255, 107, 157, 0.9);
+    }
+  }
+
+  @keyframes pulse-warning {
+
+    0%,
+    100% {
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+    }
+
+    50% {
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+    }
+  }
+
+  /* 🎯 RESPONSIVE ADJUSTMENTS */
+  @media (max-width: 1024px) {
+    .menu-item {
+      padding-right: 30px;
+    }
+
+    .item-requirements {
+      top: 6px;
+      right: 6px;
+      gap: 2px;
+    }
+
+    .req-badge {
+      font-size: 7px;
+      min-width: 10px;
+      height: 10px;
+      padding: 1px 3px;
+    }
+
+    .item-status {
+      right: 12px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .menu-item {
+      padding-right: 25px;
+      min-height: 44px;
+      /* Más espacio táctil */
+    }
+
+    .item-requirements {
+      position: static;
+      margin-top: 4px;
+      justify-content: flex-start;
+    }
+
+    .item-status {
+      position: static;
+      transform: none;
+      margin-left: auto;
+    }
+  }
+
+  /* 🔥 EFECTOS HOVER */
+  .menu-item:hover .req-badge.met {
+    background: rgba(0, 255, 135, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 135, 0.6);
+  }
+
+  .menu-item:hover .req-badge.unmet {
+    background: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+  }
+
+  /* 🎯 ASEGURAR Z-INDEX CORRECTO */
+  .smart-tooltip {
+    z-index: 99999 !important;
+  }
+
+  /* ✨ SMOOTH TRANSITIONS */
+  .menu-item,
+  .req-badge,
+  .status-indicator {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
 
 
 
 
 
-/* 🤖 COPILOT FLOATING BUTTON */
-.copilot-floating-button {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 999;
-}
+  /* 🤖 COPILOT FLOATING BUTTON */
+  .copilot-floating-button {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 999;
+  }
 
-.copilot-button {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(20px);
-  animation: copilot-pulse 3s ease infinite;
-}
-
-.copilot-button:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(108, 92, 231, 0.6);
-  background: linear-gradient(135deg, #a29bfe, #fd79a8);
-}
-
-@keyframes copilot-pulse {
-  0%, 100% {
+  .copilot-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(20px);
+    animation: copilot-pulse 3s ease infinite;
   }
-  50% {
-    box-shadow: 0 8px 24px rgba(255, 107, 157, 0.6);
-  }
-}
 
-@media (max-width: 768px) {
+  .copilot-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(108, 92, 231, 0.6);
+    background: linear-gradient(135deg, #a29bfe, #fd79a8);
+  }
+
+  @keyframes copilot-pulse {
+
+    0%,
+    100% {
+      box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
+    }
+
+    50% {
+      box-shadow: 0 8px 24px rgba(255, 107, 157, 0.6);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .copilot-floating-button {
+      top: 20px;
+      right: 20px;
+    }
+
+    .copilot-button {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+
+  /* 🤖 COPILOT 365 FLOATING BUTTON - VERSIÓN TRANSPARENTE */
   .copilot-floating-button {
-    top: 20px;
-    right: 20px;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 999;
   }
-  
+
   .copilot-button {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: transparent;
+    /* 🔥 FONDO TRANSPARENTE */
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    /* 🔥 SIN SOMBRA */
+    transition: all 0.3s ease;
+    backdrop-filter: none;
+    /* 🔥 SIN BLUR */
+    animation: none;
+    /* 🔥 SIN ANIMACIÓN DE FONDO */
   }
-}
 
-
-/* 🤖 COPILOT 365 FLOATING BUTTON - VERSIÓN TRANSPARENTE */
-.copilot-floating-button {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 999;
-}
-
-.copilot-button {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: transparent; /* 🔥 FONDO TRANSPARENTE */
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none; /* 🔥 SIN SOMBRA */
-  transition: all 0.3s ease;
-  backdrop-filter: none; /* 🔥 SIN BLUR */
-  animation: none; /* 🔥 SIN ANIMACIÓN DE FONDO */
-}
-
-.copilot-button:hover {
-  transform: translateY(-3px) scale(1.1); /* 🔥 SOLO ESCALA Y MOVIMIENTO */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* 🔥 SOMBRA SUTIL SOLO EN HOVER */
-  background: rgba(255, 255, 255, 0.1); /* 🔥 FONDO MUY SUTIL EN HOVER */
-}
-
-/* 🔥 ESTILOS PARA LA IMAGEN */
-.copilot-button img {
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); /* 🔥 SOMBRA AL ICONO */
-}
-
-.copilot-button:hover img {
-  transform: scale(1.1); /* 🔥 CRECER LIGERAMENTE EN HOVER */
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
-}
-
-@media (max-width: 768px) {
-  .copilot-floating-button {
-    top: 20px;
-    right: 20px;
+  .copilot-button:hover {
+    transform: translateY(-3px) scale(1.1);
+    /* 🔥 SOLO ESCALA Y MOVIMIENTO */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    /* 🔥 SOMBRA SUTIL SOLO EN HOVER */
+    background: rgba(255, 255, 255, 0.1);
+    /* 🔥 FONDO MUY SUTIL EN HOVER */
   }
-  
-  .copilot-button {
-    width: 48px;
-    height: 48px;
+
+  /* 🔥 ESTILOS PARA LA IMAGEN */
+  .copilot-button img {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    /* 🔥 SOMBRA AL ICONO */
   }
-}
+
+  .copilot-button:hover img {
+    transform: scale(1.1);
+    /* 🔥 CRECER LIGERAMENTE EN HOVER */
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  }
+
+  @media (max-width: 768px) {
+    .copilot-floating-button {
+      top: 20px;
+      right: 20px;
+    }
+
+    .copilot-button {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+
+  /* 🔥 CSS GRADIENTE RAYO - SOLO ICONOS (PEGAR AL FINAL DE App.css) */
+
+  /* ================================
+   VARIABLES DEL GRADIENTE RAYO
+   ================================ */
+  :root {
+    --lightning-gradient-primary: #6c5ce7;
+    --lightning-gradient-secondary: #ff6b9d;
+    --lightning-gradient-tertiary: #a29bfe;
+    --lightning-gradient-accent: #fd79a8;
+    --lightning-gradient-main: linear-gradient(135deg, var(--lightning-gradient-primary), var(--lightning-gradient-secondary));
+    --lightning-gradient-hover: linear-gradient(135deg, var(--lightning-gradient-tertiary), var(--lightning-gradient-accent));
+  }
+
+  /* ================================
+   🎯 GRADIENTE SOLO PARA ICONOS ESPECÍFICOS
+   ================================ */
+
+  /* Iconos específicos de la interfaz */
+  .nexus-app .panel-header .panel-icon,
+  .nexus-app .input-label .label-icon,
+  .nexus-app .menu-header .menu-icon,
+  .nexus-app .menu-item .item-icon,
+  .nexus-app .selected-item-info .info-icon {
+    background: var(--lightning-gradient-main) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 0 8px rgba(108, 92, 231, 0.6)) !important;
+    transition: all 0.3s ease !important;
+  }
+
+  /* ================================
+   ✨ HOVER EFFECTS PARA ICONOS
+   ================================ */
+  .nexus-app .panel-header .panel-icon:hover,
+  .nexus-app .input-label .label-icon:hover,
+  .nexus-app .menu-header .menu-icon:hover,
+  .nexus-app .menu-item:hover .item-icon,
+  .nexus-app .selected-item-info .info-icon:hover {
+    background: var(--lightning-gradient-hover) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 0 12px rgba(255, 107, 157, 0.8)) !important;
+    transform: scale(1.1) !important;
+  }
+
+  /* ================================
+   🌟 ANIMACIÓN SUTIL PARA ICONOS PRINCIPALES
+   ================================ */
+  @keyframes lightning-icon-glow {
+    from {
+      filter: drop-shadow(0 0 8px rgba(108, 92, 231, 0.6));
+    }
+
+    to {
+      filter: drop-shadow(0 0 12px rgba(255, 107, 157, 0.8));
+    }
+  }
+
+  /* Aplicar animación solo a iconos principales */
+  .nexus-app .panel-header .panel-icon,
+  .nexus-app .menu-header .menu-icon {
+    animation: lightning-icon-glow 3s ease infinite alternate !important;
+  }
+
+  /* ================================
+   📱 RESPONSIVE PARA ICONOS
+   ================================ */
+  @media (max-width: 768px) {
+
+    .nexus-app .panel-header .panel-icon,
+    .nexus-app .input-label .label-icon,
+    .nexus-app .menu-header .menu-icon,
+    .nexus-app .menu-item .item-icon,
+    .nexus-app .selected-item-info .info-icon {
+      filter: drop-shadow(0 0 4px rgba(108, 92, 231, 0.5)) !important;
+    }
+
+    .nexus-app .panel-header .panel-icon:hover,
+    .nexus-app .input-label .label-icon:hover,
+    .nexus-app .menu-header .menu-icon:hover,
+    .nexus-app .menu-item:hover .item-icon,
+    .nexus-app .selected-item-info .info-icon:hover {
+      filter: drop-shadow(0 0 8px rgba(255, 107, 157, 0.6)) !important;
+      transform: scale(1.05) !important;
+    }
+  }
