@@ -712,32 +712,10 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                     '--mouse-y': mousePosition.y
                 } as React.CSSProperties}
             >
-                {/* Holographic Background Effects */}
-                <div className="holographic-bg">
-                    <div className="holo-layer holo-1"></div>
-                    <div className="holo-layer holo-2"></div>
-                    <div className="holo-layer holo-3"></div>
-                </div>
-
-                {/* Neural Network Background */}
-                <div className="neural-network">
-                    {Array.from({ length: 50 }).map((_, i) => (
-                        <div
-                            key={i}
-                            className="neural-node"
-                            style={{
-                                left: `${Math.random() * 100}%`,
-                                top: `${Math.random() * 100}%`,
-                                animationDelay: `${Math.random() * 2}s`
-                            }}
-                        />
-                    ))}
-                </div>
-
                 {/* Header */}
                 <div className="shortcuts-header">
-                    <div className="header-content">
-                        <div className="header-title">
+                    <div className="shortcuts-header-content">
+                        <div className="shortcuts-header-title">
                             <div className="title-icon">
                                 <svg viewBox="0 0 24 24" fill="none" className="header-svg">
                                     <path
@@ -762,19 +740,19 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="header-stats">
-                            <div className="stat-item">
-                                <span className="stat-value">{filteredShortcuts.length}</span>
-                                <span className="stat-label">ACTIVE</span>
+                            <div className="shortcuts-stat-item">
+                                <span className="shortcuts-stat-value">{filteredShortcuts.length}</span>
+                                <span className="shortcuts-stat-label">ACTIVE</span>
                             </div>
                             <div className="stat-divider"></div>
-                            <div className="stat-item">
-                                <span className="stat-value">{shortcuts.filter(s => s.status === 'online').length}</span>
-                                <span className="stat-label">ONLINE</span>
+                            <div className="shortcuts-stat-item">
+                                <span className="shortcuts-stat-value">{shortcuts.filter(s => s.status === 'online').length}</span>
+                                <span className="shortcuts-stat-label">ONLINE</span>
                             </div>
                         </div>
                     </div>
 
-                    <button className="close-button" onClick={onClose}>
+                    <button className="shortcuts-close-button" onClick={onClose}>
                         <svg viewBox="0 0 24 24" fill="none">
                             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
@@ -784,14 +762,14 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                 {/* Search & Filters */}
                 <div className="shortcuts-controls">
                     <div className="search-container">
-                        <div className="search-input-wrapper">
-                            <svg className="search-icon" viewBox="0 0 24 24" fill="none">
+                        <div className="shortcuts-search-input-wrapper">
+                            <svg className="shortcuts-search-icon" viewBox="0 0 24 24" fill="none">
                                 <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
                                 <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             </svg>
                             <input
                                 type="text"
-                                className="search-input"
+                                className="shortcuts-search-input"
                                 placeholder="Search quantum portals..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -842,17 +820,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                             onMouseLeave={() => setHoveredItem('')}
                             onClick={() => handleShortcutClick(shortcut)}
                         >
-                            {/* Card Background Effects */}
-                            <div className="card-bg-effects">
-                                <div className="card-glow"></div>
-                                <div className="card-shimmer"></div>
-                                <div className="card-particles">
-                                    {Array.from({ length: 6 }).map((_, i) => (
-                                        <div key={i} className={`particle particle-${i + 1}`}></div>
-                                    ))}
-                                </div>
-                            </div>
-
+                            
 
                             {/* Priority Badge */}
                             {shortcut.priority === 'high' && (
@@ -869,7 +837,6 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                                 <div className="icon-wrapper">
                                     {NeonIcons[shortcut.icon as keyof typeof NeonIcons]?.(shortcut.color)}
                                 </div>
-                                <div className="icon-ripple"></div>
                             </div>
 
                             {/* Content */}
@@ -886,26 +853,14 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                                 <span>LAUNCH</span>
                             </div>
 
-                            {/* Hexagonal Border */}
-                            <div className="hex-border">
-                                <svg viewBox="0 0 100 100" className="hex-svg">
-                                    <polygon
-                                        points="50,1 95,25 95,75 50,99 5,75 5,25"
-                                        stroke={shortcut.color}
-                                        strokeWidth="0.5"
-                                        fill="none"
-                                        opacity="0.3"
-                                    />
-                                </svg>
-                            </div>
                         </div>
                     ))}
                 </div>
 
                 {/* Empty State */}
                 {filteredShortcuts.length === 0 && (
-                    <div className="empty-state">
-                        <div className="empty-icon">
+                    <div className="shortcuts-empty-state">
+                        <div className="shortcuts-empty-icon">
                             <svg viewBox="0 0 24 24" fill="none">
                                 <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
                                 <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />

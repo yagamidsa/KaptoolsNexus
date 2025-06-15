@@ -1,5 +1,5 @@
-/* 🚀 SHORTCUTS NEXUS - DIVINE EDITION CSS
-   Designed by the Gods of Programming
+/* 🚀 SHORTCUTS NEXUS - PERFORMANCE OPTIMIZED CSS
+   Removed heavy animations for better performance
    ========================================= */
 
 /* 🌌 OVERLAY & CONTAINER BASE */
@@ -39,6 +39,8 @@
     overflow: hidden;
     animation: containerSlideIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
     transform-style: preserve-3d;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes overlayFadeIn {
@@ -105,25 +107,17 @@
     justify-content: center;
     background: radial-gradient(circle, rgba(108, 92, 231, 0.2) 0%, transparent 70%);
     border-radius: 12px;
-    animation: iconFloat 3s ease-in-out infinite;
+    /* ❌ REMOVED: animation: iconFloat 3s ease-in-out infinite; */
 }
 
 .header-svg {
     width: 28px;
     height: 28px;
     filter: drop-shadow(0 0 15px rgba(108, 92, 231, 0.6));
-    animation: iconGlow 2s ease-in-out infinite alternate;
+    /* ❌ REMOVED: animation: iconGlow 2s ease-in-out infinite alternate; */
 }
 
-@keyframes iconFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-3px) rotate(2deg); }
-}
-
-@keyframes iconGlow {
-    from { filter: drop-shadow(0 0 15px rgba(108, 92, 231, 0.6)); }
-    to { filter: drop-shadow(0 0 25px rgba(108, 92, 231, 0.9)); }
-}
+/* ❌ REMOVED: iconFloat and iconGlow animations for performance */
 
 .title-text {
     display: flex;
@@ -134,14 +128,14 @@
 
 .title-main {
     font-size: 28px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 3px;
-    background: linear-gradient(135deg, #ffffff 0%, #6c5ce7 30%, #ff6b9d 60%, #00ff87 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #6c5ce7 50%, #ff6b9d 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 30px rgba(108, 92, 231, 0.5);
-    animation: titleShimmer 3s ease-in-out infinite;
+    /* ❌ REMOVED: animation: titleShimmer 3s ease-in-out infinite; */
 }
 
 .title-sub {
@@ -153,10 +147,7 @@
     margin-left: 4px;
 }
 
-@keyframes titleShimmer {
-    0%, 100% { filter: brightness(1) saturate(1); }
-    50% { filter: brightness(1.3) saturate(1.5); }
-}
+/* ❌ REMOVED: titleShimmer animation for performance */
 
 .header-stats {
     display: flex;
@@ -183,7 +174,7 @@
     font-weight: 700;
     color: #00ff87;
     text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
-    animation: statPulse 2s ease-in-out infinite;
+    /* ❌ REMOVED: animation: statPulse 2s ease-in-out infinite; */
 }
 
 .shortcuts-stat-value {
@@ -191,7 +182,7 @@
     font-weight: 700;
     color: #00ff87;
     text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
-    animation: statPulse 2s ease-in-out infinite;
+    /* ❌ REMOVED: animation: statPulse 2s ease-in-out infinite; */
 }
 
 .stat-label {
@@ -216,16 +207,7 @@
     background: linear-gradient(180deg, transparent, rgba(108, 92, 231, 0.5), transparent);
 }
 
-@keyframes statPulse {
-    0%, 100% {
-        transform: scale(1);
-        text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
-    }
-    50% {
-        transform: scale(1.05);
-        text-shadow: 0 0 20px rgba(0, 255, 135, 0.8);
-    }
-}
+/* ❌ REMOVED: statPulse animation for performance */
 
 .close-button {
     width: 44px;
@@ -504,53 +486,14 @@ svg[class*="search-icon"] {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    max-height: calc(100vh - 400px); /* ← Cambió de 60vh a cálculo dinámico */
-    min-height: 200px; /* ← Altura mínima para evitar cortes */
+    max-height: calc(100vh - 400px);
+    min-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: rgba(108, 92, 231, 0.5) transparent;
     z-index: 5;
     position: relative;
-}
-
-/* 🔍 SEARCH INPUT - FORCE ALIGNMENT */
-.search-input-wrapper {
-    position: relative;
-    max-width: 500px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-}
-
-/* Asegurar que ambas clases funcionen igual */
-input[class*="search"] {
-    width: 100%;
-    height: 40px !important;
-    background: rgba(26, 29, 58, 0.8);
-    border: 2px solid rgba(108, 92, 231, 0.3);
-    border-radius: 12px;
-    padding: 0 45px 0 45px !important;
-    font-size: 14px;
-    font-weight: 500;
-    color: #ffffff;
-    outline: none;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Iconos de búsqueda - forzar posición */
-[class*="search-icon"] {
-    position: absolute !important;
-    left: 14px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    width: 18px !important;
-    height: 18px !important;
-    color: rgba(180, 183, 200, 0.6);
-    transition: all 0.3s ease;
-    pointer-events: none;
-    z-index: 10 !important;
 }
 
 .shortcuts-grid::-webkit-scrollbar {
@@ -746,7 +689,7 @@ input[class*="search"] {
     width: 12px;
     height: 12px;
     color: #ffd700;
-    animation: priorityGlow 2s ease-in-out infinite;
+    /* ❌ REMOVED: animation: priorityGlow 2s ease-in-out infinite; */
     z-index: 10;
 }
 
@@ -756,16 +699,7 @@ input[class*="search"] {
     filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
 }
 
-@keyframes priorityGlow {
-    0%, 100% {
-        transform: scale(1) rotate(0deg);
-        filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
-    }
-    50% {
-        transform: scale(1.1) rotate(5deg);
-        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
-    }
-}
+/* ❌ REMOVED: priorityGlow animation for performance */
 
 .empty-state {
     display: flex;
@@ -841,32 +775,8 @@ input[class*="search"] {
     border-top: 1px solid rgba(108, 92, 231, 0.2);
     z-index: 10;
     position: relative;
-    margin-top: auto; /* ← Empuja el footer hacia abajo */
-    flex-shrink: 0; /* ← Evita que se comprima */
-}
-
-/* Asegurar que el container principal use flexbox */
-.shortcuts-nexus-container {
-    position: relative;
-    width: 100%;
-    max-width: 1400px;
-    max-height: 90vh;
-    background: linear-gradient(145deg,
-            rgba(26, 29, 58, 0.95) 0%,
-            rgba(15, 20, 45, 0.98) 50%,
-            rgba(20, 25, 50, 0.95) 100%);
-    border: 2px solid transparent;
-    border-radius: 24px;
-    box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.9),
-        0 0 0 1px rgba(108, 92, 231, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 0 200px rgba(108, 92, 231, 0.03);
-    overflow: hidden;
-    animation: containerSlideIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-    transform-style: preserve-3d;
-    display: flex; /* ← Cambió a flex */
-    flex-direction: column; /* ← Dirección vertical */
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .footer-content {
@@ -1032,7 +942,7 @@ button[onclick*="reset"]:active,
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
         padding: 15px 20px;
-        max-height: calc(100vh - 420px); /* ← Ajustado para 1400px */
+        max-height: calc(100vh - 420px);
     }
     .shortcut-card { height: 140px; padding: 12px; }
     .shortcut-title { font-size: 13px; }
@@ -1050,7 +960,7 @@ button[onclick*="reset"]:active,
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
         padding: 12px 18px;
-        max-height: calc(100vh - 380px); /* ← Ajustado para 1200px */
+        max-height: calc(100vh - 380px);
     }
     .shortcut-card { height: 130px; padding: 10px; }
     .shortcut-title { font-size: 12px; }
@@ -1072,7 +982,7 @@ button[onclick*="reset"]:active,
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
         padding: 10px 12px;
-        max-height: calc(100vh - 320px); /* ← Ajustado para móvil */
+        max-height: calc(100vh - 320px);
     }
     .shortcut-card { height: 120px; padding: 8px; }
     .shortcut-title { font-size: 11px; }
@@ -1098,7 +1008,7 @@ button[onclick*="reset"]:active,
         grid-template-columns: 1fr;
         gap: 6px;
         padding: 8px 10px;
-        max-height: calc(100vh - 280px); /* ← Ajustado para móvil pequeño */
+        max-height: calc(100vh - 280px);
     }
     .shortcut-card { height: 110px; padding: 6px; }
     .shortcut-title { font-size: 10px; }
@@ -1111,3 +1021,5 @@ button[onclick*="reset"]:active,
     .chip-label { font-size: 7px; letter-spacing: 0px; }
     .chip-count { min-width: 10px; height: 10px; font-size: 5px; border-radius: 5px; }
 }
+
+

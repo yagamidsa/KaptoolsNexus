@@ -93,7 +93,7 @@
 }
 
 /* Loading state */
-.holo-btn.loading {
+.holo-btn.holo-loading {
     pointer-events: none;
     background: linear-gradient(135deg, #6c5ce7 0%, #ff6b9d 100%);
 }
@@ -121,7 +121,7 @@
     }
 }
 
-.holo-btn.loading .holo-btn-content {
+.holo-btn.holo-loading .holo-btn-content {
     opacity: 0.3;
 }
 

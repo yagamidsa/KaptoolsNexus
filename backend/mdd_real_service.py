@@ -208,7 +208,7 @@ class IBMSPSSDataCollectionService:
     async def _create_output_zip(self, workspace, base_name, mdd_file, ddf_file, count, final_count, add_log):
         """Versión corregida del método para crear ZIP"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        zip_name = f"{base_name}_EXACT_x{count}_{timestamp}.zip"
+        zip_name = f"{base_name}_Completes_All.zip"
         zip_path = os.path.join(workspace, zip_name)
         
         try:

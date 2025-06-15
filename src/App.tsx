@@ -1,4 +1,4 @@
-// src/App.tsx - COMPLETO CON SMART TOOLTIPS IMPLEMENTADOS
+// src/App.tsx - CON SPLASH SCREEN INTEGRADO
 
 import { useState, useEffect } from "react";
 import HolographicButton from "./components/HolographicButton";
@@ -13,6 +13,7 @@ import ShortcutsNexus from './components/ShorcutsNexus';
 import { SmartTooltipWrapper } from './components/SmartTooltipWrapper';
 import './components/style/SmartTooltip.css';
 import QChunksProcessor from './components/QChunksProcessor';
+import SplashScreen from './components/SplashScreen'; // 🔥 IMPORTAR SPLASH
 import { open } from '@tauri-apps/plugin-dialog';
 import "./App.css";
 
@@ -34,10 +35,13 @@ interface WorkspaceValidation {
 }
 
 function App() {
+  // 🔥 ESTADO DEL SPLASH SCREEN
+  const [isAppLoading, setIsAppLoading] = useState(true);
+  
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
-  const [workspacePath, setWorkspacePath] = useState<string>('Path of your workspace');
+  const [workspacePath, setWorkspacePath] = useState<string>('');
   const [activeView, setActiveView] = useState<'main' | 'review-branches'>('main');
 
   // 🔥 ESTADOS DE MODALES
@@ -83,7 +87,7 @@ function App() {
       desc: 'BEE, CeV and Link',
       icon: '☁️',
       category: 'AZURE TOOLS',
-      requiresWorkspace: true  // 🔥 ARREGLADO: Requiere workspace
+      requiresWorkspace: true
     },
     {
       id: 'product-data',
@@ -147,7 +151,13 @@ function App() {
   const categories = [...new Set(menuItems.map(item => item.category))];
 
   // Verificar si hay workspace seleccionado
-  const isWorkspaceSelected = workspacePath !== 'Path of your workspace';
+  const isWorkspaceSelected = workspacePath !== '';
+
+  // 🔥 HANDLER PARA CUANDO TERMINE EL SPLASH
+  const handleSplashComplete = () => {
+    setIsAppLoading(false);
+    setResponse("🚀 KapTools Nexus successfully loaded!\n✨ All quantum systems online and ready");
+  };
 
   // 🔥 FUNCIÓN HELPER PARA TOOLTIPS DINÁMICOS
   const getTooltipContent = (item: MenuItem, enabled: boolean) => {
@@ -241,8 +251,6 @@ function App() {
     }
   };
 
-
-
   const debugCommands = async () => {
     try {
       const { invoke } = await import('@tauri-apps/api/core');
@@ -254,7 +262,6 @@ function App() {
     }
   };
 
-  <button onClick={debugCommands}>Debug Commands</button>
   const selectWorkspaceFolder = async () => {
     try {
       setResponse("🔍 Opening folder selector...");
@@ -408,7 +415,6 @@ function App() {
       setShowProductDataModal(true);
       setResponse(`📦 Opening Product Data Inspector...\n📂 Ready to analyze product metadata`);
     } else if (itemId === 'azure-download') {
-      // 🔥 ARREGLADO: Esta validación ya no es necesaria porque isMenuItemEnabled la maneja
       setShowDownloadModal(true);
       setResponse(`☁️ Opening Azure Download Center...\n📂 Target: ${workspacePath}`);
     }
@@ -476,7 +482,6 @@ function App() {
                   placeholder="Selected folder path will appear here..."
                 />
 
-                {/* 🔥 BOTÓN SELECT FOLDER CON SMART TOOLTIP */}
                 <SmartTooltipWrapper
                   content={{
                     icon: '📁',
@@ -519,7 +524,6 @@ function App() {
 
             {/* Quick Action Buttons */}
             <div className="action-matrix">
-              {/* 🔥 BOTÓN TEST API CON SMART TOOLTIP */}
               <SmartTooltipWrapper
                 content={{
                   icon: '🔗',
@@ -539,7 +543,6 @@ function App() {
                 </HolographicButton>
               </SmartTooltipWrapper>
 
-              {/* 🔥 BOTÓN OPEN WORKSPACE CON SMART TOOLTIP */}
               <SmartTooltipWrapper
                 content={{
                   icon: !isWorkspaceSelected ? '⚠️' : '✅',
@@ -617,7 +620,7 @@ function App() {
             )}
           </div>
 
-          {/* 🔥 PANEL LATERAL DE MENU CON SMART TOOLTIPS */}
+          {/* Panel lateral de menu */}
           <aside className="main-menu">
             <div className="menu-header">
               <div className="menu-icon">⚡</div>
@@ -656,7 +659,6 @@ function App() {
                               }`}></div>
                           </div>
 
-                          {/* 🔥 REQUIREMENTS BADGES VISIBLE */}
                           {(item.requiresWorkspace || item.requiresMicroservices) && (
                             <div className="item-requirements">
                               {item.requiresWorkspace && (
@@ -727,7 +729,16 @@ function App() {
         </div>
       </footer>
 
-      {/* 🔥 TODOS LOS MODALES */}
+      {/* 🔥 SPLASH SCREEN EN RECUADRO CENTRADO */}
+      {isAppLoading && (
+        <div className="splash-overlay">
+          <div className="splash-modal">
+            <SplashScreen onLoadingComplete={handleSplashComplete} />
+          </div>
+        </div>
+      )}
+
+      {/* Todos los modales */}
       <DownloadFiles
         isOpen={showDownloadModal}
         onClose={handleCloseDownloadModal}
@@ -765,6 +776,7 @@ function App() {
         }}
         workspacePath={workspacePath}
       />
+      
       <ShortcutsNexus
         isOpen={showShortcutsModal}
         onClose={() => {

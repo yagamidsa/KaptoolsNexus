@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import './DuplicateMDD.css';
 
 interface DuplicateMDDProps {
     isOpen: boolean;

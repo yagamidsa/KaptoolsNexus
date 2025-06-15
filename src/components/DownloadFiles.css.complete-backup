@@ -1,6 +1,6 @@
 /* src/components/DownloadFiles.css */
 
-.df-download-modal-backdrop {
+.download-df-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -56,7 +56,7 @@
     }
 }
 
-.download-modal-header {
+.download-df-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -427,7 +427,7 @@
 .modal-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none ;
+    transform: none;
 }
 
 .df-loading-spinner {
@@ -721,10 +721,10 @@
 }
 
 .success-details {
-    font-size: 12px ;
-    color: #00ff87 ;
+    font-size: 12px;
+    color: #00ff87;
     font-weight: 600;
-    margin-top: 12px ;
+    margin-top: 12px;
 }
 
 .error-message {
@@ -835,7 +835,7 @@
         max-width: none;
     }
 
-    .download-modal-header {
+    .download-df-modal-header {
         padding: 20px 20px 16px;
     }
 
@@ -882,11 +882,11 @@
 }
 
 /* Mejoras adicionales */
-.df-download-modal-backdrop::-webkit-scrollbar {
+.download-df-modal-backdrop::-webkit-scrollbar {
     display: none;
 }
 
-.df-download-modal-backdrop {
+.download-df-modal-backdrop {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -1200,7 +1200,7 @@
     }
 }
 
-.download-modal-backdrop.closing {
+.download-df-modal-backdrop.closing {
     animation: backdrop-disappear 0.3s ease-out forwards;
 }
 
@@ -1255,9 +1255,9 @@
     *,
     *::before,
     *::after {
-        animation-duration: 0.01ms ;
-        animation-iteration-count: 1 ;
-        transition-duration: 0.01ms ;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
 
@@ -1279,7 +1279,7 @@
 
 /* Print styles (por si acaso) */
 @media print {
-    .df-download-modal-backdrop {
+    .download-df-modal-backdrop {
         display: none;
     }
 }
@@ -1291,7 +1291,7 @@
         border-radius: 12px;
     }
 
-    .download-modal-header {
+    .download-df-modal-header {
         padding: 16px;
         flex-direction: column;
         align-items: flex-start;
@@ -1391,7 +1391,7 @@
     scroll-behavior: smooth;
 }
 
-body:has(.download-modal-backdrop) {
+body:has(.download-df-modal-backdrop) {
     overflow: hidden;
 }
 

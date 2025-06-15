@@ -328,10 +328,13 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 <option key={server} value={server}>{server}</option>
                             ))}
                         </select>
+                        {validationErrors.server && (
+                            <span className="error-text-validation">{validationErrors.server}</span>
+                        )}
                     </div>
 
                     {/* KapID Input */}
-                    <div className="form-group">
+                    <div className={`form-group ${validationErrors.kapId ? 'error' : ''}`}>
                         <label className="form-label">
                             <span className="label-icon">
                                 {/* ID Card SVG Icon */}
@@ -351,10 +354,13 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             className="cyber-input"
                             autoComplete="off"
                         />
+                        {validationErrors.kapId && (
+                            <span className="error-text-validation">{validationErrors.kapId}</span>
+                        )}
                     </div>
 
                     {/* WaveID Input */}
-                    <div className="form-group">
+                    <div className={`form-group ${validationErrors.waveId ? 'error' : ''}`}>
                         <label className="form-label">
                             <span className="label-icon">
                                 {/* Wave SVG Icon */}
@@ -378,10 +384,13 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             className="cyber-input"
                             autoComplete="off"
                         />
+                        {validationErrors.waveId && (
+                            <span className="error-text-validation">{validationErrors.waveId}</span>
+                        )}
                     </div>
 
                     {/* Token Input */}
-                    <div className="form-group">
+                    <div className={`form-group ${validationErrors.token ? 'error' : ''}`}>
                         <label className="form-label">
                             <span className="label-icon">
                                 {/* Key SVG Icon */}
@@ -417,6 +426,9 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 <span className="checkbox-text">Update Token</span>
                             </label>
                         </div>
+                        {validationErrors.token && (
+                            <span className="error-text-validation">{validationErrors.token}</span>
+                        )}
                     </div>
 
                     {/* Workspace Info */}
@@ -474,8 +486,6 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                     </button>
                 </div>
             </div>
-
-
         </div>
     );
 };

@@ -12,24 +12,12 @@
     background: radial-gradient(ellipse at center,
             rgba(15, 15, 25, 0.95) 0%,
             rgba(5, 5, 15, 0.98) 100%);
-    backdrop-filter: blur(20px) saturate(1.5);
     z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
     animation: overlayFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes overlayFadeIn {
-    from {
-        opacity: 0;
-        backdrop-filter: blur(0px);
-    }
-    to {
-        opacity: 1;
-        backdrop-filter: blur(20px) saturate(1.5);
-    }
 }
 
 .shortcuts-nexus-container {
@@ -43,7 +31,6 @@
             rgba(20, 25, 50, 0.95) 100%);
     border: 2px solid transparent;
     border-radius: 24px;
-    backdrop-filter: blur(30px) brightness(1.1);
     box-shadow:
         0 25px 80px rgba(0, 0, 0, 0.9),
         0 0 0 1px rgba(108, 92, 231, 0.3),
@@ -52,6 +39,15 @@
     overflow: hidden;
     animation: containerSlideIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
     transform-style: preserve-3d;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes containerSlideIn {
@@ -65,63 +61,6 @@
     }
 }
 
-/* 🌈 HOLOGRAPHIC BACKGROUND EFFECTS */
-.holographic-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.3;
-}
-
-.holo-layer {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0.05;
-}
-
-.holo-1 {
-    background: radial-gradient(circle at 20% 50%, rgba(108, 92, 231, 0.1) 0%, transparent 50%);
-}
-
-.holo-2 {
-    background: radial-gradient(circle at 80% 30%, rgba(255, 107, 157, 0.1) 0%, transparent 50%);
-}
-
-.holo-3 {
-    background: radial-gradient(circle at 50% 80%, rgba(0, 255, 135, 0.1) 0%, transparent 50%);
-}
-
-/* NEURAL NETWORK SIMPLIFICADO */
-.neural-network {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 2;
-    opacity: 0.5;
-}
-
-.neural-node {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    background: #6c5ce7;
-    border-radius: 50%;
-    opacity: 0.3;
-}
-
-.neural-node::before {
-    display: none;
-}
-
 /* 🎯 HEADER SECTION */
 .shortcuts-header {
     position: relative;
@@ -132,7 +71,6 @@
     z-index: 10;
     border-bottom: 1px solid rgba(108, 92, 231, 0.2);
     background: linear-gradient(135deg, rgba(26, 29, 58, 0.8) 0%, rgba(15, 20, 45, 0.6) 100%);
-    backdrop-filter: blur(15px);
 }
 
 .header-content {
@@ -141,7 +79,19 @@
     gap: 40px;
 }
 
+.shortcuts-header-content {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
 .header-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.shortcuts-header-title {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -221,6 +171,13 @@
     gap: 4px;
 }
 
+.shortcuts-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
 .stat-value {
     font-size: 24px;
     font-weight: 700;
@@ -229,7 +186,23 @@
     animation: statPulse 2s ease-in-out infinite;
 }
 
+.shortcuts-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #00ff87;
+    text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+    animation: statPulse 2s ease-in-out infinite;
+}
+
 .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba(180, 183, 200, 0.7);
+    text-transform: uppercase;
+}
+
+.shortcuts-stat-label {
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 2px;
@@ -267,10 +240,25 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    backdrop-filter: blur(10px);
 }
 
-.close-button:hover {
+.shortcuts-close-button {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: rgba(255, 107, 157, 0.1);
+    border: 2px solid rgba(255, 107, 157, 0.3);
+    border-radius: 12px;
+    color: #ff6b9d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.close-button:hover,
+.shortcuts-close-button:hover {
     background: rgba(255, 107, 157, 0.2);
     border-color: #ff6b9d;
     transform: scale(1.1) rotate(90deg);
@@ -285,7 +273,7 @@
 
 /* 🎮 CONTROLS SECTION */
 .shortcuts-controls {
-    padding: 20px 40px;
+    padding: 16px 40px;
     background: rgba(15, 20, 45, 0.4);
     border-bottom: 1px solid rgba(108, 92, 231, 0.15);
     z-index: 10;
@@ -293,67 +281,78 @@
 }
 
 .search-container {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
-.search-input-wrapper {
+.search-input-wrapper,
+.shortcuts-search-input-wrapper {
     position: relative;
     max-width: 500px;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
 }
 
-.search-input {
+.search-input,
+.shortcuts-search-input {
     width: 100%;
-    height: 50px;
+    height: 40px;
     background: rgba(26, 29, 58, 0.8);
     border: 2px solid rgba(108, 92, 231, 0.3);
-    border-radius: 16px;
-    padding: 0 50px 0 50px;
-    font-size: 16px;
+    border-radius: 12px;
+    padding: 0 45px 0 45px;
+    font-size: 14px;
     font-weight: 500;
     color: #ffffff;
     outline: none;
     transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    backdrop-filter: blur(15px);
-    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.search-input::placeholder {
+.search-input::placeholder,
+.shortcuts-search-input::placeholder {
     color: rgba(180, 183, 200, 0.6);
     font-style: italic;
+    font-size: 13px;
 }
 
-.search-input:focus {
+.search-input:focus,
+.shortcuts-search-input:focus {
     border-color: #6c5ce7;
     background: rgba(26, 29, 58, 0.95);
-    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 30px rgba(108, 92, 231, 0.3);
-    transform: scale(1.02);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 25px rgba(108, 92, 231, 0.3);
+    transform: scale(1.01);
 }
 
-.search-icon {
+.search-icon,
+.shortcuts-search-icon {
     position: absolute;
-    left: 16px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     color: rgba(180, 183, 200, 0.6);
     transition: all 0.3s ease;
     pointer-events: none;
+    z-index: 2;
 }
 
-.search-input:focus + .search-icon {
+.search-input:focus + .search-icon,
+.search-input:focus + .shortcuts-search-icon,
+.shortcuts-search-input:focus + .search-icon,
+.shortcuts-search-input:focus + .shortcuts-search-icon {
     color: #6c5ce7;
-    transform: translateY(-50%) scale(1.1);
+    transform: translateY(-50%) scale(1.05);
 }
 
 .search-clear {
     position: absolute;
-    right: 16px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: none;
     background: none;
     color: rgba(180, 183, 200, 0.6);
@@ -363,16 +362,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
 }
 
 .search-clear:hover {
     color: #ff6b9d;
-    transform: translateY(-50%) scale(1.2) rotate(90deg);
+    transform: translateY(-50%) scale(1.1) rotate(90deg);
 }
 
 .search-clear svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+}
+
+/* 🔍 FORCE ALIGNMENT FOR ALL SEARCH VARIANTS */
+input[class*="search"] {
+    height: 40px !important;
+    padding: 0 45px 0 45px !important;
+}
+
+svg[class*="search-icon"] {
+    position: absolute !important;
+    left: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 18px !important;
+    height: 18px !important;
+    z-index: 10 !important;
 }
 
 /* 🏷️ CATEGORIES */
@@ -404,7 +420,6 @@
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
-    backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
     min-width: fit-content;
@@ -439,6 +454,13 @@
     transform: translateY(-2px);
 }
 
+.category-chip.shortcuts-active {
+    background: linear-gradient(135deg, rgba(26, 29, 58, 0.9) 0%, rgba(108, 92, 231, 0.2) 100%);
+    border-color: var(--category-color);
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
 .chip-label {
     font-size: 11px;
     font-weight: 600;
@@ -448,7 +470,8 @@
     transition: all 0.3s ease;
 }
 
-.category-chip.active .chip-label {
+.category-chip.active .chip-label,
+.category-chip.shortcuts-active .chip-label {
     color: var(--category-color);
     text-shadow: 0 0 8px var(--category-color);
 }
@@ -468,25 +491,66 @@
     transition: all 0.3s ease;
 }
 
-.category-chip.active .chip-count {
+.category-chip.active .chip-count,
+.category-chip.shortcuts-active .chip-count {
     background: var(--category-color);
     color: rgba(0, 0, 0, 0.8);
     box-shadow: 0 0 10px var(--category-color);
 }
 
-/* 🎯 SHORTCUTS GRID */
+/* 🎯 SHORTCUTS GRID - FIXED HEIGHT ISSUE */
 .shortcuts-grid {
     padding: 15px 20px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    max-height: 60vh;
+    max-height: calc(100vh - 400px); /* ← Cambió de 60vh a cálculo dinámico */
+    min-height: 200px; /* ← Altura mínima para evitar cortes */
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: rgba(108, 92, 231, 0.5) transparent;
     z-index: 5;
     position: relative;
+}
+
+/* 🔍 SEARCH INPUT - FORCE ALIGNMENT */
+.search-input-wrapper {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+/* Asegurar que ambas clases funcionen igual */
+input[class*="search"] {
+    width: 100%;
+    height: 40px !important;
+    background: rgba(26, 29, 58, 0.8);
+    border: 2px solid rgba(108, 92, 231, 0.3);
+    border-radius: 12px;
+    padding: 0 45px 0 45px !important;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Iconos de búsqueda - forzar posición */
+[class*="search-icon"] {
+    position: absolute !important;
+    left: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: rgba(180, 183, 200, 0.6);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 10 !important;
 }
 
 .shortcuts-grid::-webkit-scrollbar {
@@ -517,7 +581,6 @@
     padding: 12px;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    backdrop-filter: blur(15px);
     overflow: hidden;
     animation: cardSlideIn 0.6s ease var(--animation-delay);
     animation-fill-mode: both;
@@ -544,7 +607,8 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--shortcut-color), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.shortcut-card.hovered .card-bg-effects {
+.shortcut-card.hovered .card-bg-effects,
+.shortcut-card.shortcuts-hovered .card-bg-effects {
     opacity: 1;
 }
 
@@ -569,7 +633,6 @@
     border: 2px solid rgba(108, 92, 231, 0.2);
     border-radius: 10px;
     transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    backdrop-filter: blur(10px);
 }
 
 .shortcut-card:hover .icon-wrapper {
@@ -651,7 +714,6 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    backdrop-filter: blur(10px);
     opacity: 0;
     transform: translateY(8px);
     z-index: 5;
@@ -704,6 +766,7 @@
         filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
     }
 }
+
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -716,7 +779,27 @@
     position: relative;
 }
 
+.shortcuts-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    min-height: 300px;
+    z-index: 10;
+    position: relative;
+}
+
 .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
+    color: rgba(108, 92, 231, 0.5);
+    animation: emptyIconFloat 3s ease-in-out infinite;
+}
+
+.shortcuts-empty-icon {
     width: 80px;
     height: 80px;
     margin-bottom: 24px;
@@ -751,14 +834,39 @@
     line-height: 1.6;
 }
 
-/* 🦶 FOOTER */
+/* 🦶 FOOTER - FIXED POSITIONING */
 .shortcuts-footer {
     padding: 15px 30px;
     background: linear-gradient(135deg, rgba(15, 20, 45, 0.8) 0%, rgba(26, 29, 58, 0.6) 100%);
     border-top: 1px solid rgba(108, 92, 231, 0.2);
-    backdrop-filter: blur(15px);
     z-index: 10;
     position: relative;
+    margin-top: auto; /* ← Empuja el footer hacia abajo */
+    flex-shrink: 0; /* ← Evita que se comprima */
+}
+
+/* Asegurar que el container principal use flexbox */
+.shortcuts-nexus-container {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    max-height: 90vh;
+    background: linear-gradient(145deg,
+            rgba(26, 29, 58, 0.95) 0%,
+            rgba(15, 20, 45, 0.98) 50%,
+            rgba(20, 25, 50, 0.95) 100%);
+    border: 2px solid transparent;
+    border-radius: 24px;
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(108, 92, 231, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 0 200px rgba(108, 92, 231, 0.03);
+    overflow: hidden;
+    animation: containerSlideIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+    display: flex; /* ← Cambió a flex */
+    flex-direction: column; /* ← Dirección vertical */
 }
 
 .footer-content {
@@ -849,7 +957,6 @@ input[type="button"][value*="reset"] {
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    backdrop-filter: blur(10px);
     text-decoration: none;
     font-family: inherit;
     outline: none;
@@ -918,26 +1025,14 @@ button[onclick*="reset"]:active,
     display: none !important;
 }
 
-/* 📱 RESPONSIVE DESIGN */
-@media (min-width: 1600px) {
-    .shortcuts-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        padding: 15px 25px;
-    }
-    .shortcut-card { height: 150px; padding: 14px; }
-    .shortcut-title { font-size: 14px; }
-    .shortcut-description { font-size: 11px; }
-    .icon-wrapper { width: 40px; height: 40px; }
-    .neon-svg { width: 22px; height: 22px; }
-}
-
+/* 📱 RESPONSIVE DESIGN - FIXED GRID HEIGHTS */
 @media (max-width: 1400px) {
     .shortcuts-nexus-container { max-width: 1200px; }
     .shortcuts-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
         padding: 15px 20px;
+        max-height: calc(100vh - 420px); /* ← Ajustado para 1400px */
     }
     .shortcut-card { height: 140px; padding: 12px; }
     .shortcut-title { font-size: 13px; }
@@ -955,6 +1050,7 @@ button[onclick*="reset"]:active,
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
         padding: 12px 18px;
+        max-height: calc(100vh - 380px); /* ← Ajustado para 1200px */
     }
     .shortcut-card { height: 130px; padding: 10px; }
     .shortcut-title { font-size: 12px; }
@@ -976,6 +1072,7 @@ button[onclick*="reset"]:active,
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
         padding: 10px 12px;
+        max-height: calc(100vh - 320px); /* ← Ajustado para móvil */
     }
     .shortcut-card { height: 120px; padding: 8px; }
     .shortcut-title { font-size: 11px; }
@@ -993,14 +1090,15 @@ button[onclick*="reset"]:active,
     .title-main { font-size: 14px; letter-spacing: 0.5px; }
     .title-sub { font-size: 7px; letter-spacing: 2px; }
     .header-stats { flex-direction: row; gap: 6px; }
-    .stat-value { font-size: 12px; }
-    .stat-label { font-size: 7px; }
+    .shortcuts-stat-value { font-size: 12px; }
+    .shortcuts-stat-label { font-size: 7px; }
     .shortcuts-controls { padding: 6px 12px; }
-    .search-input { height: 36px; font-size: 13px; padding: 0 35px 0 35px; }
+    .shortcuts-search-input { height: 32px; font-size: 12px; padding: 0 35px 0 35px; }
     .shortcuts-grid {
         grid-template-columns: 1fr;
         gap: 6px;
         padding: 8px 10px;
+        max-height: calc(100vh - 280px); /* ← Ajustado para móvil pequeño */
     }
     .shortcut-card { height: 110px; padding: 6px; }
     .shortcut-title { font-size: 10px; }

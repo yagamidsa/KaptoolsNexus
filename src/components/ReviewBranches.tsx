@@ -1,5 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import './ReviewBranches.css';
+
+// ================================
+// 🔧 INTERFACES Y TIPOS
+// ================================
 
 interface BranchInfo {
     name: string;
@@ -54,46 +58,181 @@ interface ReviewBranchesProps {
     onClose: () => void;
 }
 
-const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose }) => {
-    const [branches, setBranches] = useState<BranchInfo[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string>('');
-    const [success, setSuccess] = useState<string>('');
-    const [repositoryFilter, setRepositoryFilter] = useState<'both' | 'content' | 'dimensions'>('content');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortBy, setSortBy] = useState<'date' | 'author' | 'name' | 'behind'>('date');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-    const [selectedBranch, setSelectedBranch] = useState<BranchInfo | null>(null);
-    const [comparison, setComparison] = useState<BranchComparison | null>(null);
-    const [showComparison, setShowComparison] = useState(false);
-    const [availableRepos, setAvailableRepos] = useState({ content: false, dimensions: false });
+interface RepositoryAvailability {
+    content: boolean;
+    dimensions: boolean;
+}
 
-    // Estados para File Diff Viewer
-    const [selectedFile, setSelectedFile] = useState<ComparisonFile | null>(null);
-    const [fileDiff, setFileDiff] = useState<FileDiff | null>(null);
-    const [showFileDiff, setShowFileDiff] = useState(false);
-    const [loadingFileDiff, setLoadingFileDiff] = useState(false);
+interface ScreenSize {
+    isMobile: boolean;
+    isTablet: boolean;
+    isDesktop: boolean;
+    isLargeDesktop: boolean;
+}
 
-    // Estados para responsive
-    const [isMobile, setIsMobile] = useState(false);
-    const [isTablet, setIsTablet] = useState(false);
+// ================================
+// 🛠️ CONFIGURACIÓN DEVOPS
+// ================================
+const DEVOPS_CONFIG = {
+    baseUrl: 'https://kantarware.visualstudio.com/', 
+    projectName: 'Kantar%20Automation%20Platform', 
+    repositories: {
+        'content': 'outputs-dimensions-content',
+        'dimensions': 'outputs-dimensions'
+    }
+};
+
+// ================================
+// 🎯 CUSTOM HOOKS
+// ================================
+const useScreenSize = (): ScreenSize => {
+    const [screenSize, setScreenSize] = useState<ScreenSize>({
+        isMobile: false,
+        isTablet: false,
+        isDesktop: false,
+        isLargeDesktop: false
+    });
 
     useEffect(() => {
-        const checkScreenSize = () => {
-            setIsMobile(window.innerWidth <= 768);
-            setIsTablet(window.innerWidth > 768 && window.innerWidth <= 1024);
+        const updateScreenSize = () => {
+            const width = window.innerWidth;
+            setScreenSize({
+                isMobile: width <= 768,
+                isTablet: width > 768 && width <= 1024,
+                isDesktop: width > 1024 && width <= 1440,
+                isLargeDesktop: width > 1440
+            });
         };
 
-        checkScreenSize();
-        window.addEventListener('resize', checkScreenSize);
-        return () => window.removeEventListener('resize', checkScreenSize);
+        updateScreenSize();
+        window.addEventListener('resize', updateScreenSize);
+        return () => window.removeEventListener('resize', updateScreenSize);
     }, []);
 
-    useEffect(() => {
-        validateAndLoadBranches();
-    }, [workspacePath, repositoryFilter]);
+    return screenSize;
+};
 
-    const validateAndLoadBranches = async () => {
+const useDebounce = <T,>(value: T, delay: number): T => {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+};
+
+// ================================
+// 🧩 COMPONENTE PRINCIPAL
+// ================================
+const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose }) => {
+    // ================================
+    // 📊 ESTADOS PRINCIPALES
+    // ================================
+    const [branches, setBranches] = useState<BranchInfo[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const [success, setSuccess] = useState<string>('');
+    
+    // ================================
+    // 🎛️ ESTADOS DE FILTROS Y BÚSQUEDA
+    // ================================
+    const [repositoryFilter, setRepositoryFilter] = useState<'both' | 'content' | 'dimensions'>('content');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [sortBy, setSortBy] = useState<'date' | 'author' | 'name' | 'behind'>('date');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    
+    // ================================
+    // 🗂️ ESTADOS DE MODALES Y COMPARACIÓN
+    // ================================
+    const [selectedBranch, setSelectedBranch] = useState<BranchInfo | null>(null);
+    const [comparison, setComparison] = useState<BranchComparison | null>(null);
+    const [showComparison, setShowComparison] = useState<boolean>(false);
+    const [selectedFile, setSelectedFile] = useState<ComparisonFile | null>(null);
+    const [fileDiff, setFileDiff] = useState<FileDiff | null>(null);
+    const [showFileDiff, setShowFileDiff] = useState<boolean>(false);
+    const [loadingFileDiff, setLoadingFileDiff] = useState<boolean>(false);
+    
+    // ================================
+    // 🏗️ ESTADOS DE CONFIGURACIÓN
+    // ================================
+    const [availableRepos, setAvailableRepos] = useState<RepositoryAvailability>({ 
+        content: false, 
+        dimensions: false 
+    });
+
+    // ================================
+    // 🎯 HOOKS PERSONALIZADOS
+    // ================================
+    const screenSize = useScreenSize();
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+    // ================================
+    // 📱 RESPONSIVE REFS
+    // ================================
+    const leftPanelRef = useRef<HTMLDivElement>(null);
+    const rightPanelRef = useRef<HTMLDivElement>(null);
+    const unifiedViewRef = useRef<HTMLDivElement>(null);
+
+    // ================================
+    // 🛠️ FUNCIONES HELPER
+    // ================================
+    const generateDevOpsUrl = useCallback((branch: BranchInfo): string => {
+        const repoName = DEVOPS_CONFIG.repositories[branch.repository];
+        const branchName = encodeURIComponent(branch.display_name);
+        return `${DEVOPS_CONFIG.baseUrl}/${DEVOPS_CONFIG.projectName}/_git/${repoName}?version=GB${branchName}`;
+    }, []);
+
+    const openBranchInDevOps = useCallback((branch: BranchInfo) => {
+        const url = generateDevOpsUrl(branch);
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }, [generateDevOpsUrl]);
+
+    const handleBranchNameClick = useCallback((branch: BranchInfo, e: React.MouseEvent) => {
+        e.stopPropagation();
+        openBranchInDevOps(branch);
+    }, [openBranchInDevOps]);
+
+    const getRepositoryBadgeColor = useCallback((repo: string): string => {
+        return repo === 'content' ? 'bg-blue-repo' : 'bg-purple-repo';
+    }, []);
+
+    const getChangeTypeColor = useCallback((type: string): string => {
+        switch (type) {
+            case 'added': return 'text-green';
+            case 'deleted': return 'text-red';
+            case 'modified': return 'text-yellow';
+            case 'renamed': return 'text-blue';
+            default: return 'text-gray';
+        }
+    }, []);
+
+    const formatDate = useCallback((dateString: string): string => {
+        try {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now.getTime() - date.getTime();
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            return date.toLocaleDateString();
+        } catch {
+            return 'Invalid date';
+        }
+    }, []);
+
+    // ================================
+    // 🔄 OPERACIONES ASYNC
+    // ================================
+    const validateAndLoadBranches = useCallback(async () => {
         if (!workspacePath || workspacePath === 'Path of your workspace') {
             setError('Please select a valid workspace first');
             return;
@@ -105,79 +244,43 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         try {
             console.log('🔍 Validating repositories for workspace:', workspacePath);
 
-            // 🔥 FIX 1: Mejorar la validación de repositorios
-            const validateRes = await fetch(`http://127.0.0.1:8000/git/validate-repositories?project_path=${encodeURIComponent(workspacePath)}`);
+            const validateRes = await fetch(
+                `http://127.0.0.1:8000/git/validate-repositories?project_path=${encodeURIComponent(workspacePath)}`
+            );
 
             if (!validateRes.ok) {
-                console.error('❌ Validation request failed:', validateRes.status, validateRes.statusText);
-
-                if (validateRes.status === 404) {
-                    setError('Backend endpoint not found. Please check if the backend is running and updated.');
-                } else {
-                    const errorText = await validateRes.text().catch(() => 'Unknown error');
-                    setError(`Validation failed (${validateRes.status}): ${errorText}`);
-                }
-                setLoading(false);
-                return;
+                const errorText = await validateRes.text().catch(() => 'Unknown error');
+                throw new Error(`Validation failed (${validateRes.status}): ${errorText}`);
             }
 
             const validateData = await validateRes.json();
-            console.log('✅ Validation response:', validateData);
 
-            if (!validateData.success) {
-                setError(validateData.message || 'Repository validation failed');
-                setLoading(false);
-                return;
+            if (!validateData.success || !validateData.validation?.valid) {
+                throw new Error(validateData.validation?.message || 'Repository validation failed');
             }
 
-            // 🔥 FIX 2: Validar estructura de la respuesta
-            if (!validateData.validation || typeof validateData.validation.valid === 'undefined') {
-                setError('Invalid validation response structure from backend');
-                setLoading(false);
-                return;
-            }
-
-            if (!validateData.validation.valid) {
-                setError(validateData.validation.message || 'No Git repositories found. Please clone microservices first.');
-                setLoading(false);
-                return;
-            }
-
-            // 🔥 FIX 3: Validar que repositories existe y tiene estructura correcta
             const repositories = validateData.validation.repositories || { content: false, dimensions: false };
             setAvailableRepos(repositories);
 
-            console.log('🔍 Available repositories:', repositories);
-
-            // 🔥 FIX 4: Verificar que al menos un repositorio esté disponible
             if (!repositories.content && !repositories.dimensions) {
-                setError('No repositories are available. Please clone microservices first.');
-                setLoading(false);
-                return;
+                throw new Error('No repositories are available. Please clone microservices first.');
             }
-
-            // 🔥 FIX 5: Mejorar la carga de ramas
-            console.log('🔍 Loading branches with filter:', repositoryFilter);
 
             const branchesRes = await fetch(
                 `http://127.0.0.1:8000/git/branches?project_path=${encodeURIComponent(workspacePath)}&repo=${repositoryFilter}&limit=20`
             );
 
             if (!branchesRes.ok) {
-                console.error('❌ Branches request failed:', branchesRes.status, branchesRes.statusText);
                 const errorText = await branchesRes.text().catch(() => 'Unknown error');
                 throw new Error(`HTTP ${branchesRes.status}: ${errorText}`);
             }
 
             const branchesData = await branchesRes.json();
-            console.log('✅ Branches response:', branchesData);
 
             if (branchesData.success) {
-                // 🔥 FIX 6: Validar que branches existe y es un array
                 const branchesArray = Array.isArray(branchesData.branches) ? branchesData.branches : [];
                 setBranches(branchesArray);
                 setSuccess(`Found ${branchesData.total || branchesArray.length} branches`);
-                console.log('✅ Loaded branches:', branchesArray.length);
             } else {
                 throw new Error(branchesData.message || 'Failed to load branches');
             }
@@ -189,45 +292,39 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         } finally {
             setLoading(false);
         }
-    };
+    }, [workspacePath, repositoryFilter]);
 
-    const handleCheckout = async (branch: BranchInfo) => {
+    const handleCheckout = useCallback(async (branch: BranchInfo) => {
         setLoading(true);
         setError('');
         setSuccess('');
 
         try {
-            console.log('🔄 Checking out branch:', branch.display_name, 'in repository:', branch.repository);
-
-            const response = await fetch(`http://127.0.0.1:8000/git/checkout?project_path=${encodeURIComponent(workspacePath)}&repo_name=${branch.repository}&branch_name=${encodeURIComponent(branch.display_name)}`, {
-                method: 'POST',
-            });
+            const response = await fetch(
+                `http://127.0.0.1:8000/git/checkout?project_path=${encodeURIComponent(workspacePath)}&repo_name=${branch.repository}&branch_name=${encodeURIComponent(branch.display_name)}`,
+                { method: 'POST' }
+            );
 
             const data = await response.json();
 
             if (response.ok && data.success) {
                 setSuccess(`✅ Successfully checked out to ${branch.display_name}`);
-                // Recargar ramas para actualizar el estado actual
                 await validateAndLoadBranches();
             } else {
                 throw new Error(data.message || 'Checkout failed');
             }
-
         } catch (err: any) {
-            console.error('💥 Checkout error:', err);
             setError(`Checkout failed: ${err.message}`);
         } finally {
             setLoading(false);
         }
-    };
+    }, [workspacePath, validateAndLoadBranches]);
 
-    const handleCompare = async (branch: BranchInfo) => {
+    const handleCompare = useCallback(async (branch: BranchInfo) => {
         setLoading(true);
         setError('');
 
         try {
-            console.log('📊 Comparing branch:', branch.display_name, 'with master in repository:', branch.repository);
-
             const response = await fetch(
                 `http://127.0.0.1:8000/git/compare?project_path=${encodeURIComponent(workspacePath)}&repo_name=${branch.repository}&branch_name=${encodeURIComponent(branch.display_name)}`
             );
@@ -241,17 +338,14 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
             } else {
                 throw new Error(data.message || 'Comparison failed');
             }
-
         } catch (err: any) {
-            console.error('💥 Comparison error:', err);
             setError(`Comparison failed: ${err.message}`);
         } finally {
             setLoading(false);
         }
-    };
+    }, [workspacePath]);
 
-    // Función: Ver diferencias de archivo específico
-    const handleFileClick = async (file: ComparisonFile) => {
+    const handleFileClick = useCallback(async (file: ComparisonFile) => {
         if (!selectedBranch || !comparison) return;
 
         setLoadingFileDiff(true);
@@ -270,31 +364,62 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
             } else {
                 throw new Error(data.message || 'Failed to get file diff');
             }
-
         } catch (err: any) {
-            console.error('💥 File diff error:', err);
             setError(`Failed to get file diff: ${err.message}`);
         } finally {
             setLoadingFileDiff(false);
         }
-    };
+    }, [workspacePath, selectedBranch, comparison]);
 
-    const handleRefresh = async () => {
-        // Hacer fetch de ramas remotas primero
+    const handleRefresh = useCallback(async () => {
         try {
             setLoading(true);
-            console.log('🔄 Fetching remote branches...');
-            await fetch(`http://127.0.0.1:8000/git/fetch-all?project_path=${encodeURIComponent(workspacePath)}`, {
-                method: 'POST'
-            });
+            await fetch(
+                `http://127.0.0.1:8000/git/fetch-all?project_path=${encodeURIComponent(workspacePath)}`,
+                { method: 'POST' }
+            );
         } catch (err) {
             console.warn('⚠️ Fetch failed, but continuing with local branches:', err);
         }
-
         await validateAndLoadBranches();
-    };
+    }, [workspacePath, validateAndLoadBranches]);
 
-    // Función para cerrar modales con ESC
+    // ================================
+    // 🔍 FILTRADO Y ORDENAMIENTO OPTIMIZADO
+    // ================================
+    const filteredAndSortedBranches = useMemo(() => {
+        return branches
+            .filter(branch => {
+                const searchLower = debouncedSearchTerm.toLowerCase();
+                return branch.display_name.toLowerCase().includes(searchLower) ||
+                       branch.author.toLowerCase().includes(searchLower) ||
+                       branch.commit_message.toLowerCase().includes(searchLower);
+            })
+            .sort((a, b) => {
+                let compareValue = 0;
+
+                switch (sortBy) {
+                    case 'date':
+                        compareValue = new Date(a.date).getTime() - new Date(b.date).getTime();
+                        break;
+                    case 'author':
+                        compareValue = a.author.localeCompare(b.author);
+                        break;
+                    case 'name':
+                        compareValue = a.display_name.localeCompare(b.display_name);
+                        break;
+                    case 'behind':
+                        compareValue = a.commits_behind - b.commits_behind;
+                        break;
+                }
+
+                return sortOrder === 'desc' ? -compareValue : compareValue;
+            });
+    }, [branches, debouncedSearchTerm, sortBy, sortOrder]);
+
+    // ================================
+    // ⌨️ KEYBOARD HANDLERS
+    // ================================
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -310,343 +435,65 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         return () => document.removeEventListener('keydown', handleEscape);
     }, [showFileDiff, showComparison]);
 
-    // Filtrar y ordenar ramas
-    const filteredAndSortedBranches = branches
-        .filter(branch => {
-            const matchesSearch = branch.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                branch.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                branch.commit_message.toLowerCase().includes(searchTerm.toLowerCase());
-            return matchesSearch;
-        })
-        .sort((a, b) => {
-            let compareValue = 0;
+    // ================================
+    // 🔄 EFECTOS DE INICIALIZACIÓN
+    // ================================
+    useEffect(() => {
+        validateAndLoadBranches();
+    }, [validateAndLoadBranches]);
 
-            switch (sortBy) {
-                case 'date':
-                    compareValue = new Date(a.date).getTime() - new Date(b.date).getTime();
-                    break;
-                case 'author':
-                    compareValue = a.author.localeCompare(b.author);
-                    break;
-                case 'name':
-                    compareValue = a.display_name.localeCompare(b.display_name);
-                    break;
-                case 'behind':
-                    compareValue = a.commits_behind - b.commits_behind;
-                    break;
-            }
+    // ================================
+    // 🎨 COMPONENTES INTERNOS
+    // ================================
+    const BranchNameComponent: React.FC<{ branch: BranchInfo }> = React.memo(({ branch }) => (
+        <span 
+            className={`branch-name clickable-branch ${branch.is_current ? 'current-branch' : ''}`}
+            onClick={(e) => handleBranchNameClick(branch, e)}
+            title={`Open ${branch.display_name} in Azure DevOps`}
+        >
+            {branch.display_name}
+            <span className="devops-link-icon">🔗</span>
+        </span>
+    ));
 
-            return sortOrder === 'desc' ? -compareValue : compareValue;
-        });
-
-    const getRepositoryBadgeColor = (repo: string) => {
-        return repo === 'content' ? 'bg-blue-repo' : 'bg-purple-repo';
-    };
-
-    const getChangeTypeColor = (type: string) => {
-        switch (type) {
-            case 'added': return 'text-green';
-            case 'deleted': return 'text-red';
-            case 'modified': return 'text-yellow';
-            case 'renamed': return 'text-blue';
-            default: return 'text-gray';
-        }
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return date.toLocaleDateString();
-    };
-
-    // 🔥 COMPONENTE MEJORADO: FileDiffViewer con vista lado a lado y tema oscuro
-    const FileDiffViewer = () => {
-        const [viewMode, setViewMode] = useState<'unified' | 'side-by-side'>('side-by-side');
-
-        // Refs para sincronizar scroll
-        const leftPanelRef = useRef<HTMLDivElement>(null);
-        const rightPanelRef = useRef<HTMLDivElement>(null);
-        const unifiedViewRef = useRef<HTMLDivElement>(null);
-
-        if (!showFileDiff || !fileDiff || !selectedFile) return null;
-
-        // Determinar si es solo agregado (sin comparación)
-        const isAddedOnly = selectedFile.change_type === 'added';
-        const isDeletedOnly = selectedFile.change_type === 'deleted';
-        const hasComparison = !isAddedOnly && !isDeletedOnly;
-
-        // 🔥 FUNCIÓN PARA SINCRONIZAR SCROLL HORIZONTAL
-        const handleSyncScroll = (source: 'left' | 'right', scrollLeft: number) => {
-            if (viewMode === 'side-by-side') {
-                if (source === 'left' && rightPanelRef.current) {
-                    rightPanelRef.current.scrollLeft = scrollLeft;
-                } else if (source === 'right' && leftPanelRef.current) {
-                    leftPanelRef.current.scrollLeft = scrollLeft;
-                }
-            }
-        };
-
-        // Funciones para renderizar contenido
-        const renderUnifiedView = () => {
-            if (!fileDiff.diff_lines || fileDiff.diff_lines.length === 0) {
-                return (
-                    <div className="diff-rb-empty-state">
-                        <div className="rb-empty-icon">📄</div>
-                        <h3>No differences found</h3>
-                        <p>This file appears to be identical or binary.</p>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="diff-viewer unified" ref={unifiedViewRef}>
-                    <div className="diff-content-wrapper">
-                        {fileDiff.diff_lines.map((line, index) => (
-                            <div
-                                key={index}
-                                className={`diff-line diff-line-${line.type}`}
-                            >
-                                <div className="line-numbers">
-                                    <span className="line-number-old">
-                                        {line.line_number_old || ''}
-                                    </span>
-                                    <span className="line-number-new">
-                                        {line.line_number_new || ''}
-                                    </span>
-                                </div>
-                                <div className="line-content">
-                                    <span className="line-prefix">
-                                        {line.type === 'added' ? '+' :
-                                            line.type === 'deleted' ? '-' :
-                                                line.type === 'header' ? '@' : ' '}
-                                    </span>
-                                    <span className="line-text">{line.content}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+    const LoadingSpinner: React.FC = React.memo(() => (
+        <div className="loading-state">
+            <div className="rb-loading-spinner">
+                <div className="loading-spinner-container">
+                    <div className="spinner-ring"></div>
                 </div>
-            );
-        };
-
-        const renderSideBySideView = () => {
-            if (!hasComparison) {
-                // Para archivos solo agregados/eliminados, mostrar unified
-                return renderUnifiedView();
-            }
-
-            // Separar líneas por tipo para vista lado a lado
-            const oldLines: DiffLine[] = [];
-            const newLines: DiffLine[] = [];
-
-            fileDiff.diff_lines.forEach(line => {
-                if (line.type === 'deleted' || line.type === 'context') {
-                    oldLines.push(line);
-                }
-                if (line.type === 'added' || line.type === 'context') {
-                    newLines.push(line);
-                }
-                if (line.type === 'header') {
-                    oldLines.push(line);
-                    newLines.push(line);
-                }
-            });
-
-            const maxLines = Math.max(oldLines.length, newLines.length);
-
-            return (
-                <div className="diff-viewer side-by-side">
-                    {/* Panel Izquierdo - Archivo Original */}
-                    <div className="diff-panel">
-                        <div className="diff-panel-header old">
-                            <span className="header-label">Original (master)</span>
-                            <span className="rb-header-info">-{selectedFile.deletions} deletions</span>
-                        </div>
-                        <div
-                            className="diff-panel-content"
-                            ref={leftPanelRef}
-                            onScroll={(e) => handleSyncScroll('left', e.currentTarget.scrollLeft)}
-                        >
-                            <div className="diff-content-wrapper">
-                                {Array.from({ length: maxLines }, (_, index) => {
-                                    const line = oldLines[index];
-                                    if (!line) {
-                                        return (
-                                            <div key={`old-${index}`} className="diff-line diff-line-empty">
-                                                <div className="line-numbers">
-                                                    <span className="line-number-old"></span>
-                                                </div>
-                                                <div className="line-content">
-                                                    <span className="line-text"></span>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-
-                                    return (
-                                        <div
-                                            key={`old-${index}`}
-                                            className={`diff-line diff-line-${line.type === 'added' ? 'context' : line.type}`}
-                                        >
-                                            <div className="line-numbers">
-                                                <span className="line-number-old">
-                                                    {line.line_number_old || ''}
-                                                </span>
-                                            </div>
-                                            <div className="line-content">
-                                                <span className="line-prefix">
-                                                    {line.type === 'deleted' ? '-' :
-                                                        line.type === 'header' ? '@' : ' '}
-                                                </span>
-                                                <span className="line-text">{line.content}</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Panel Derecho - Archivo Nuevo */}
-                    <div className="diff-panel">
-                        <div className="diff-panel-header new">
-                            <span className="header-label">Modified ({selectedBranch?.display_name})</span>
-                            <span className="rb-header-info">+{selectedFile.additions} additions</span>
-                        </div>
-                        <div
-                            className="diff-panel-content"
-                            ref={rightPanelRef}
-                            onScroll={(e) => handleSyncScroll('right', e.currentTarget.scrollLeft)}
-                        >
-                            <div className="diff-content-wrapper">
-                                {Array.from({ length: maxLines }, (_, index) => {
-                                    const line = newLines[index];
-                                    if (!line) {
-                                        return (
-                                            <div key={`new-${index}`} className="diff-line diff-line-empty">
-                                                <div className="line-numbers">
-                                                    <span className="line-number-new"></span>
-                                                </div>
-                                                <div className="line-content">
-                                                    <span className="line-text"></span>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-
-                                    return (
-                                        <div
-                                            key={`new-${index}`}
-                                            className={`diff-line diff-line-${line.type === 'deleted' ? 'context' : line.type}`}
-                                        >
-                                            <div className="line-numbers">
-                                                <span className="line-number-new">
-                                                    {line.line_number_new || ''}
-                                                </span>
-                                            </div>
-                                            <div className="line-content">
-                                                <span className="line-prefix">
-                                                    {line.type === 'added' ? '+' :
-                                                        line.type === 'header' ? '@' : ' '}
-                                                </span>
-                                                <span className="line-text">{line.content}</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        return (
-            <div className="rb-file-diff-overlay" onClick={(e) => {
-                if (e.target === e.currentTarget) setShowFileDiff(false);
-            }}>
-                <div className="file-diff-modal">
-                    {/* Header Mejorado */}
-                    <div className="file-diff-header">
-                        <div className="file-diff-header-top">
-                            <div className="file-diff-title">
-                                <span className="file-diff-icon">📄</span>
-                                <div className="file-diff-info">
-                                    <h3 title={selectedFile.path}>{selectedFile.path}</h3>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setShowFileDiff(false)}
-                                className="file-diff-close"
-                                title="Close diff viewer"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className="file-diff-header-center">
-                            <span className={`change-type-badge ${getChangeTypeColor(selectedFile.change_type)}`}>
-                                {selectedFile.change_type.toUpperCase()}
-                            </span>
-                            <div className="file-diff-stats">
-                                {selectedFile.additions > 0 && (
-                                    <span className="additions">+{selectedFile.additions} additions</span>
-                                )}
-                                {selectedFile.deletions > 0 && (
-                                    <span className="deletions">-{selectedFile.deletions} deletions</span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Mode Toggle - Solo mostrar para archivos con comparación y no en mobile */}
-                    {hasComparison && !isMobile && (
-                        <div className="diff-mode-toggle">
-                            <div>
-                                <button
-                                    className={`mode-button ${viewMode === 'unified' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('unified')}
-                                >
-                                    📋 Unified
-                                </button>
-                                <button
-                                    className={`mode-button ${viewMode === 'side-by-side' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('side-by-side')}
-                                >
-                                    ⚖️ Side by Side
-                                </button>
-                            </div>
-                            {!isTablet && (
-                                <div className="mode-info">
-                                    <span className="scroll-hint">💡 Scroll is synchronized between panels</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Content */}
-                    <div className="file-diff-content">
-                        {viewMode === 'unified' || !hasComparison || isMobile ? renderUnifiedView() : renderSideBySideView()}
-                    </div>
-                </div>
+                <div className="loading-text">Loading branches</div>
+                <div className="loading-subtext">Fetching latest Git information...</div>
             </div>
-        );
-    };
+        </div>
+    ));
 
+    const EmptyState: React.FC = React.memo(() => (
+        <div className="rb-empty-state">
+            <span className="rb-empty-icon">🌿</span>
+            <h3>No branches found</h3>
+            <p>Try adjusting your filters or refresh to get the latest branches</p>
+        </div>
+    ));
+
+    const StatusMessage: React.FC<{ type: 'error' | 'success'; message: string }> = React.memo(({ type, message }) => (
+        <div className={`status-message rb-${type}-message`}>
+            <span className="status-icon">{type === 'error' ? '❌' : '✅'}</span>
+            {message}
+        </div>
+    ));
+
+    // ================================
+    // 🎯 RENDER PRINCIPAL
+    // ================================
     return (
         <div className="review-branches-container">
-            {/* Header */}
+            {/* ================================
+                📋 HEADER SECTION
+                ================================ */}
             <div className="branches-header">
                 <div className="rb-header-left">
-                    <div className="rb-header-icon">
-                        🌿
-                    </div>
+                    <div className="rb-header-icon">🌿</div>
                     <div className="rb-header-info">
                         <h1 className="rb-header-title">Review Branches</h1>
                         <p className="header-subtitle">Manage Git branches across microservices</p>
@@ -657,29 +504,31 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                     <button
                         onClick={handleRefresh}
                         disabled={loading}
-                        className="action-button refresh-button"
+                        className="refresh-button"
                         title="Refresh branches"
+                        aria-label="Refresh branches"
                     >
-                        <span className={`refresh-icon ${loading ? 'spinning' : ''}`}>🔄</span>
+                        <span className={`refresh-icon ${loading ? 'spinning' : ''}`}></span>
                     </button>
 
                     <button
                         onClick={onClose}
-                        className="action-button rb-close-button"
+                        className="rb-close-button"
                         title="Close Review Branches"
-                    >
-                        ✕
-                    </button>
+                        aria-label="Close Review Branches"
+                    />
                 </div>
             </div>
 
-            {/* Controls */}
+            {/* ================================
+                🎛️ CONTROLS SECTION
+                ================================ */}
             <div className="branches-controls">
                 <div className="controls-left">
-                    {/* Repository Filter */}
                     <div className="filter-group">
-                        <label className="filter-label">Repository:</label>
+                        <label className="filter-label" htmlFor="repo-filter">Repository:</label>
                         <select
+                            id="repo-filter"
                             value={repositoryFilter}
                             onChange={(e) => setRepositoryFilter(e.target.value as any)}
                             className="filter-select"
@@ -693,27 +542,29 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                             </option>
                         </select>
                     </div>
+                </div>
 
-                    {/* Search */}
+                <div className="controls-center">
                     <div className="search-group">
                         <div className="rb-search-input-container">
                             <span className="rb-search-icon">🔍</span>
                             <input
                                 type="text"
-                                placeholder={isMobile ? "Search..." : "Search branches, authors, or commits..."}
+                                placeholder={screenSize.isMobile ? "Search..." : "Search branches, authors, or commits..."}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="rb-search-input"
+                                aria-label="Search branches"
                             />
                         </div>
                     </div>
                 </div>
 
                 <div className="controls-right">
-                    {/* Sort Controls */}
                     <div className="sort-group">
-                        <label className="filter-label">Sort by:</label>
+                        <label className="filter-label" htmlFor="sort-filter">Sort by:</label>
                         <select
+                            id="sort-filter"
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as any)}
                             className="filter-select"
@@ -728,6 +579,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                             className="sort-order-button"
                             title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+                            aria-label={`Toggle sort order: currently ${sortOrder}`}
                         >
                             {sortOrder === 'asc' ? '↑' : '↓'}
                         </button>
@@ -735,57 +587,40 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 </div>
             </div>
 
-            {/* Status Messages */}
-            {error && (
-                <div className="status-message rb-error-message">
-                    <span className="status-icon">❌</span>
-                    {error}
-                </div>
-            )}
+            {/* ================================
+                📊 STATUS MESSAGES
+                ================================ */}
+            {error && <StatusMessage type="error" message={error} />}
+            {success && <StatusMessage type="success" message={success} />}
 
-            {success && (
-                <div className="status-message rb-success-message">
-                    <span className="status-icon">✅</span>
-                    {success}
-                </div>
-            )}
-
-            {/* Repository Status */}
+            {/* ================================
+                📡 REPOSITORY STATUS
+                ================================ */}
             <div className="repo-status">
                 <div className="status-item">
-                    <div className={`status-indicator ${availableRepos.content ? 'active' : 'inactive'}`}></div>
-                    <span>{isMobile ? 'content' : 'outputs-dimensions-content'}</span>
+                    <div className={`status-indicator ${availableRepos.content ? 'active' : 'inactive'}`} />
+                    <span>{screenSize.isMobile ? 'content' : 'outputs-dimensions-content'}</span>
                 </div>
                 <div className="status-item">
-                    <div className={`status-indicator ${availableRepos.dimensions ? 'active' : 'inactive'}`}></div>
-                    <span>{isMobile ? 'dimensions' : 'outputs-dimensions'}</span>
+                    <div className={`status-indicator ${availableRepos.dimensions ? 'active' : 'inactive'}`} />
+                    <span>{screenSize.isMobile ? 'dimensions' : 'outputs-dimensions'}</span>
                 </div>
                 <div className="status-summary">
                     {filteredAndSortedBranches.length} branches found
                 </div>
             </div>
 
-            {/* Branches Table */}
+            {/* ================================
+                📋 BRANCHES TABLE
+                ================================ */}
             <div className="branches-table-container">
                 {loading ? (
-                    <div className="loading-state">
-                        <div className="rb-loading-spinner">
-                            <div className="loading-spinner-container">
-                                <div className="spinner-ring"></div>
-                            </div>
-                            <div className="loading-text">Loading branches</div>
-                            <div className="loading-subtext">Fetching latest Git information...</div>
-                        </div>
-                    </div>
+                    <LoadingSpinner />
                 ) : filteredAndSortedBranches.length === 0 ? (
-                    <div className="rb-empty-state">
-                        <span className="rb-empty-icon">🌿</span>
-                        <h3>No branches found</h3>
-                        <p>Try adjusting your filters or refresh to get the latest branches</p>
-                    </div>
+                    <EmptyState />
                 ) : (
                     <div className="branches-table">
-                        {!isMobile && (
+                        {!screenSize.isMobile && (
                             <div className="table-header">
                                 <div className="header-cell branch-cell">Branch</div>
                                 <div className="header-cell author-cell">Author</div>
@@ -799,13 +634,12 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                         <div className="table-body">
                             {filteredAndSortedBranches.map((branch, index) => (
                                 <div key={`${branch.repository}-${branch.name}`} className="table-row">
+                                    {/* Branch Info */}
                                     <div className="table-cell branch-cell">
                                         <div className="branch-info">
                                             <div className="branch-main">
                                                 <span className="branch-icon">🌿</span>
-                                                <span className={`branch-name ${branch.is_current ? 'current-branch' : ''}`}>
-                                                    {branch.display_name}
-                                                </span>
+                                                <BranchNameComponent branch={branch} />
                                                 {branch.is_current && <span className="current-badge">CURRENT</span>}
                                             </div>
                                             <div className={`repository-badge ${getRepositoryBadgeColor(branch.repository)}`}>
@@ -814,6 +648,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
+                                    {/* Author Info */}
                                     <div className="table-cell author-cell">
                                         <div className="author-info">
                                             <span className="author-icon">👨‍💻</span>
@@ -821,18 +656,20 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
+                                    {/* Commit Info */}
                                     <div className="table-cell commit-cell">
                                         <div className="commit-info">
                                             <span className="commit-icon">💻</span>
                                             <div className="commit-details">
                                                 <span className="commit-hash">{branch.commit_hash}</span>
-                                                {!isMobile && (
+                                                {!screenSize.isMobile && (
                                                     <span className="commit-message">{branch.commit_message}</span>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* Date Info */}
                                     <div className="table-cell date-cell">
                                         <div className="date-info">
                                             <span className="date-icon">🕒</span>
@@ -840,6 +677,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
+                                    {/* Behind Info */}
                                     <div className="table-cell behind-cell">
                                         <div className="behind-info">
                                             {branch.commits_behind > 0 ? (
@@ -852,6 +690,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
+                                    {/* Actions */}
                                     <div className="table-cell actions-cell">
                                         <div className="action-buttons">
                                             <button
@@ -860,8 +699,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                                 className="table-rb-action-button checkout-button"
                                                 title="Checkout Branch"
                                             >
-
-                                                {!isMobile && 'Checkout'}
+                                                {!screenSize.isMobile && 'Checkout'}
                                             </button>
 
                                             <button
@@ -870,8 +708,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                                 className="table-rb-action-button compare-button"
                                                 title="Compare with Master"
                                             >
-
-                                                {!isMobile && 'Compare'}
+                                                {!screenSize.isMobile && 'Compare'}
                                             </button>
                                         </div>
                                     </div>
@@ -882,7 +719,9 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 )}
             </div>
 
-            {/* Comparison Modal */}
+            {/* ================================
+                🔍 COMPARISON MODAL
+                ================================ */}
             {showComparison && comparison && selectedBranch && (
                 <div className="rb-comparison-modal-overlay" onClick={(e) => {
                     if (e.target === e.currentTarget) setShowComparison(false);
@@ -896,6 +735,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                             <button
                                 onClick={() => setShowComparison(false)}
                                 className="modal-close"
+                                aria-label="Close comparison modal"
                             >
                                 ✕
                             </button>
@@ -961,10 +801,22 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 </div>
             )}
 
-            {/* File Diff Viewer Mejorado */}
-            <FileDiffViewer />
+            {/* ================================
+                📄 FILE DIFF VIEWER
+                ================================ */}
+            {showFileDiff && fileDiff && selectedFile && (
+                <FileDiffViewer 
+                    fileDiff={fileDiff}
+                    selectedFile={selectedFile}
+                    selectedBranch={selectedBranch}
+                    onClose={() => setShowFileDiff(false)}
+                    screenSize={screenSize}
+                />
+            )}
 
-            {/* Loading overlay para file diff */}
+            {/* ================================
+                ⏳ LOADING OVERLAY FOR FILE DIFF
+                ================================ */}
             {loadingFileDiff && (
                 <div className="rb-loading-overlay">
                     <div className="rb-loading-spinner">
@@ -976,5 +828,303 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         </div>
     );
 };
+
+// ================================
+// 📄 COMPONENTE FILE DIFF VIEWER
+// ================================
+interface FileDiffViewerProps {
+    fileDiff: FileDiff;
+    selectedFile: ComparisonFile;
+    selectedBranch: BranchInfo | null;
+    onClose: () => void;
+    screenSize: ScreenSize;
+}
+
+const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({ 
+    fileDiff, 
+    selectedFile, 
+    selectedBranch, 
+    onClose, 
+    screenSize 
+}) => {
+    const [viewMode, setViewMode] = useState<'unified' | 'side-by-side'>('side-by-side');
+    const leftPanelRef = useRef<HTMLDivElement>(null);
+    const rightPanelRef = useRef<HTMLDivElement>(null);
+    const unifiedViewRef = useRef<HTMLDivElement>(null);
+
+    // Determinar si es solo agregado (sin comparación)
+    const isAddedOnly = selectedFile.change_type === 'added';
+    const isDeletedOnly = selectedFile.change_type === 'deleted';
+    const hasComparison = !isAddedOnly && !isDeletedOnly;
+
+    // Función para sincronizar scroll horizontal
+    const handleSyncScroll = useCallback((source: 'left' | 'right', scrollLeft: number) => {
+        if (viewMode === 'side-by-side') {
+            if (source === 'left' && rightPanelRef.current) {
+                rightPanelRef.current.scrollLeft = scrollLeft;
+            } else if (source === 'right' && leftPanelRef.current) {
+                leftPanelRef.current.scrollLeft = scrollLeft;
+            }
+        }
+    }, [viewMode]);
+
+    const getChangeTypeColor = useCallback((type: string): string => {
+        switch (type) {
+            case 'added': return 'text-green';
+            case 'deleted': return 'text-red';
+            case 'modified': return 'text-yellow';
+            case 'renamed': return 'text-blue';
+            default: return 'text-gray';
+        }
+    }, []);
+
+    const renderUnifiedView = useCallback(() => {
+        if (!fileDiff.diff_lines || fileDiff.diff_lines.length === 0) {
+            return (
+                <div className="diff-rb-empty-state">
+                    <div className="rb-empty-icon">📄</div>
+                    <h3>No differences found</h3>
+                    <p>This file appears to be identical or binary.</p>
+                </div>
+            );
+        }
+
+        return (
+            <div className="diff-viewer unified" ref={unifiedViewRef}>
+                <div className="diff-content-wrapper">
+                    {fileDiff.diff_lines.map((line, index) => (
+                        <div
+                            key={index}
+                            className={`diff-line diff-line-${line.type}`}
+                        >
+                            <div className="line-numbers">
+                                <span className="line-number-old">
+                                    {line.line_number_old || ''}
+                                </span>
+                                <span className="line-number-new">
+                                    {line.line_number_new || ''}
+                                </span>
+                            </div>
+                            <div className="line-content">
+                                <span className="line-prefix">
+                                    {line.type === 'added' ? '+' :
+                                        line.type === 'deleted' ? '-' :
+                                            line.type === 'header' ? '@' : ' '}
+                                </span>
+                                <span className="line-text">{line.content}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }, [fileDiff]);
+
+    const renderSideBySideView = useCallback(() => {
+        if (!hasComparison) {
+            return renderUnifiedView();
+        }
+
+        // Separar líneas por tipo para vista lado a lado
+        const oldLines: DiffLine[] = [];
+        const newLines: DiffLine[] = [];
+
+        fileDiff.diff_lines.forEach(line => {
+            if (line.type === 'deleted' || line.type === 'context') {
+                oldLines.push(line);
+            }
+            if (line.type === 'added' || line.type === 'context') {
+                newLines.push(line);
+            }
+            if (line.type === 'header') {
+                oldLines.push(line);
+                newLines.push(line);
+            }
+        });
+
+        const maxLines = Math.max(oldLines.length, newLines.length);
+
+        return (
+            <div className="diff-viewer side-by-side">
+                {/* Panel Izquierdo - Archivo Original */}
+                <div className="diff-panel">
+                    <div className="diff-panel-header old">
+                        <span className="header-label">Original (master)</span>
+                        <span className="rb-header-info">-{selectedFile.deletions} deletions</span>
+                    </div>
+                    <div
+                        className="diff-panel-content"
+                        ref={leftPanelRef}
+                        onScroll={(e) => handleSyncScroll('left', e.currentTarget.scrollLeft)}
+                    >
+                        <div className="diff-content-wrapper">
+                            {Array.from({ length: maxLines }, (_, index) => {
+                                const line = oldLines[index];
+                                if (!line) {
+                                    return (
+                                        <div key={`old-${index}`} className="diff-line diff-line-empty">
+                                            <div className="line-numbers">
+                                                <span className="line-number-old"></span>
+                                            </div>
+                                            <div className="line-content">
+                                                <span className="line-text"></span>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div
+                                        key={`old-${index}`}
+                                        className={`diff-line diff-line-${line.type === 'added' ? 'context' : line.type}`}
+                                    >
+                                        <div className="line-numbers">
+                                            <span className="line-number-old">
+                                                {line.line_number_old || ''}
+                                            </span>
+                                        </div>
+                                        <div className="line-content">
+                                            <span className="line-prefix">
+                                                {line.type === 'deleted' ? '-' :
+                                                    line.type === 'header' ? '@' : ' '}
+                                            </span>
+                                            <span className="line-text">{line.content}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Panel Derecho - Archivo Nuevo */}
+                <div className="diff-panel">
+                    <div className="diff-panel-header new">
+                        <span className="header-label">Modified ({selectedBranch?.display_name})</span>
+                        <span className="rb-header-info">+{selectedFile.additions} additions</span>
+                    </div>
+                    <div
+                        className="diff-panel-content"
+                        ref={rightPanelRef}
+                        onScroll={(e) => handleSyncScroll('right', e.currentTarget.scrollLeft)}
+                    >
+                        <div className="diff-content-wrapper">
+                            {Array.from({ length: maxLines }, (_, index) => {
+                                const line = newLines[index];
+                                if (!line) {
+                                    return (
+                                        <div key={`new-${index}`} className="diff-line diff-line-empty">
+                                            <div className="line-numbers">
+                                                <span className="line-number-new"></span>
+                                            </div>
+                                            <div className="line-content">
+                                                <span className="line-text"></span>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div
+                                        key={`new-${index}`}
+                                        className={`diff-line diff-line-${line.type === 'deleted' ? 'context' : line.type}`}
+                                    >
+                                        <div className="line-numbers">
+                                            <span className="line-number-new">
+                                                {line.line_number_new || ''}
+                                            </span>
+                                        </div>
+                                        <div className="line-content">
+                                            <span className="line-prefix">
+                                                {line.type === 'added' ? '+' :
+                                                    line.type === 'header' ? '@' : ' '}
+                                            </span>
+                                            <span className="line-text">{line.content}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }, [fileDiff, hasComparison, selectedFile, selectedBranch, handleSyncScroll]);
+
+    return (
+        <div className="rb-file-diff-overlay" onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+        }}>
+            <div className="file-diff-modal">
+                {/* Header Mejorado */}
+                <div className="file-diff-header">
+                    <div className="file-diff-header-top">
+                        <div className="file-diff-title">
+                            <span className="file-diff-icon">📄</span>
+                            <div className="file-diff-info">
+                                <h3 title={selectedFile.path}>{selectedFile.path}</h3>
+                            </div>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="file-diff-close"
+                            title="Close diff viewer"
+                            aria-label="Close file diff viewer"
+                        />
+                    </div>
+
+                    <div className="file-diff-header-center">
+                        <span className={`change-type-badge ${getChangeTypeColor(selectedFile.change_type)}`}>
+                            {selectedFile.change_type.toUpperCase()}
+                        </span>
+                        <div className="file-diff-stats">
+                            {selectedFile.additions > 0 && (
+                                <span className="additions">+{selectedFile.additions} additions</span>
+                            )}
+                            {selectedFile.deletions > 0 && (
+                                <span className="deletions">-{selectedFile.deletions} deletions</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mode Toggle - Solo mostrar para archivos con comparación y no en mobile */}
+                {hasComparison && !screenSize.isMobile && (
+                    <div className="diff-mode-toggle">
+                        <div>
+                            <button
+                                className={`mode-button ${viewMode === 'unified' ? 'active' : ''}`}
+                                onClick={() => setViewMode('unified')}
+                            >
+                                📋 Unified
+                            </button>
+                            <button
+                                className={`mode-button ${viewMode === 'side-by-side' ? 'active' : ''}`}
+                                onClick={() => setViewMode('side-by-side')}
+                            >
+                                ⚖️ Side by Side
+                            </button>
+                        </div>
+                        {!screenSize.isTablet && (
+                            <div className="mode-info">
+                                <span className="scroll-hint">💡 Scroll is synchronized between panels</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Content */}
+                <div className="file-diff-content">
+                    {viewMode === 'unified' || !hasComparison || screenSize.isMobile ? 
+                        renderUnifiedView() : 
+                        renderSideBySideView()
+                    }
+                </div>
+            </div>
+        </div>
+    );
+});
+
+FileDiffViewer.displayName = 'FileDiffViewer';
 
 export default ReviewBranches;
