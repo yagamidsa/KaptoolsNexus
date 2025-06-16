@@ -16,7 +16,6 @@ import QChunksProcessor from './components/QChunksProcessor';
 import SplashScreen from './components/SplashScreen';
 import { useExchangeRates } from './hooks/useExchangeRates';
 import ExchangeRateDisplay from './components/ExchangeRate';
-import { open } from '@tauri-apps/plugin-dialog';
 import "./App.css";
 
 interface MenuItem {
@@ -259,11 +258,11 @@ function App() {
 
   const selectWorkspaceFolder = async () => {
     try {
-      setResponse("🔍 Opening folder selector...");
-
+      setResponse("🔍 Opening native Windows folder selector...");
+  
       const { invoke } = await import('@tauri-apps/api/core');
-      const selectedPath = await invoke('select_folder') as string | null;
-
+      const selectedPath = await invoke('select_folder_native') as string | null;
+  
       if (selectedPath && selectedPath.trim() !== '') {
         setWorkspacePath(selectedPath);
         setResponse(`📁 Workspace folder selected:\n📁 ${selectedPath}\n🔄 Validating...`);
