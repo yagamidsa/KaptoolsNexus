@@ -85,10 +85,21 @@ class IBMSPSSDataCollectionService:
             output_mdd_name = f"{base_name}_Completes_All.mdd"
             
             with open(dms_script_path, "w", encoding="utf-8") as dms_file:
+                if duplicate_count <= 20:
+                    batch_size = duplicate_count
+                elif duplicate_count <= 50:
+                    batch_size = 10
+                else:
+                    batch_size = 15
+                
+                add_log(f"🔧 Generando script con lotes de {batch_size} InputDatasources")
+                
+                # Generar InputDatasources en lotes optimizados
                 for i in range(1, duplicate_count + 1):
                     dms_file.write(f"InputDatasource(Input{i})\n")
-                    dms_file.write(f'    ConnectionString = "Provider=mrOleDB.Provider.2;Data Source=mrDataFileDsc;Location=.\\{base_name}.ddf;Initial Catalog=.\\{base_name}.mdd"\n')
+                    dms_file.write(f'    ConnectionString = "Provider=mrOleDB.Provider.2;Data Source=mrDataFileDsc;Location=.\\{base_name}.ddf;Initial Catalog=.\\{base_name}.mdd;Pooling=true;Max Pool Size=10;Connection Timeout=300"\n')
                     dms_file.write(f'    SelectQuery = "SELECT * FROM VDATA"\n')
+                    
                     dms_file.write("End InputDatasource\n\n")
                 
                 dms_file.write("OutputDatasource(FinalOutput)\n")
@@ -110,7 +121,7 @@ class IBMSPSSDataCollectionService:
                 cwd=workspace_path,
                 capture_output=True,
                 text=True,
-                timeout=600,
+                timeout=None,
                 encoding='utf-8',
                 errors='replace'
             )
