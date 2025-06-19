@@ -2,15 +2,10 @@
 name = "kaptools-nexus"
 version = "2.0.0"
 description = "KapTools Nexus Application"
-authors = ["David Rojas David.alipio@Kantar.com"]
+authors = ["you"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
-# The `_lib` suffix may seem redundant but it is necessary
-# to make the lib name unique and wouldn't conflict with the bin name.
-# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
 name = "kaptools_nexus_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
@@ -24,6 +19,7 @@ tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-http = "2"
+tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tempfile = "3.8"
@@ -31,19 +27,14 @@ tokio = { version = "1", features = ["full"] }
 thiserror = "1"
 byteorder = "1.5"
 base64 = "0.21"
-
-tauri-plugin-shell = "2"
-# Para procesamiento de archivos
 uuid = { version = "1.0", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
-
-# Para compresión/descompresión ZIP
 zip = "0.6"
-
-# Para manipulación de paths cross-platform
-path-absolutize = "3.0"
+path-absolutize = "3"
+jsonpath_lib = "0.3.0" 
+anyhow = "1"
+reqwest = { version = "0.12", features = ["json"] }
 
 
 [features]
-# This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]

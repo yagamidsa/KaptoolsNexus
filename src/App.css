@@ -1114,6 +1114,7 @@
   .status-success {
     background: rgba(0, 255, 135, 0.1);
     border-color: rgba(0, 255, 135, 0.3);
+    border-radius: 8px;
     color: #00ff87;
   }
 

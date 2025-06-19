@@ -1,4 +1,4 @@
-// src/hooks/useExchangeRates.tsx
+// src/hooks/useExchangeRates.tsx - VERSIÓN CORREGIDA PARA DATOS ACTUALES
 import { useState, useEffect } from 'react';
 
 interface ExchangeRate {
@@ -17,10 +17,12 @@ interface ExchangeRatesState {
     error: string | null;
 }
 
-const EXCHANGE_API = 'https://api.exchangerate-api.com/v4/latest/USD';
+// 🔥 CAMBIO PRINCIPAL: API que se actualiza en tiempo real
+const EXCHANGE_API = 'https://open.er-api.com/v6/latest/USD';
+
 const CACHE_KEY = 'kaptools_exchange_rates';
 const HISTORY_KEY = 'kaptools_exchange_history';
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas
+const CACHE_DURATION = 1 * 60 * 60 * 1000; // 🔥 Reducido a 1 hora
 
 export const useExchangeRates = () => {
     const [exchangeRates, setExchangeRates] = useState<ExchangeRatesState>({
@@ -31,15 +33,21 @@ export const useExchangeRates = () => {
         error: null
     });
 
-    // Obtener datos del cache
+    // Obtener datos del cache con validación mejorada
     const getCachedRates = () => {
         const cached = localStorage.getItem(CACHE_KEY);
         if (!cached) return null;
 
-        const { data, timestamp } = JSON.parse(cached);
-        const isExpired = Date.now() - timestamp > CACHE_DURATION;
+        try {
+            const { data, timestamp } = JSON.parse(cached);
+            const isExpired = Date.now() - timestamp > CACHE_DURATION;
 
-        return isExpired ? null : data;
+            // 🔥 NO validar por fecha de la API, solo por tiempo de cache
+            return isExpired ? null : data;
+        } catch (error) {
+            console.error('Error parsing cached data:', error);
+            return null;
+        }
     };
 
     // Obtener datos del día anterior
@@ -79,6 +87,7 @@ export const useExchangeRates = () => {
             timestamp: Date.now()
         }));
 
+        // 🔥 USAR FECHA ACTUAL (no de la API)
         const today = new Date().toDateString();
         const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
 
@@ -103,10 +112,17 @@ export const useExchangeRates = () => {
         try {
             setExchangeRates(prev => ({ ...prev, loading: true, error: null }));
 
+            console.log('🔄 Fetching current exchange rates...');
             const response = await fetch(EXCHANGE_API);
             if (!response.ok) throw new Error('API request failed');
 
             const data = await response.json();
+            
+            // Verificar que tenemos las monedas necesarias
+            if (!data.rates?.COP || !data.rates?.INR) {
+                throw new Error('Required currencies not found in API response');
+            }
+
             const previousRates = getPreviousDayRate();
 
             const copTrend = calculateTrend(
@@ -119,6 +135,9 @@ export const useExchangeRates = () => {
                 previousRates?.USD_INR || data.rates.INR
             );
 
+            // 🔥 USAR FECHA Y HORA ACTUALES (no de la API)
+            const lastUpdated = new Date();
+
             const newRates = {
                 USD_COP: {
                     current: data.rates.COP,
@@ -130,20 +149,27 @@ export const useExchangeRates = () => {
                     previous: previousRates?.USD_INR || data.rates.INR,
                     ...inrTrend
                 },
-                lastUpdated: new Date(data.date),
+                lastUpdated: lastUpdated,
                 loading: false,
                 error: null
             };
+
+            console.log('✅ Exchange rates updated:', {
+                COP: data.rates.COP,
+                INR: data.rates.INR,
+                time: lastUpdated.toLocaleString()
+            });
 
             setExchangeRates(newRates);
             saveToCache(newRates);
 
         } catch (error) {
-            console.error('Error fetching exchange rates:', error);
+            console.error('❌ Error fetching exchange rates:', error);
 
             // Intentar usar cache como fallback
             const cached = getCachedRates();
             if (cached) {
+                console.log('📋 Using cached data as fallback');
                 setExchangeRates({ ...cached, loading: false, error: 'Using cached data' });
             } else {
                 setExchangeRates(prev => ({
@@ -155,48 +181,62 @@ export const useExchangeRates = () => {
         }
     };
 
-    // Verificar si cambió el día
-    const checkDayChange = () => {
+    // 🔥 MEJORAR DETECCIÓN DE CAMBIO DE DÍA
+    const checkForUpdates = async () => {
         const today = new Date().toDateString();
         const lastCheck = localStorage.getItem('last_exchange_check');
-
+        
+        // Si cambió el día o no hay último check, fetch nuevos datos
         if (lastCheck !== today) {
-            fetchExchangeRates();
+            console.log('📅 New day detected, fetching fresh rates');
+            await fetchExchangeRates();
             localStorage.setItem('last_exchange_check', today);
+        } else {
+            // Verificar si el cache expiró
+            const cached = getCachedRates();
+            if (!cached) {
+                console.log('⏰ Cache expired, fetching fresh rates');
+                await fetchExchangeRates();
+            }
         }
     };
 
     useEffect(() => {
+        console.log('🚀 Exchange rates hook initializing...');
+        
         // Cargar cache inicial o fetch
         const cached = getCachedRates();
         if (cached) {
+            console.log('📋 Loading from cache');
             setExchangeRates({ ...cached, loading: false });
         } else {
+            console.log('🔄 No valid cache, fetching fresh data');
             fetchExchangeRates();
         }
 
-        // Check inicial de cambio de día
-        checkDayChange();
+        // Check inicial de actualizaciones
+        checkForUpdates();
 
-        // Interval cada 24 horas
-        const dailyInterval = setInterval(fetchExchangeRates, 24 * 60 * 60 * 1000);
+        // 🔥 INTERVALOS MÁS FRECUENTES
+        // Check cada 1 hora
+        const hourlyInterval = setInterval(checkForUpdates, 60 * 60 * 1000);
 
-        // Check cada hora para detectar cambio de día
-        const hourlyCheck = setInterval(checkDayChange, 60 * 60 * 1000);
+        // Check cada 15 minutos para detectar cambio de día
+        const frequentCheck = setInterval(checkForUpdates, 15 * 60 * 1000);
 
-        // Event listener para visibility change
+        // Event listener para cuando la app vuelve a ser visible
         const handleVisibilityChange = () => {
             if (!document.hidden) {
-                const cached = getCachedRates();
-                if (!cached) fetchExchangeRates();
+                console.log('👁️ App became visible, checking for updates');
+                checkForUpdates();
             }
         };
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
-            clearInterval(dailyInterval);
-            clearInterval(hourlyCheck);
+            clearInterval(hourlyInterval);
+            clearInterval(frequentCheck);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, []);

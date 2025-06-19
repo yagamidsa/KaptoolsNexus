@@ -573,8 +573,6 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                                     <div className="pd-result-value">{formatDate(productInfo.creation_date)}</div>
                                 </div>
 
-
-                                {/* 🔥 Server item centrado */}
                                 <div className="pd-result-item server-item">
                                     <label>
                                         <svg viewBox="0 0 24 24" className="result-icon">

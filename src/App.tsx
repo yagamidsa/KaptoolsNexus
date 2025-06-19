@@ -16,6 +16,8 @@ import QChunksProcessor from './components/QChunksProcessor';
 import SplashScreen from './components/SplashScreen';
 import { useExchangeRates } from './hooks/useExchangeRates';
 import ExchangeRateDisplay from './components/ExchangeRate';
+import './utils/test_backend.js';
+import JSONPathTool from './components/JSONPathTool';
 import "./App.css";
 
 interface MenuItem {
@@ -43,7 +45,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
   const [workspacePath, setWorkspacePath] = useState<string>('');
-  const [activeView, setActiveView] = useState<'main' | 'review-branches'>('main');
+  const [activeView, setActiveView] = useState<'main' | 'review-branches' | 'jsonpath'>('main');
 
   // Estados de modales
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -123,13 +125,6 @@ function App() {
 
     // Utilities
     {
-      id: 'kapchat',
-      label: 'KapChat',
-      desc: 'AI Support',
-      icon: '🎭',
-      category: 'UTILITIES'
-    },
-    {
       id: 'jsonpath',
       label: 'JsonPath Tool',
       desc: 'JSON query tool',
@@ -146,7 +141,7 @@ function App() {
     },
     {
       id: 'shortcuts',
-      label: 'Quantum Shortcuts',
+      label: 'Command Shortcuts',
       desc: 'Divine portal matrix',
       icon: '🌐',
       category: 'UTILITIES'
@@ -162,8 +157,9 @@ function App() {
   const handleSplashComplete = () => {
     console.log("✅ Splash screen completed!");
     setIsAppLoading(false);
-    setResponse("🚀 KapTools Nexus successfully loaded!\n✨ All quantum systems online and ready");
+    setResponse("🚀 KapTools Nexus successfully loaded!\n✨ All Command systems online and ready");
   };
+
 
   // Función helper para tooltips dinámicos
   const getTooltipContent = (item: MenuItem, enabled: boolean) => {
@@ -217,32 +213,112 @@ function App() {
   }, [workspacePath]);
 
   // Validar workspace con el backend
+  // Función corregida para validar workspace en App.tsx
+  // Función mejorada que combina verificación local con backend
   const validateWorkspace = async () => {
-    if (!isWorkspaceSelected) return;
+    if (!workspacePath || workspacePath.trim() === '') {
+      setResponse('❌ No workspace path to validate');
+      return;
+    }
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/git/validate-workspace?workspace_path=${encodeURIComponent(workspacePath)}`);
+      setResponse("🔄 Validating workspace...");
+      console.log('Validating workspace:', workspacePath);
 
-      if (res.ok) {
-        const data = await res.json();
-        setWorkspaceValidation(data);
+      // PASO 1: Verificación local con Tauri (más confiable)
+      try {
+        const { invoke } = await import('@tauri-apps/api/core');
+        const localValidation = await invoke('check_workspace_folders', {
+          workspacePath: workspacePath
+        }) as any;
 
-        if (data.has_microservices) {
-          setResponse(`✅ Workspace validated!\n📂 ${workspacePath}\n🌿 Found repositories: ${data.existing_repos.join(', ')}`);
+        console.log('Local validation result:', localValidation);
+
+        // Si encontramos microservicios localmente, usar esa información
+        if (localValidation && localValidation.has_microservices) {
+          setWorkspaceValidation({
+            valid: true,
+            has_microservices: true,
+            existing_repos: localValidation.existing_repos || [],
+            workspace_path: workspacePath
+          });
+
+          setResponse(`✅ Workspace validated locally!\n📂 Path: ${workspacePath}\n🌿 Found repositories: ${localValidation.existing_repos.join(', ')}\n📁 Contents: ${localValidation.details.workspace_contents.join(', ')}`);
+          return; // Éxito con validación local
         } else {
-          setResponse(`📂 Workspace ready: ${workspacePath}\n⚠️ No microservices found - clone them first`);
+          // Si no hay microservicios, mostrar información detallada
+          const details = localValidation.details || {};
+          setResponse(`📂 Workspace validated: ${workspacePath}\n⚠️ No microservices found\n\nDetails:\n• Content folder exists: ${details.content_folder_exists ? '✅' : '❌'}\n• Content is git repo: ${details.content_is_git_repo ? '✅' : '❌'}\n• Dimensions folder exists: ${details.dimensions_folder_exists ? '✅' : '❌'}\n• Dimensions is git repo: ${details.dimensions_is_git_repo ? '✅' : '❌'}\n• Workspace contents: ${details.workspace_contents?.join(', ') || 'empty'}\n\n💡 Use "Clone Master" to download microservices`);
+
+          setWorkspaceValidation({
+            valid: true,
+            has_microservices: false,
+            existing_repos: [],
+            workspace_path: workspacePath
+          });
+          return; // Workspace válido pero sin microservicios
         }
-      } else {
-        setResponse(`❌ Could not validate workspace - Backend not available`);
+      } catch (tauriError) {
+        console.warn('Local validation failed:', tauriError);
+        setResponse("⚠️ Local validation failed, trying backend...");
       }
+
+      // PASO 2: Si Tauri falla, intentar con backend
+      try {
+        const res = await fetch("http://127.0.0.1:8000/validate-workspace", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ workspace_path: workspacePath }),
+        });
+
+        if (res.ok) {
+          const validation = await res.json();
+          console.log('Backend validation result:', validation);
+
+          setWorkspaceValidation({
+            valid: validation.valid || validation.success || false,
+            has_microservices: validation.has_microservices || false,
+            existing_repos: validation.existing_repos || validation.existing_repositories || [],
+            workspace_path: workspacePath
+          });
+
+          if (validation.has_microservices) {
+            setResponse(`✅ Workspace validated via backend!\n📂 Path: ${workspacePath}\n🌿 Found repositories: ${(validation.existing_repos || []).join(', ')}`);
+          } else {
+            setResponse(`📂 Workspace ready: ${workspacePath}\n⚠️ No microservices found via backend\n💡 Use "Clone Master" to download microservices`);
+          }
+        } else {
+          const errorText = await res.text();
+          throw new Error(`Backend validation failed: ${res.status} - ${errorText}`);
+        }
+      } catch (backendError) {
+        console.warn('Backend validation failed:', backendError);
+
+        // PASO 3: Fallback - marcar como válido para permitir operaciones
+        setWorkspaceValidation({
+          valid: true,
+          has_microservices: false,
+          existing_repos: [],
+          workspace_path: workspacePath
+        });
+
+        setResponse(`📂 Workspace path set: ${workspacePath}\n⚠️ Validation services unavailable\n🔧 Backend may not be running\n💡 Start backend: cd backend && python main.py\n\n✅ You can still use basic functions`);
+      }
+
     } catch (error) {
-      setResponse(`❌ Backend connection failed\n💡 Make sure to start the backend first`);
+      console.error('Workspace validation error:', error);
+
+      // En caso de error total, al menos permitir usar el workspace
       setWorkspaceValidation({
-        valid: false,
+        valid: true,
         has_microservices: false,
         existing_repos: [],
         workspace_path: workspacePath
       });
+
+      setResponse(`⚠️ Validation failed but workspace path set\n📂 Path: ${workspacePath}\n❌ Error: ${error}\n\n💡 You can try:\n• Check the path exists\n• Start the backend\n• Use "Clone Master" if no repos found`);
     }
   };
 
@@ -258,23 +334,81 @@ function App() {
 
   const selectWorkspaceFolder = async () => {
     try {
-      setResponse("🔍 Opening native Windows folder selector...");
-  
+      setResponse("🔍 Opening folder selector...");
+
       const { invoke } = await import('@tauri-apps/api/core');
-      const selectedPath = await invoke('select_folder_native') as string | null;
-  
-      if (selectedPath && selectedPath.trim() !== '') {
-        setWorkspacePath(selectedPath);
-        setResponse(`📁 Workspace folder selected:\n📁 ${selectedPath}\n🔄 Validating...`);
-        console.log('Selected workspace:', selectedPath);
-      } else {
-        setResponse("❌ No folder selected - User cancelled");
+
+      // Método 1: Windows Forms (corregido)
+      try {
+        setResponse("🔍 Trying Windows Forms dialog...");
+        const selectedPath = await invoke('select_folder_native') as string | null;
+
+        if (selectedPath && selectedPath.trim() !== '') {
+          setWorkspacePath(selectedPath);
+          setResponse(`📁 Workspace folder selected (Windows Forms):\n📁 ${selectedPath}\n🔄 Validating...`);
+          console.log('Selected workspace (Windows Forms):', selectedPath);
+
+          // Validar el workspace después de seleccionarlo
+          await validateWorkspace();
+          return;
+        } else {
+          setResponse("❌ No folder selected - User cancelled (Windows Forms)");
+        }
+      } catch (winformsError) {
+        console.warn('Windows Forms method failed:', winformsError);
+        setResponse("⚠️ Windows Forms failed, trying Shell COM...");
+
+        // Método 2: Shell COM Object
+        try {
+          const selectedPath = await invoke('select_folder_shell') as string | null;
+
+          if (selectedPath && selectedPath.trim() !== '') {
+            setWorkspacePath(selectedPath);
+            setResponse(`📁 Workspace folder selected (Shell):\n📁 ${selectedPath}\n🔄 Validating...`);
+            console.log('Selected workspace (Shell):', selectedPath);
+
+            // Validar el workspace después de seleccionarlo
+            await validateWorkspace();
+            return;
+          } else {
+            setResponse("❌ No folder selected - User cancelled (Shell)");
+          }
+        } catch (shellError) {
+          console.warn('Shell method failed:', shellError);
+          setResponse("⚠️ Shell failed, trying RFD fallback...");
+
+          // Método 3: RFD (fallback nativo de Rust)
+          try {
+            const selectedPath = await invoke('select_folder_rfd') as string | null;
+
+            if (selectedPath && selectedPath.trim() !== '') {
+              setWorkspacePath(selectedPath);
+              setResponse(`📁 Workspace folder selected (RFD):\n📁 ${selectedPath}\n🔄 Validating...`);
+              console.log('Selected workspace (RFD):', selectedPath);
+
+              // Validar el workspace después de seleccionarlo
+              await validateWorkspace();
+              return;
+            } else {
+              setResponse("❌ No folder selected - User cancelled (RFD)");
+            }
+          } catch (rfdError) {
+            console.error('All folder selection methods failed:', {
+              winforms: winformsError,
+              shell: shellError,
+              rfd: rfdError
+            });
+            setResponse(`❌ All folder selectors failed:\n• Windows Forms: ${winformsError}\n• Shell: ${shellError}\n• RFD: ${rfdError}`);
+          }
+        }
       }
     } catch (error) {
-      console.error('Error opening folder selector:', error);
+      console.error('Error in selectWorkspaceFolder:', error);
       setResponse(`❌ Folder selector error: ${error}`);
     }
   };
+
+
 
   const openWorkspaceFolder = async () => {
     if (!isWorkspaceSelected) {
@@ -301,7 +435,7 @@ function App() {
     }
 
     setLoading(true);
-    setResponse("⚡ Initializing quantum git protocols...");
+    setResponse("⚡ Initializing Command git protocols...");
 
     try {
       const res = await fetch("http://127.0.0.1:8000/git/clone-microservices", {
@@ -324,7 +458,7 @@ function App() {
         setResponse(`❌ Error: ${data.detail}`);
       }
     } catch (error) {
-      setResponse("❌ Quantum connection failed - Backend not available");
+      setResponse("❌ Command connection failed - Backend not available");
     } finally {
       setLoading(false);
     }
@@ -418,7 +552,7 @@ function App() {
       setResponse(`📋 Opening MDD Duplicator...\n📂 Workspace: ${workspacePath}\n🔄 Ready to duplicate and combine files`);
     } else if (itemId === 'create-structure') {
       setShowCreateStructureModal(true);
-      setResponse(`🏗️ Opening Project Structure Creator...\n📂 Workspace: ${workspacePath}\n🌿 Microservices: ${workspaceValidation.existing_repos.join(', ')}\n⚡ Ready to deploy quantum architecture`);
+      setResponse(`🏗️ Opening Project Structure Creator...\n📂 Workspace: ${workspacePath}\n🌿 Microservices: ${workspaceValidation.existing_repos.join(', ')}\n⚡ Ready to deploy Command architecture`);
     } else if (itemId === 'q-chunks-processor') {
       setShowQChunksModal(true);
       setResponse(`⚙️ Opening ODIN Chunks Processor...\n📂 Workspace: ${workspacePath}\n🔧 Ready to process .odin files and generate Template_Chunks structure`);
@@ -427,10 +561,15 @@ function App() {
     // Handler Shortcuts:
     else if (itemId === 'shortcuts') {
       setShowShortcutsModal(true);
-      setResponse(`🌐 Opening Quantum Shortcuts Portal...\n⚡ Accessing divine portal matrix`);
+      setResponse(`🌐 Opening Command Shortcuts Portal...\n⚡ Accessing divine portal matrix`);
     }
 
     // Handle Utilities
+    else if (itemId === 'jsonpath') {
+      setActiveView('jsonpath');
+      setResponse(`🔗 Opening JSONPath Tool...\n🎯 Advanced API querying ready\n⚡ Quantum JSON analysis activated`);
+    }
+    
     else {
       setResponse(`🔧 Selected: ${item.label}`);
     }
@@ -446,13 +585,17 @@ function App() {
       );
     }
 
+    if (activeView === 'jsonpath') {
+      return <JSONPathTool />;
+    }
+
     return (
       <>
         <main className="nexus-main">
           <div className="control-panel">
             <div className="panel-header">
               <div className="panel-icon">🌐</div>
-              <h2>Quantum Command Center</h2>
+              <h2>Command Control Center</h2>
               <div className="panel-status">
                 <div className="status-dot"></div>
                 ONLINE
@@ -678,7 +821,7 @@ function App() {
 
   // 🔥 MOSTRAR APP PRINCIPAL CUANDO HAYA TERMINADO EL SPLASH
   return (
-    <div className={`nexus-app ${activeView === 'review-branches' ? 'review-branches-mode' : ''}`}>
+    <div className={`nexus-app ${activeView === 'review-branches' || activeView === 'jsonpath' ? 'review-branches-mode' : ''}`}>
       <FuturisticBackground />
       <NeonDock />
 
@@ -694,6 +837,13 @@ function App() {
           <div className="view-indicator">
             <span className="view-icon">🌿</span>
             <span className="view-name">Review Branches</span>
+          </div>
+        )}
+
+        {activeView === 'jsonpath' && (
+          <div className="view-indicator">
+            <span className="view-icon">🔗</span>
+            <span className="view-name">JSONPath Tool</span>
           </div>
         )}
       </header>
@@ -751,7 +901,13 @@ function App() {
             <>
               <span className="footer-view">🌿 Review Branches Active</span>
               <span>•</span>
+            </>
+          )}
 
+          {activeView === 'jsonpath' && (
+            <>
+              <span className="footer-view">🔗 JSONPath Tool Active</span>
+              <span>•</span>
             </>
           )}
         </div>
@@ -801,52 +957,10 @@ function App() {
         onClose={() => {
           setShowShortcutsModal(false);
           setSelectedItem('');
-          setResponse('🌐 Quantum Shortcuts Portal closed');
+          setResponse('🌐 Command Shortcuts Portal closed');
         }}
       />
 
-      {/* 🤖 COPILOT MODAL */}
-      {showCopilotModal && (
-        <div className="copilot-modal-overlay">
-          <div className="copilot-modal">
-            <div className="copilot-header">
-              <div className="copilot-header-content">
-                <div className="copilot-icon">🤖</div>
-                <div className="copilot-title">
-                  <h2>KapChat AI Assistant</h2>
-                  <p>Your quantum AI companion for KapTools</p>
-                </div>
-              </div>
-              <button
-                className="copilot-close-button"
-                onClick={() => {
-                  setShowCopilotModal(false);
-                  setResponse('🤖 KapChat AI Assistant closed');
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-            <div className="copilot-content">
-              <div className="copilot-placeholder">
-                <div className="placeholder-icon">🚧</div>
-                <h3>Coming Soon</h3>
-                <p>KapChat AI Assistant is under development</p>
-                <p>This will be your intelligent companion for:</p>
-                <ul>
-                  <li>🎯 Project guidance and best practices</li>
-                  <li>🔧 Technical troubleshooting</li>
-                  <li>📊 Data analysis insights</li>
-                  <li>⚡ Workflow optimization</li>
-                  <li>🤝 Step-by-step tutorials</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

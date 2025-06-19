@@ -1286,7 +1286,7 @@
 
 
 .header-subtitle {
-    color: var(--dracula-comment);
+    color: var(--dracula-purple);
     font-size: 14px;
     margin: 0;
     opacity: 0.9;
@@ -1423,7 +1423,7 @@
 }
 
 .rb-search-input::placeholder {
-    color: var(--dracula-comment);
+    color: var(--dracula-purple);
     opacity: 0.8;
 }
 
@@ -1830,7 +1830,7 @@
 }
 
 .header-subtitle {
-    color: var(--dracula-comment);
+    color: var(--dracula-purple);
     font-size: 11px;
     /* Subtítulo muy pequeño */
     margin: 0;
@@ -2006,7 +2006,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    color: var(--dracula-comment);
+    color: var(--dracula-purple);
     line-height: 1;
 }
 
@@ -2148,7 +2148,7 @@
 .commit-message {
     font-size: 11px;
     /* Mensaje más pequeño */
-    color: var(--dracula-foreground);
+    color: var(--dracula-purple);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2178,7 +2178,7 @@
     background: rgba(255, 85, 85, 0.2);
     color: var(--dracula-red);
     border: 1px solid rgba(255, 85, 85, 0.4);
-    font-size: 9px;
+    font-size: 12px;
     /* Badge muy pequeño */
     font-weight: 600;
     padding: 2px 4px;
@@ -3461,7 +3461,7 @@
 
 .commit-message {
     font-size: 13px;
-    color: var(--dracula-comment);
+    color: var(--dracula-purple);
 
     /* Permitir que el mensaje se muestre en múltiples líneas si es necesario */
     white-space: normal;
@@ -4924,7 +4924,7 @@
     font-size: 11px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     opacity: 0.9;
-    background: rgba(0, 0, 0, 0.3);
+    background: transparent;
     padding: 4px 8px;
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -7465,3 +7465,240 @@
         margin-top: 10px !important;
     }
 }
+
+/* ================================
+   🎯 HEADER SIN FONDO - TRANSPARENTE
+   ================================ */
+   .branches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--dracula-current-line);
+    /* QUITAR FONDO - TRANSPARENTE */
+    background: transparent !important;
+    border-radius: 8px;
+    position: relative;
+    /* QUITAR BOX-SHADOW */
+    box-shadow: none !important;
+}
+
+/* ================================
+   🔘 BOTÓN ICONO TRANSPARENTE
+   ================================ */
+.rb-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    /* FONDO TRANSPARENTE */
+    background: transparent !important;
+    padding: 0;
+    /* TEXTO EN ROSA/MORADO */
+    color: var(--dracula-pink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    /* QUITAR SOMBRAS */
+    box-shadow: none !important;
+    /* QUITAR ANIMACIÓN */
+    animation: none !important;
+    flex-shrink: 0;
+    /* BORDE OPCIONAL PARA VER EL BOTÓN */
+    border: 1px solid rgba(255, 121, 198, 0.3);
+}
+
+/* HOVER PARA EL BOTÓN TRANSPARENTE */
+.rb-header-icon:hover {
+    background: rgba(255, 121, 198, 0.1) !important;
+    color: var(--dracula-purple);
+    border-color: rgba(189, 147, 249, 0.5);
+    transform: scale(1.05);
+}
+
+/* ================================
+   🎯 CENTRAR ICONO EN RB-HEADER-INFO
+   ================================ */
+   .rb-header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar horizontalmente */
+    justify-content: center; /* Centrar verticalmente */
+    text-align: center; /* Centrar el texto */
+    gap: 8px; /* Espacio entre icono y textos */
+}
+
+/* Asegurar que el icono esté centrado */
+.rb-header-icon {
+    margin: 0 auto; /* Centrado adicional */
+    align-self: center; /* Centrado en flex */
+}
+
+/* Centrar también los textos */
+.rb-header-title,
+.header-subtitle {
+    text-align: center;
+    margin: 0; /* Quitar márgenes por defecto */
+}
+
+/* Si quieres que todo el header tenga el icono al centro */
+.rb-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+}
+
+/* ================================
+   🔧 SOLUCIÓN DEFINITIVA - HEADERS COMPACTOS
+   ================================ */
+
+/* ================================
+   📝 REDUCIR TAMAÑO DE LETRA Y COMPACTAR
+   ================================ */
+   .diff-panel-header {
+    padding: 8px 12px !important; /* Menos padding */
+    background: linear-gradient(135deg,
+            var(--dracula-current-line) 0%,
+            var(--dracula-lighter) 100%);
+    border-bottom: 2px solid var(--dracula-current-line);
+    font-weight: 600 !important; /* Menos bold */
+    font-size: 10px !important; /* MUCHO más pequeño */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+    line-height: 1.2 !important; /* Línea más compacta */
+    min-height: 28px !important; /* Altura mínima fija */
+    max-height: 28px !important; /* Altura máxima fija */
+    overflow: hidden; /* Ocultar overflow */
+}
+
+/* ================================
+   🏷️ LABELS MUY COMPACTOS CON TRUNCAMIENTO
+   ================================ */
+.header-label {
+    font-size: 9px !important; /* EXTRA pequeño */
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    /* TRUNCAMIENTO INTELIGENTE */
+    max-width: 200px; /* Ancho máximo */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+    /* Abreviaciones automáticas */
+    word-spacing: -1px; /* Compactar palabras */
+}
+
+
+/* ================================
+   🎨 COLORES ESPECÍFICOS COMPACTOS
+   ================================ */
+.diff-panel-header.old {
+    background: linear-gradient(135deg,
+            rgba(255, 85, 85, 0.1) 0%,
+            rgba(255, 85, 85, 0.15) 100%);
+    border-bottom-color: rgba(255, 85, 85, 0.3);
+}
+
+.diff-panel-header.old .header-label {
+    color: var(--dracula-red);
+    text-shadow: none; /* Quitar sombra para más claridad */
+}
+
+.diff-panel-header.new {
+    background: linear-gradient(135deg,
+            rgba(80, 250, 123, 0.1) 0%,
+            rgba(80, 250, 123, 0.15) 100%);
+    border-bottom-color: rgba(80, 250, 123, 0.3);
+}
+
+.diff-panel-header.new .header-label {
+    color: var(--dracula-green);
+    text-shadow: none; /* Quitar sombra para más claridad */
+}
+
+/* ================================
+   📱 RESPONSIVE ULTRA COMPACTO
+   ================================ */
+@media (max-width: 1199px) {
+    .diff-panel-header {
+        padding: 6px 8px !important;
+        font-size: 9px !important;
+        min-height: 24px !important;
+        max-height: 24px !important;
+    }
+    
+    .header-label {
+        font-size: 8px !important;
+        max-width: 150px;
+    }
+    
+    .rb-header-info {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        max-width: 60px;
+    }
+}
+
+@media (max-width: 767px) {
+    .diff-panel-header {
+        padding: 4px 6px !important;
+        font-size: 8px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+    }
+    
+    .header-label {
+        font-size: 7px !important;
+        max-width: 100px;
+    }
+    
+    .rb-header-info {
+        font-size: 6px !important;
+        padding: 1px 2px !important;
+        max-width: 40px;
+    }
+}
+
+/* ================================
+   ✂️ ABREVIACIONES AUTOMÁTICAS
+   ================================ */
+.header-label:lang(en) {
+    /* Reemplazos automáticos con CSS (si el navegador lo soporta) */
+    text-transform: none;
+}
+
+/* Para casos específicos muy largos */
+.diff-panel-header.old .header-label::before {
+    content: "Original ";
+    font-size: 8px;
+    opacity: 0.7;
+}
+
+.diff-panel-header.new .header-label::before {
+    content: "Modified ";
+    font-size: 8px;
+    opacity: 0.7;
+}
+
+/* Ocultar el texto original y mostrar solo la versión corta */
+.diff-panel-header .header-label {
+    color: transparent; /* Ocultar texto original */
+}
+
+.diff-panel-header.old .header-label::before {
+    color: var(--dracula-red); /* Mostrar versión corta */
+}
+
+.diff-panel-header.new .header-label::before {
+    color: var(--dracula-green); /* Mostrar versión corta */
+}
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import './ReviewBranches.css';
 
 // ================================
@@ -74,8 +74,8 @@ interface ScreenSize {
 // 🛠️ CONFIGURACIÓN DEVOPS
 // ================================
 const DEVOPS_CONFIG = {
-    baseUrl: 'https://kantarware.visualstudio.com/', 
-    projectName: 'Kantar%20Automation%20Platform', 
+    baseUrl: 'https://kantarware.visualstudio.com/',
+    projectName: 'Kantar%20Automation%20Platform',
     repositories: {
         'content': 'outputs-dimensions-content',
         'dimensions': 'outputs-dimensions'
@@ -139,7 +139,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
-    
+
     // ================================
     // 🎛️ ESTADOS DE FILTROS Y BÚSQUEDA
     // ================================
@@ -147,7 +147,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [sortBy, setSortBy] = useState<'date' | 'author' | 'name' | 'behind'>('date');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-    
+
     // ================================
     // 🗂️ ESTADOS DE MODALES Y COMPARACIÓN
     // ================================
@@ -158,13 +158,13 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     const [fileDiff, setFileDiff] = useState<FileDiff | null>(null);
     const [showFileDiff, setShowFileDiff] = useState<boolean>(false);
     const [loadingFileDiff, setLoadingFileDiff] = useState<boolean>(false);
-    
+
     // ================================
     // 🏗️ ESTADOS DE CONFIGURACIÓN
     // ================================
-    const [availableRepos, setAvailableRepos] = useState<RepositoryAvailability>({ 
-        content: false, 
-        dimensions: false 
+    const [availableRepos, setAvailableRepos] = useState<RepositoryAvailability>({
+        content: false,
+        dimensions: false
     });
 
     // ================================
@@ -392,8 +392,8 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
             .filter(branch => {
                 const searchLower = debouncedSearchTerm.toLowerCase();
                 return branch.display_name.toLowerCase().includes(searchLower) ||
-                       branch.author.toLowerCase().includes(searchLower) ||
-                       branch.commit_message.toLowerCase().includes(searchLower);
+                    branch.author.toLowerCase().includes(searchLower) ||
+                    branch.commit_message.toLowerCase().includes(searchLower);
             })
             .sort((a, b) => {
                 let compareValue = 0;
@@ -446,7 +446,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     // 🎨 COMPONENTES INTERNOS
     // ================================
     const BranchNameComponent: React.FC<{ branch: BranchInfo }> = React.memo(({ branch }) => (
-        <span 
+        <span
             className={`branch-name clickable-branch ${branch.is_current ? 'current-branch' : ''}`}
             onClick={(e) => handleBranchNameClick(branch, e)}
             title={`Open ${branch.display_name} in Azure DevOps`}
@@ -805,7 +805,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 📄 FILE DIFF VIEWER
                 ================================ */}
             {showFileDiff && fileDiff && selectedFile && (
-                <FileDiffViewer 
+                <FileDiffViewer
                     fileDiff={fileDiff}
                     selectedFile={selectedFile}
                     selectedBranch={selectedBranch}
@@ -840,12 +840,12 @@ interface FileDiffViewerProps {
     screenSize: ScreenSize;
 }
 
-const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({ 
-    fileDiff, 
-    selectedFile, 
-    selectedBranch, 
-    onClose, 
-    screenSize 
+const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
+    fileDiff,
+    selectedFile,
+    selectedBranch,
+    onClose,
+    screenSize
 }) => {
     const [viewMode, setViewMode] = useState<'unified' | 'side-by-side'>('side-by-side');
     const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -858,13 +858,37 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
     const hasComparison = !isAddedOnly && !isDeletedOnly;
 
     // Función para sincronizar scroll horizontal
-    const handleSyncScroll = useCallback((source: 'left' | 'right', scrollLeft: number) => {
-        if (viewMode === 'side-by-side') {
-            if (source === 'left' && rightPanelRef.current) {
-                rightPanelRef.current.scrollLeft = scrollLeft;
-            } else if (source === 'right' && leftPanelRef.current) {
-                leftPanelRef.current.scrollLeft = scrollLeft;
-            }
+    const isScrollingLeft = useRef(false);
+    const isScrollingRight = useRef(false);
+
+    // Función mejorada para manejar scroll con throttling
+    const handleScrollSync = useCallback((source: 'left' | 'right', element: HTMLDivElement) => {
+        if (viewMode !== 'side-by-side') return;
+
+        // Evitar loops infinitos
+        if (source === 'left' && isScrollingLeft.current) return;
+        if (source === 'right' && isScrollingRight.current) return;
+
+        const { scrollLeft, scrollTop } = element;
+
+        if (source === 'left' && rightPanelRef.current) {
+            isScrollingRight.current = true;
+            rightPanelRef.current.scrollLeft = scrollLeft;
+            rightPanelRef.current.scrollTop = scrollTop;
+
+            // Reset flag después de un frame
+            requestAnimationFrame(() => {
+                isScrollingRight.current = false;
+            });
+        } else if (source === 'right' && leftPanelRef.current) {
+            isScrollingLeft.current = true;
+            leftPanelRef.current.scrollLeft = scrollLeft;
+            leftPanelRef.current.scrollTop = scrollTop;
+
+            // Reset flag después de un frame
+            requestAnimationFrame(() => {
+                isScrollingLeft.current = false;
+            });
         }
     }, [viewMode]);
 
@@ -955,7 +979,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
                     <div
                         className="diff-panel-content"
                         ref={leftPanelRef}
-                        onScroll={(e) => handleSyncScroll('left', e.currentTarget.scrollLeft)}
+                        onScroll={(e) => handleScrollSync('left', e.currentTarget)}
                     >
                         <div className="diff-content-wrapper">
                             {Array.from({ length: maxLines }, (_, index) => {
@@ -1006,7 +1030,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
                     <div
                         className="diff-panel-content"
                         ref={rightPanelRef}
-                        onScroll={(e) => handleSyncScroll('right', e.currentTarget.scrollLeft)}
+                        onScroll={(e) => handleScrollSync('right', e.currentTarget)}
                     >
                         <div className="diff-content-wrapper">
                             {Array.from({ length: maxLines }, (_, index) => {
@@ -1049,7 +1073,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
                 </div>
             </div>
         );
-    }, [fileDiff, hasComparison, selectedFile, selectedBranch, handleSyncScroll]);
+    }, [fileDiff, hasComparison, selectedFile, selectedBranch, handleScrollSync]);
 
     return (
         <div className="rb-file-diff-overlay" onClick={(e) => {
@@ -1115,8 +1139,8 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
 
                 {/* Content */}
                 <div className="file-diff-content">
-                    {viewMode === 'unified' || !hasComparison || screenSize.isMobile ? 
-                        renderUnifiedView() : 
+                    {viewMode === 'unified' || !hasComparison || screenSize.isMobile ?
+                        renderUnifiedView() :
                         renderSideBySideView()
                     }
                 </div>

@@ -1,5 +1,6 @@
 // src/components/SplashScreen.tsx - VERSIÓN COMPACTA Y CENTRADA
 import React, { useState, useEffect } from 'react';
+import './SplashScreen.css';
 
 interface SplashScreenProps {
     onLoadingComplete: () => void;
