@@ -82,10 +82,10 @@ pub fn get_environments() -> Vec<Environment> {
 pub fn get_services() -> HashMap<String, ServiceConfig> {
     let mut services = HashMap::new();
 
-    // Study Definition
+    // Study Definition - URL CORREGIDA
     services.insert("study-definition".to_string(), ServiceConfig {
         name: "Study Definition".to_string(),
-        base_url: "studydef.azurewebsites.net".to_string(),
+        base_url: "kap-studydef.azurewebsites.net".to_string(), // ✅ Agregado 'kap-'
         templates: vec![
             ServiceTemplate {
                 name: "Study Details".to_string(),
@@ -100,20 +100,25 @@ pub fn get_services() -> HashMap<String, ServiceConfig> {
         ],
     });
 
-    // Questionnaire Factory
+    // Questionnaire Factory - URL CORREGIDA
     services.insert("questionnaire-factory".to_string(), ServiceConfig {
         name: "Questionnaire Factory".to_string(),
-        base_url: "qfactory.azurewebsites.net".to_string(),
+        base_url: "kap-qfactory.azurewebsites.net".to_string(), // ✅ Agregado 'kap-'
         templates: vec![
+            ServiceTemplate {
+                name: "Wave Details".to_string(),
+                pattern: "/waves/{WAVE_ID}".to_string(),
+                example: "/waves/4d3009d9-dc7d-4449-835b-91962359460c".to_string(),
+            },
             ServiceTemplate {
                 name: "All Questions in Wave".to_string(),
                 pattern: "/waves/{WAVE_ID}/all-questions".to_string(),
-                example: "/waves/f0f6dd9e-f343-4fb8-bc8d-515ce92f228f/all-questions".to_string(),
+                example: "/waves/4d3009d9-dc7d-4449-835b-91962359460c/all-questions".to_string(),
             },
             ServiceTemplate {
                 name: "List Replacements".to_string(),
                 pattern: "/waves/{WAVE_ID}/list_replacements".to_string(),
-                example: "/waves/f0f6dd9e-f343-4fb8-bc8d-515ce92f228f/list_replacements".to_string(),
+                example: "/waves/4d3009d9-dc7d-4449-835b-91962359460c/list_replacements".to_string(),
             },
             ServiceTemplate {
                 name: "Custom Path".to_string(),
@@ -123,10 +128,10 @@ pub fn get_services() -> HashMap<String, ServiceConfig> {
         ],
     });
 
-    // Azure File Manager
+    // Azure File Manager - URL CORREGIDA
     services.insert("azure-file-manager".to_string(), ServiceConfig {
         name: "Azure File Manager".to_string(),
-        base_url: "azure-file-manager.azurewebsites.net/api".to_string(),
+        base_url: "kap-azure-file-manager.azurewebsites.net/api".to_string(), // ✅ Agregado 'kap-'
         templates: vec![
             ServiceTemplate {
                 name: "File List".to_string(),
@@ -141,10 +146,10 @@ pub fn get_services() -> HashMap<String, ServiceConfig> {
         ],
     });
 
-    // User Store
+    // User Store - URL CORREGIDA
     services.insert("user-store".to_string(), ServiceConfig {
         name: "User Store".to_string(),
-        base_url: "qfactory.azurewebsites.net".to_string(),
+        base_url: "kap-userstore.azurewebsites.net".to_string(), // ✅ Agregado 'kap-'
         templates: vec![
             ServiceTemplate {
                 name: "User Info".to_string(),
@@ -159,10 +164,10 @@ pub fn get_services() -> HashMap<String, ServiceConfig> {
         ],
     });
 
-    // Common Data
+    // Common Data - URL CORREGIDA
     services.insert("common-data".to_string(), ServiceConfig {
         name: "Common Data".to_string(),
-        base_url: "qfactory.azurewebsites.net".to_string(),
+        base_url: "kap-commondata.azurewebsites.net".to_string(), // ✅ Agregado 'kap-'
         templates: vec![
             ServiceTemplate {
                 name: "Data Query".to_string(),
@@ -177,10 +182,10 @@ pub fn get_services() -> HashMap<String, ServiceConfig> {
         ],
     });
 
-    // Agregar más servicios...
+    // Product Template - URL CORREGIDA
     services.insert("product-template".to_string(), ServiceConfig {
         name: "Product Template".to_string(),
-        base_url: "kap-product-template.azurewebsites.net/api".to_string(),
+        base_url: "kap-product-template.azurewebsites.net/api".to_string(), // ✅ Ya tenía 'kap-'
         templates: vec![
             ServiceTemplate {
                 name: "Product Template".to_string(),
@@ -190,9 +195,10 @@ pub fn get_services() -> HashMap<String, ServiceConfig> {
         ],
     });
 
+    // Tesseract Schema - URL CORREGIDA
     services.insert("tesseract-schema".to_string(), ServiceConfig {
         name: "Tesseract Schema".to_string(),
-        base_url: "tesseract-pre-prod.azurewebsites.net".to_string(),
+        base_url: "kap-tesseract-pre-prod.azurewebsites.net".to_string(), // ✅ Agregado 'kap-'
         templates: vec![
             ServiceTemplate {
                 name: "Product Outputs".to_string(),

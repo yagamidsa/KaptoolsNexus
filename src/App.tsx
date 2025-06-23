@@ -212,6 +212,28 @@ function App() {
     }
   }, [workspacePath]);
 
+
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeView === 'jsonpath') {
+        setActiveView('main');
+        setSelectedItem('');
+        setResponse('🔗 JSONPath Tool closed');
+      }
+    };
+  
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [activeView]);
+  
+  // 3. Opcional: Agregar función helper para cerrar JSONPath
+  const handleCloseJSONPath = () => {
+    setActiveView('main');
+    setSelectedItem('');
+    setResponse('🔗 JSONPath Tool closed');
+  };
+  
   // Validar workspace con el backend
   // Función corregida para validar workspace en App.tsx
   // Función mejorada que combina verificación local con backend
@@ -569,7 +591,7 @@ function App() {
       setActiveView('jsonpath');
       setResponse(`🔗 Opening JSONPath Tool...\n🎯 Advanced API querying ready\n⚡ Quantum JSON analysis activated`);
     }
-    
+
     else {
       setResponse(`🔧 Selected: ${item.label}`);
     }
@@ -584,10 +606,14 @@ function App() {
         />
       );
     }
-
+  
+    // ✅ AGREGAR ESTO:
     if (activeView === 'jsonpath') {
-      return <JSONPathTool />;
+      return (
+        <JSONPathTool onClose={handleCloseJSONPath} />
+      );
     }
+  
 
     return (
       <>
@@ -840,12 +866,6 @@ function App() {
           </div>
         )}
 
-        {activeView === 'jsonpath' && (
-          <div className="view-indicator">
-            <span className="view-icon">🔗</span>
-            <span className="view-name">JSONPath Tool</span>
-          </div>
-        )}
       </header>
 
 

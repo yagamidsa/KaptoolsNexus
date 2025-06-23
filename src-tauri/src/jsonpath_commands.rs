@@ -214,33 +214,13 @@ pub fn format_json(json_text: String) -> Result<String, String> {
 pub async fn test_api_connectivity(environment: String, service: String) -> Result<String, String> {
     let client = get_client();
     
-    // Construir URL de prueba
-    let url = match client.build_url(&environment, &service, "/health") {
-        Ok(url) => url,
-        Err(_) => {
-            // Fallback a root path
-            match client.build_url(&environment, &service, "/") {
-                Ok(url) => url,
-                Err(e) => return Err(format!("Failed to build test URL: {}", e)),
-            }
-        }
-    };
+    println!("🔍 Testing connectivity to {}/{}", environment, service);
     
-    println!("🔍 Testing connectivity to: {}", url);
-    
-    // Hacer request simple sin autenticación
-    let http_client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
-    
-    match http_client.head(&url).send().await {
-        Ok(response) => {
-            let status = response.status();
-            Ok(format!("✅ Connectivity test successful\n🌐 URL: {}\n📊 Status: {}", url, status))
-        }
-        Err(e) => {
-            Ok(format!("⚠️ Connectivity test failed\n🌐 URL: {}\n❌ Error: {}\n💡 This might be normal if the endpoint requires authentication", url, e))
-        }
+    match client.test_connectivity(&environment, &service).await {
+        Ok(result) => Ok(result),
+        Err(e) => Ok(format!(
+            "⚠️ Connectivity test failed\n❌ Error: {}\n💡 Possible issues:\n• Network connectivity\n• Invalid credentials\n• Service unavailable\n• Firewall blocking requests", 
+            e
+        )),
     }
 }
