@@ -216,7 +216,7 @@ pub async fn test_api_connectivity(environment: String, service: String) -> Resu
     
     println!("🔍 Testing connectivity to {}/{}", environment, service);
     
-    match client.test_connectivity(&environment, &service).await {
+    match client.test_connectivity_fast(&environment, &service).await {
         Ok(result) => Ok(result),
         Err(e) => Ok(format!(
             "⚠️ Connectivity test failed\n❌ Error: {}\n💡 Possible issues:\n• Network connectivity\n• Invalid credentials\n• Service unavailable\n• Firewall blocking requests", 
