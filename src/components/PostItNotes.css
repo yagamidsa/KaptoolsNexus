@@ -1,0 +1,893 @@
+/* src/components/PostItNotes.css */
+
+/* Variables consistentes con tu aplicación */
+:root {
+    /* Colores base profesionales */
+    --navy-900: #0f1629;
+    --navy-800: #1a202c;
+    --navy-700: #2d3748;
+    --navy-600: #4a5568;
+    --navy-500: #718096;
+
+    /* Colores de acento */
+    --gold-500: #f6ad55;
+    --gold-400: #fbb042;
+    --blue-400: #63b3ed;
+    --purple-400: #9f7aea;
+    --red-400: #fc8181;
+    --green-400: #68d391;
+
+    /* Colores específicos del proyecto */
+    --primary-purple: #6c5ce7;
+    --primary-pink: #ff6b9d;
+    --success-green: #00ff87;
+    --warning-yellow: #fbbf24;
+    --error-red: #ef4444;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a3bd;
+    --bg-primary: #1a1d3a;
+    --bg-secondary: #252a4a;
+    --bg-card: rgba(37, 42, 74, 0.6);
+
+    /* Gradientes profesionales */
+    --gradient-primary: linear-gradient(135deg, var(--navy-700) 0%, var(--navy-600) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 100%);
+
+    /* Sombras profesionales */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.25);
+    --shadow-glow: 0 0 20px rgba(246, 173, 85, 0.3);
+}
+
+/* Backdrop del modal - Mismo estilo que la app principal */
+.postit-notes-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(246, 173, 85, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(99, 179, 237, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(159, 122, 234, 0.02) 0%, transparent 50%),
+        linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, var(--navy-900) 100%);
+    backdrop-filter: blur(8px) saturate(1.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: backdropSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    padding: 20px;
+}
+
+@keyframes backdropSlideIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(8px) saturate(1.1);
+    }
+}
+
+/* Contenedor principal - Mismo estilo que tu app */
+.postit-notes-container {
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(246, 173, 85, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(99, 179, 237, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(159, 122, 234, 0.01) 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+    border: 1px solid rgba(246, 173, 85, 0.2);
+    border-radius: 16px;
+    backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow:
+        var(--shadow-xl),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header estilo Apple - Consistente con la app principal */
+.postit-app-header {
+    padding: 20px 24px;
+    background: 
+        linear-gradient(135deg, rgba(45, 55, 72, 0.8) 0%, rgba(74, 85, 104, 0.6) 100%);
+    border-bottom: 1px solid rgba(246, 173, 85, 0.2);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.postit-app-header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-purple), var(--primary-pink), transparent);
+    opacity: 0.5;
+}
+
+.postit-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.postit-app-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: var(--shadow-glow);
+}
+
+.postit-app-title {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--text-primary), var(--gold-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.postit-header-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.postit-color-palette {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid rgba(246, 173, 85, 0.2);
+}
+
+.postit-color-option {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.postit-color-option.active {
+    border-color: var(--gold-400);
+    transform: scale(1.2);
+    box-shadow: 0 0 12px currentColor;
+}
+
+.postit-color-option:hover {
+    transform: scale(1.1);
+}
+
+.postit-color-yellow { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.postit-color-pink { background: linear-gradient(135deg, #ff6b9d, #ec4899); }
+.postit-color-blue { background: linear-gradient(135deg, #63b3ed, #3b82f6); }
+.postit-color-green { background: linear-gradient(135deg, #00ff87, #10b981); }
+.postit-color-purple { background: linear-gradient(135deg, #9f7aea, #7c3aed); }
+.postit-color-orange { background: linear-gradient(135deg, #f6ad55, #ea580c); }
+
+.postit-add-note-btn {
+    padding: 12px 20px;
+    background: var(--gradient-accent);
+    border: none;
+    border-radius: 12px;
+    color: var(--navy-900);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.postit-add-note-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.postit-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(252, 129, 129, 0.1);
+    border: 1px solid rgba(252, 129, 129, 0.2);
+    color: var(--red-400);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.postit-close-btn:hover {
+    background: rgba(252, 129, 129, 0.15);
+    border-color: rgba(252, 129, 129, 0.4);
+    color: #fc8181;
+    transform: rotate(90deg) scale(1.05);
+}
+
+/* Tablero de notas - Mismo fondo que la app principal */
+.notes-board {
+    flex: 1;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(246, 173, 85, 0.01) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(99, 179, 237, 0.01) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(159, 122, 234, 0.005) 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background-image: 
+        radial-gradient(circle at 20px 20px, rgba(246, 173, 85, 0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* Nota individual estilo Post-it - Sin animaciones de flotación */
+.postit-note {
+    width: 280px;
+    min-height: 200px;
+    padding: 20px;
+    border-radius: 16px;
+    position: absolute;
+    cursor: move;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: noteAppear 0.3s ease-out;
+    transform-origin: top center;
+    /* Efecto vidrio empañado mejorado */
+    backdrop-filter: blur(25px) saturate(1.8) brightness(1.2);
+    -webkit-backdrop-filter: blur(25px) saturate(1.8) brightness(1.2);
+}
+
+@keyframes noteAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Pin de la nota con color magenta vibrante */
+.postit-note::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 16px;
+    background: 
+        radial-gradient(circle at 30% 30%, #ff69b4, #e91e63),
+        linear-gradient(45deg, #ff1493, #c2185b);
+    border-radius: 50%;
+    box-shadow: 
+        0 4px 12px rgba(255, 20, 147, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.6),
+        inset 0 -1px 1px rgba(139, 0, 79, 0.4);
+    z-index: 10;
+}
+
+/* Agujero del pin con sombra magenta */
+.postit-note::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: rgba(139, 0, 79, 0.7);
+    border-radius: 50%;
+    box-shadow: 
+        inset 0 1px 1px rgba(0, 0, 0, 0.5),
+        0 0 2px rgba(255, 20, 147, 0.3);
+    z-index: 11;
+}
+
+.postit-note:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.postit-note.dragging {
+    transform: rotate(3deg) scale(1.02);
+    z-index: 1000;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Rotaciones aleatorias para efecto más natural */
+.postit-note:nth-child(3n+1) { 
+    transform: rotate(-2deg); 
+}
+.postit-note:nth-child(3n+2) { 
+    transform: rotate(1deg); 
+}
+.postit-note:nth-child(3n+3) { 
+    transform: rotate(-1deg); 
+}
+.postit-note:nth-child(5n+1) { 
+    transform: rotate(2deg); 
+}
+.postit-note:nth-child(7n+1) { 
+    transform: rotate(-3deg); 
+}
+
+/* Colores de notas - MÁS VIVOS Y SATURADOS para mejor contraste */
+.postit-note-yellow {
+    background: 
+        linear-gradient(135deg, rgba(255, 215, 0, 0.85), rgba(255, 193, 7, 0.80)),
+        rgba(255, 235, 59, 0.40);
+    backdrop-filter: blur(20px) saturate(2.5) brightness(1.3);
+    color: #000000;
+    border: 1px solid rgba(255, 215, 0, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(255, 193, 7, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.postit-note-pink {
+    background: 
+        linear-gradient(135deg, rgba(255, 20, 147, 0.85), rgba(255, 69, 158, 0.80)),
+        rgba(255, 107, 157, 0.40);
+    backdrop-filter: blur(20px) saturate(2.5) brightness(1.3);
+    color: #ffffff;
+    border: 1px solid rgba(255, 20, 147, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(255, 20, 147, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.postit-note-blue {
+    background: 
+        linear-gradient(135deg, rgba(0, 123, 255, 0.85), rgba(30, 136, 229, 0.80)),
+        rgba(100, 181, 246, 0.40);
+    backdrop-filter: blur(20px) saturate(2.5) brightness(1.3);
+    color: #ffffff;
+    border: 1px solid rgba(0, 123, 255, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 123, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.postit-note-green {
+    background: 
+        linear-gradient(135deg, rgba(0, 200, 83, 0.85), rgba(56, 142, 60, 0.80)),
+        rgba(129, 199, 132, 0.40);
+    backdrop-filter: blur(20px) saturate(2.5) brightness(1.3);
+    color: #ffffff;
+    border: 1px solid rgba(0, 200, 83, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 200, 83, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.postit-note-purple {
+    background: 
+        linear-gradient(135deg, rgba(156, 39, 176, 0.85), rgba(142, 36, 170, 0.80)),
+        rgba(186, 104, 200, 0.40);
+    backdrop-filter: blur(20px) saturate(2.5) brightness(1.3);
+    color: #ffffff;
+    border: 1px solid rgba(156, 39, 176, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(156, 39, 176, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.postit-note-orange {
+    background: 
+        linear-gradient(135deg, rgba(255, 87, 34, 0.85), rgba(255, 111, 0, 0.80)),
+        rgba(255, 183, 77, 0.40);
+    backdrop-filter: blur(20px) saturate(2.5) brightness(1.3);
+    color: #ffffff;
+    border: 1px solid rgba(255, 87, 34, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(255, 87, 34, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Contenido de la nota con mejor contraste para colores vivos */
+.postit-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.postit-note-timestamp {
+    font-size: 11px;
+    opacity: 0.9;
+    font-weight: 700;
+    color: inherit;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 1px 2px rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+    backdrop-filter: blur(10px);
+}
+
+.postit-note-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.postit-note:hover .postit-note-actions {
+    opacity: 1;
+}
+
+.postit-note-action {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.postit-note-action:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.note-content {
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 90px;
+    outline: none;
+    border: none;
+    background: rgba(0, 0, 0, 0.15);
+    color: inherit;
+    font-family: inherit;
+    resize: none;
+    width: 100%;
+    font-weight: 500;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 1px 2px rgba(0, 0, 0, 0.6);
+    padding: 8px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.note-title {
+    font-size: 16px;
+    line-height: 1.4;
+    min-height: 20px;
+    max-height: 40px;
+    outline: none;
+    border: none;
+    background: rgba(0, 0, 0, 0.2);
+    color: inherit;
+    font-family: inherit;
+    resize: none;
+    width: 100%;
+    font-weight: 700;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 1px 2px rgba(0, 0, 0, 0.6);
+    padding: 8px 12px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+/* Placeholders con mejor contraste */
+.note-title::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.note-content::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Estados focus con mejor contraste */
+.note-title:focus {
+    background: rgba(0, 0, 0, 0.3);
+    text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.note-content:focus {
+    background: rgba(0, 0, 0, 0.25);
+    text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Específico para nota amarilla (texto negro) */
+.postit-note-yellow .postit-note-timestamp,
+.postit-note-yellow .note-title,
+.postit-note-yellow .note-content {
+    color: #000000;
+    text-shadow: 
+        0 1px 2px rgba(255, 255, 255, 0.8),
+        0 0 4px rgba(255, 255, 255, 0.6);
+}
+
+.postit-note-yellow .note-title::placeholder,
+.postit-note-yellow .note-content::placeholder {
+    color: rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Estado vacío */
+.postit-empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.postit-empty-icon {
+    font-size: 64px;
+    background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.postit-empty-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.postit-empty-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 0;
+}
+
+/* Animaciones de notificación */
+@keyframes slideInNotification {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutNotification {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Responsive para laptops y pantallas medianas */
+@media (max-width: 1366px) {
+    .postit-notes-container {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    .notes-board {
+        padding: 16px;
+    }
+
+    .postit-note {
+        width: 240px;
+        min-height: 180px;
+        font-size: 13px;
+    }
+
+    .note-title {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .note-content {
+        font-size: 12px;
+        min-height: 80px;
+        padding: 6px;
+    }
+
+    .postit-note-timestamp {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .postit-note-action {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+}
+
+/* Responsive para tablets */
+@media (max-width: 1024px) {
+    .postit-app-header {
+        padding: 16px;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .postit-header-controls {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .postit-color-palette {
+        order: 2;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .postit-add-note-btn {
+        order: 1;
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+    }
+
+    .postit-close-btn {
+        order: 3;
+        flex-shrink: 0;
+    }
+
+    .notes-board {
+        padding: 12px;
+    }
+
+    .postit-note {
+        width: 220px;
+        min-height: 160px;
+    }
+
+    .note-title {
+        font-size: 13px;
+    }
+
+    .note-content {
+        font-size: 11px;
+        min-height: 70px;
+    }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .postit-notes-backdrop {
+        padding: 10px;
+    }
+
+    .postit-notes-container {
+        border-radius: 12px;
+    }
+
+    .postit-app-header {
+        padding: 12px;
+    }
+
+    .postit-app-title {
+        font-size: 20px;
+    }
+
+    .postit-app-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .postit-header-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .postit-color-palette {
+        order: 1;
+        padding: 6px 8px;
+        justify-content: space-around;
+    }
+
+    .postit-color-option {
+        width: 20px;
+        height: 20px;
+    }
+
+    .postit-add-note-btn {
+        order: 2;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .postit-close-btn {
+        order: 3;
+        align-self: flex-end;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .notes-board {
+        padding: 8px;
+    }
+
+    .postit-note {
+        width: 200px;
+        min-height: 140px;
+        padding: 16px;
+    }
+
+    .postit-note-header {
+        margin-bottom: 8px;
+    }
+
+    .postit-note-timestamp {
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+
+    .postit-note-action {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+        gap: 6px;
+    }
+
+    .note-title {
+        font-size: 12px;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+    }
+
+    .note-content {
+        font-size: 10px;
+        min-height: 60px;
+        padding: 6px;
+    }
+
+    /* Pin más pequeño en móvil */
+    .postit-note::before {
+        width: 12px;
+        height: 12px;
+        top: -6px;
+    }
+
+    .postit-note::after {
+        width: 3px;
+        height: 3px;
+        top: -3px;
+    }
+}
+
+/* Ajustes específicos para posicionamiento responsivo */
+@media (max-width: 1366px) {
+    /* Limitar posiciones para pantallas más pequeñas */
+    .notes-board {
+        position: relative;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 1024px) {
+    /* En tablets, ajustar las posiciones máximas */
+    .postit-note {
+        position: absolute;
+        max-width: calc(100vw - 60px);
+    }
+}
+
+@media (max-width: 768px) {
+    /* En móviles, cambiar a layout más controlado */
+    .notes-board {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    .postit-note {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        margin: 8px auto;
+        display: block;
+        width: calc(100% - 16px);
+        max-width: 280px;
+    }
+
+    /* Ocultar rotaciones en móvil para mejor organización */
+    .postit-note:nth-child(3n+1),
+    .postit-note:nth-child(3n+2), 
+    .postit-note:nth-child(3n+3),
+    .postit-note:nth-child(5n+1),
+    .postit-note:nth-child(7n+1) {
+        transform: none !important;
+    }
+
+    .postit-note:hover {
+        transform: translateY(-2px) scale(1.01) !important;
+    }
+
+    .postit-note.dragging {
+        transform: scale(1.02) !important;
+    }
+}

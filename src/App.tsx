@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import HolographicButton from "./components/HolographicButton";
 import FuturisticBackground from "./components/FuturisticBackground";
 import NeonDock from "./components/NeonDock";
+import PostItNotes from './components/PostItNotes';
 import ReviewBranches from "./components/ReviewBranches";
 import DownloadFiles from "./components/DownloadFiles";
 import ProductData from './components/ProductData';
@@ -20,6 +21,7 @@ import './utils/test_backend.js';
 import JSONPathTool from './components/JSONPathTool';
 import "./App.css";
 
+
 interface MenuItem {
   id: string;
   label: string;
@@ -29,6 +31,8 @@ interface MenuItem {
   requiresWorkspace?: boolean;
   requiresMicroservices?: boolean;
 }
+
+
 
 interface WorkspaceValidation {
   valid: boolean;
@@ -48,6 +52,7 @@ function App() {
   const [activeView, setActiveView] = useState<'main' | 'review-branches' | 'jsonpath'>('main');
 
   // Estados de modales
+  const [showPostItNotesModal, setShowPostItNotesModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showProductDataModal, setShowProductDataModal] = useState(false);
   const [showDuplicateMDDModal, setShowDuplicateMDDModal] = useState(false);
@@ -68,6 +73,13 @@ function App() {
   const { exchangeRates } = useExchangeRates();
 
   const menuItems: MenuItem[] = [
+    {
+      id: 'post-it-notes',
+      label: 'Post-it Notes',
+      desc: 'Digital sticky notes',
+      icon: '📝',
+      category: 'UTILITIES'
+    },
     // Git Operations
     {
       id: 'clone-master',
@@ -222,18 +234,18 @@ function App() {
         setResponse('🔗 JSONPath Tool closed');
       }
     };
-  
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [activeView]);
-  
+
   // 3. Opcional: Agregar función helper para cerrar JSONPath
   const handleCloseJSONPath = () => {
     setActiveView('main');
     setSelectedItem('');
     setResponse('🔗 JSONPath Tool closed');
   };
-  
+
   // Validar workspace con el backend
   // Función corregida para validar workspace en App.tsx
   // Función mejorada que combina verificación local con backend
@@ -360,75 +372,26 @@ function App() {
 
       const { invoke } = await import('@tauri-apps/api/core');
 
-      // Método 1: Windows Forms (corregido)
-      try {
-        setResponse("🔍 Trying Windows Forms dialog...");
-        const selectedPath = await invoke('select_folder_native') as string | null;
+      // Usar solo RFD (Rust File Dialog) - más confiable y simple
+      const selectedPath = await invoke('select_folder_rfd') as string | null;
 
-        if (selectedPath && selectedPath.trim() !== '') {
-          setWorkspacePath(selectedPath);
-          setResponse(`📁 Workspace folder selected (Windows Forms):\n📁 ${selectedPath}\n🔄 Validating...`);
-          console.log('Selected workspace (Windows Forms):', selectedPath);
+      if (selectedPath && selectedPath.trim() !== '') {
+        setWorkspacePath(selectedPath);
+        setResponse(`📁 Workspace folder selected:\n📁 ${selectedPath}\n🔄 Validating...`);
+        console.log('Selected workspace:', selectedPath);
 
-          // Validar el workspace después de seleccionarlo
-          await validateWorkspace();
-          return;
-        } else {
-          setResponse("❌ No folder selected - User cancelled (Windows Forms)");
-        }
-      } catch (winformsError) {
-        console.warn('Windows Forms method failed:', winformsError);
-        setResponse("⚠️ Windows Forms failed, trying Shell COM...");
-
-        // Método 2: Shell COM Object
-        try {
-          const selectedPath = await invoke('select_folder_shell') as string | null;
-
-          if (selectedPath && selectedPath.trim() !== '') {
-            setWorkspacePath(selectedPath);
-            setResponse(`📁 Workspace folder selected (Shell):\n📁 ${selectedPath}\n🔄 Validating...`);
-            console.log('Selected workspace (Shell):', selectedPath);
-
-            // Validar el workspace después de seleccionarlo
-            await validateWorkspace();
-            return;
-          } else {
-            setResponse("❌ No folder selected - User cancelled (Shell)");
-          }
-        } catch (shellError) {
-          console.warn('Shell method failed:', shellError);
-          setResponse("⚠️ Shell failed, trying RFD fallback...");
-
-          // Método 3: RFD (fallback nativo de Rust)
-          try {
-            const selectedPath = await invoke('select_folder_rfd') as string | null;
-
-            if (selectedPath && selectedPath.trim() !== '') {
-              setWorkspacePath(selectedPath);
-              setResponse(`📁 Workspace folder selected (RFD):\n📁 ${selectedPath}\n🔄 Validating...`);
-              console.log('Selected workspace (RFD):', selectedPath);
-
-              // Validar el workspace después de seleccionarlo
-              await validateWorkspace();
-              return;
-            } else {
-              setResponse("❌ No folder selected - User cancelled (RFD)");
-            }
-          } catch (rfdError) {
-            console.error('All folder selection methods failed:', {
-              winforms: winformsError,
-              shell: shellError,
-              rfd: rfdError
-            });
-            setResponse(`❌ All folder selectors failed:\n• Windows Forms: ${winformsError}\n• Shell: ${shellError}\n• RFD: ${rfdError}`);
-          }
-        }
+        // Validar el workspace después de seleccionarlo
+        await validateWorkspace();
+      } else {
+        setResponse("❌ No folder selected - Operation cancelled");
       }
+
     } catch (error) {
-      console.error('Error in selectWorkspaceFolder:', error);
-      setResponse(`❌ Folder selector error: ${error}`);
+      console.error('Error selecting folder:', error);
+      setResponse(`❌ Folder selector error: ${error}\n💡 Make sure the backend supports RFD folder selection`);
     }
   };
+
 
 
 
@@ -537,6 +500,12 @@ function App() {
     setResponse('🏗️ Project Structure Creator closed');
   };
 
+  const handleClosePostItNotesModal = () => {
+    setShowPostItNotesModal(false);
+    setSelectedItem('');
+    setResponse('📝 Post-it Notes closed');
+  };
+
   // Handler principal del menú
   const handleMenuItemClick = async (itemId: string) => {
     const item = menuItems.find(item => item.id === itemId);
@@ -550,9 +519,12 @@ function App() {
     }
 
     setSelectedItem(itemId);
-
+    if (itemId === 'post-it-notes') {
+      setShowPostItNotesModal(true);
+      setResponse(`📝 Opening Post-it Notes...\n🎨 Digital sticky notes ready for organizing your ideas`);
+    }
     // Handle Git operations
-    if (itemId === 'clone-master') {
+    else if (itemId === 'clone-master') {
       await cloneMicroservices('master');
     } else if (itemId === 'review-branches') {
       setActiveView('review-branches');
@@ -606,14 +578,14 @@ function App() {
         />
       );
     }
-  
+
     // ✅ AGREGAR ESTO:
     if (activeView === 'jsonpath') {
       return (
         <JSONPathTool onClose={handleCloseJSONPath} />
       );
     }
-  
+
 
     return (
       <>
@@ -969,6 +941,12 @@ function App() {
           setSelectedItem('');
           setResponse('⚙️ ODIN Chunks Processor closed');
         }}
+        workspacePath={workspacePath}
+      />
+
+      <PostItNotes
+        isOpen={showPostItNotesModal}
+        onClose={handleClosePostItNotesModal}
         workspacePath={workspacePath}
       />
 

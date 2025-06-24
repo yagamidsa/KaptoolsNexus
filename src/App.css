@@ -2211,3 +2211,68 @@
       transform: scale(1.05) !important;
     }
   }
+
+
+  /* 🔧 AJUSTES MÍNIMOS PARA PANEL OPERATIONS - SIN ROMPER EL DISEÑO */
+  /* Agrega SOLO estos estilos para hacer ajustes graduales */
+
+  /* ================================
+   AJUSTES GRADUALES Y SEGUROS
+   ================================ */
+
+  /* Reducir altura de los menu items un poco */
+  .menu-item {
+    min-height: 48px;
+    /* Cambiar de 56px a 48px - Solo 8px menos */
+    padding: 10px 16px;
+    /* Cambiar de 12px a 10px - Solo 2px menos */
+    margin-bottom: 4px;
+    /* Cambiar de 6px a 4px - Solo 2px menos */
+  }
+
+  /* Reducir espacio entre secciones */
+  .menu-section {
+    margin-bottom: 12px;
+    /* Cambiar de 16px a 12px - Solo 4px menos */
+  }
+
+  /* Reducir padding del header del menu */
+  .menu-header {
+    padding: 14px 20px;
+    /* Cambiar de 16px a 14px - Solo 2px menos */
+    margin-bottom: 10px;
+    /* Cambiar de 12px a 10px - Solo 2px menos */
+  }
+
+  /* Reducir espacio del section title */
+  .section-title {
+    margin-bottom: 6px;
+    /* Cambiar de 8px a 6px - Solo 2px menos */
+    padding: 6px 12px;
+    /* Cambiar de 8px a 6px - Solo 2px menos */
+  }
+
+  /* Hacer las descripciones un poco más pequeñas */
+  .item-desc {
+    font-size: 11.5px;
+    /* Cambiar de 12px a 11.5px - Solo 0.5px menos */
+    line-height: 1.3;
+    /* Mejorar el line-height */
+  }
+
+  /* ================================
+ SI NECESITAS MÁS ESPACIO, USA ESTO:
+ ================================ */
+
+.menu-item {
+  min-height: 44px;
+  padding: 7px 16px;
+}
+
+.item-label {
+  font-size: 13px;
+}
+
+.item-desc {
+  font-size: 11px;
+}
