@@ -457,7 +457,9 @@ pub fn run() {
             build_preview_url,
             validate_jsonpath_query,
             test_jsonpath_tool,
-            get_jsonpath_examples,
+            validate_jsonpath_query_async,
+            validate_jsonpath_with_progress,
+            get_json_processing_strategy,
             format_json,
             test_api_connectivity,
             test_commands

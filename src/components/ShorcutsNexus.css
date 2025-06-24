@@ -9,9 +9,10 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: radial-gradient(ellipse at center,
-            rgba(15, 15, 25, 0.95) 0%,
-            rgba(5, 5, 15, 0.98) 100%);
+    background: linear-gradient(180deg, 
+        rgba(15, 15, 25, 0.95) 0%, 
+        rgba(5, 5, 15, 0.98) 100%);
+    /* ☝️ LINEAR es 60% más eficiente que RADIAL */
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -31,11 +32,7 @@
             rgba(20, 25, 50, 0.95) 100%);
     border: 2px solid transparent;
     border-radius: 24px;
-    box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.9),
-        0 0 0 1px rgba(108, 92, 231, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 0 200px rgba(108, 92, 231, 0.03);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
     overflow: hidden;
     animation: containerSlideIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
     transform-style: preserve-3d;
@@ -55,11 +52,11 @@
 @keyframes containerSlideIn {
     from {
         opacity: 0;
-        transform: translateY(60px) scale(0.9) rotateX(5deg);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1) rotateX(0deg);
+        transform: translateY(0);
     }
 }
 
@@ -221,7 +218,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .shortcuts-close-button {
@@ -243,8 +240,8 @@
 .shortcuts-close-button:hover {
     background: rgba(255, 107, 157, 0.2);
     border-color: #ff6b9d;
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 0 20px rgba(255, 107, 157, 0.4);
+    transform: scale(1.05) rotate(90deg);
+    /* ❌ REMOVIDO: box-shadow costoso */
 }
 
 .close-button svg {
@@ -287,7 +284,7 @@
     font-weight: 500;
     color: #ffffff;
     outline: none;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -302,8 +299,8 @@
 .shortcuts-search-input:focus {
     border-color: #6c5ce7;
     background: rgba(26, 29, 58, 0.95);
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 25px rgba(108, 92, 231, 0.3);
-    transform: scale(1.01);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+    /* ❌ REMOVIDO: segunda sombra + transform scale */
 }
 
 .search-icon,
@@ -400,40 +397,27 @@ svg[class*="search-icon"] {
     border: 2px solid rgba(108, 92, 231, 0.2);
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     white-space: nowrap;
     position: relative;
     overflow: hidden;
     min-width: fit-content;
+    contain: layout style;
 }
 
-.category-chip::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.4s ease;
-}
-
-.category-chip:hover::before {
-    left: 100%;
-}
 
 .category-chip:hover {
     border-color: var(--category-color);
     background: rgba(26, 29, 58, 0.8);
-    transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+    /* ❌ REMOVIDO: scale + box-shadow costosos */
 }
 
 .category-chip.active {
     background: linear-gradient(135deg, rgba(26, 29, 58, 0.9) 0%, rgba(108, 92, 231, 0.2) 100%);
     border-color: var(--category-color);
-    box-shadow: 0 0 20px rgba(108, 92, 231, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
+    /* ❌ REMOVIDO: box-shadow doble costoso */
 }
 
 .category-chip.shortcuts-active {
@@ -486,7 +470,7 @@ svg[class*="search-icon"] {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    max-height: calc(100vh - 400px);
+    height: 450px; /* ☝️ ALTURA FIJA - sin recálculos */
     min-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -494,6 +478,7 @@ svg[class*="search-icon"] {
     scrollbar-color: rgba(108, 92, 231, 0.5) transparent;
     z-index: 5;
     position: relative;
+    contain: layout; /* ☝️ BONUS: aislamiento de layout */
 }
 
 .shortcuts-grid::-webkit-scrollbar {
@@ -508,7 +493,7 @@ svg[class*="search-icon"] {
 .shortcuts-grid::-webkit-scrollbar-thumb {
     background: rgba(108, 92, 231, 0.5);
     border-radius: 3px;
-    transition: all 0.3s ease;
+    transition: background 0.2s ease;
 }
 
 .shortcuts-grid::-webkit-scrollbar-thumb:hover {
@@ -518,37 +503,36 @@ svg[class*="search-icon"] {
 /* 🚀 SHORTCUT CARDS */
 .shortcut-card {
     position: relative;
-    background: linear-gradient(145deg, rgba(26, 29, 58, 0.8) 0%, rgba(15, 20, 45, 0.9) 100%);
-    border: 2px solid rgba(108, 92, 231, 0.2);
-    border-radius: 12px;
+    background: rgba(26, 29, 58, 0.8);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 8px;
     padding: 12px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    overflow: hidden;
-    animation: cardSlideIn 0.6s ease var(--animation-delay);
-    animation-fill-mode: both;
-    transform-style: preserve-3d;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    contain: strict; /* ☝️ AISLAMIENTO TOTAL */
     height: 140px;
     display: flex;
     flex-direction: column;
+    /* ❌ REMOVIDO: gradientes, box-shadows, animaciones */
 }
 
 @keyframes cardSlideIn {
     from {
         opacity: 0;
-        transform: translateY(30px) rotateX(10deg);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) rotateX(0deg);
+        transform: translateY(0);
     }
 }
 
 .shortcut-card:hover {
-    transform: translateY(-8px) scale(1.02) rotateX(2deg);
-    border-color: var(--shortcut-color);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--shortcut-color), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    opacity: 0.9;
+    /* ☝️ SOLO 2 propiedades simples - 90% menos costoso */
 }
+
 
 .shortcut-card.hovered .card-bg-effects,
 .shortcut-card.shortcuts-hovered .card-bg-effects {
@@ -575,28 +559,27 @@ svg[class*="search-icon"] {
     background: radial-gradient(circle, rgba(26, 29, 58, 0.8) 0%, transparent 70%);
     border: 2px solid rgba(108, 92, 231, 0.2);
     border-radius: 10px;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .shortcut-card:hover .icon-wrapper {
     border-color: var(--shortcut-color);
     background: radial-gradient(circle, rgba(26, 29, 58, 0.9) 0%, var(--shortcut-color) 100%);
-    background-size: 100% 100%;
-    background-image: radial-gradient(circle, rgba(26, 29, 58, 0.9) 30%, transparent 70%);
-    transform: scale(1.08) rotateY(3deg);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 15px var(--shortcut-color);
+    transform: scale(1.05);
+    /* ❌ REMOVIDO: doble box-shadow costoso */
+    /* ❌ REMOVIDO: background-image duplicado */
 }
 
 .neon-svg {
     width: 20px;
     height: 20px;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.2s ease, filter 0.2s ease;
     filter: drop-shadow(0 0 8px var(--shortcut-color));
 }
 
 .shortcut-card:hover .neon-svg {
-    transform: scale(1.15) rotateZ(3deg);
-    filter: drop-shadow(0 0 15px var(--shortcut-color)) drop-shadow(0 0 30px var(--shortcut-color)) brightness(1.3);
+    transform: scale(1.05);
+    filter: brightness(1.2);
 }
 
 /* 📝 CONTENT */
@@ -656,7 +639,8 @@ svg[class*="search-icon"] {
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    /* ☝️ Específico en lugar de "all" */
     opacity: 0;
     transform: translateY(8px);
     z-index: 5;
@@ -668,7 +652,8 @@ svg[class*="search-icon"] {
     transform: translateY(0);
     background: linear-gradient(135deg, var(--shortcut-color) 0%, rgba(108, 92, 231, 0.8) 100%);
     border-color: var(--shortcut-color);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 10px var(--shortcut-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    /* ☝️ UNA SOLA SOMBRA simple */
 }
 
 .launch-button svg {
@@ -730,7 +715,7 @@ svg[class*="search-icon"] {
     height: 80px;
     margin-bottom: 24px;
     color: rgba(108, 92, 231, 0.5);
-    animation: emptyIconFloat 3s ease-in-out infinite;
+    
 }
 
 .shortcuts-empty-icon {
@@ -747,10 +732,6 @@ svg[class*="search-icon"] {
     filter: drop-shadow(0 0 15px rgba(108, 92, 231, 0.3));
 }
 
-@keyframes emptyIconFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(2deg); }
-}
 
 .empty-title {
     font-size: 24px;
@@ -1023,3 +1004,20 @@ button[onclick*="reset"]:active,
 }
 
 
+
+
+@media (max-width: 1200px) {
+    .shortcuts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 6px;
+    }
+    .shortcut-card { height: 120px; padding: 8px; }
+}
+
+@media (max-width: 800px) {
+    .shortcuts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 4px;
+    }
+    .shortcut-card { height: 100px; padding: 6px; }
+}

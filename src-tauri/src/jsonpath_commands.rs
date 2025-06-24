@@ -4,6 +4,9 @@ use crate::jsonpath_client::KapApiClient;
 use crate::jsonpath_types::*;
 use serde_json::Value;
 use std::sync::OnceLock;
+use tokio::task;
+use tauri::Manager;
+use tauri::Emitter;
 
 // ================================
 // CLIENTE GLOBAL SINGLETON
@@ -223,4 +226,208 @@ pub async fn test_api_connectivity(environment: String, service: String) -> Resu
             e
         )),
     }
+}
+
+
+#[tauri::command]
+pub async fn validate_jsonpath_query_async(json_text: String, query: String) -> Result<String, String> {
+    let json_size = json_text.len();
+    
+    println!("🔍 Async JSONPath validation for {} chars", json_size);
+    
+    // Para JSONs grandes, usar worker thread
+    if json_size > 2_000_000 { // 2MB threshold
+        println!("📦 Using worker thread for large JSON ({}MB)", json_size / 1_000_000);
+        return validate_large_jsonpath_worker(json_text, query).await;
+    }
+    
+    // Para JSONs medianos, procesamiento normal async
+    if json_size > 500_000 { // 500KB threshold
+        println!("⚡ Using async processing for medium JSON");
+        return validate_medium_jsonpath_async(json_text, query).await;
+    }
+    
+    // Para JSONs pequeños, método síncrono existente
+    println!("🔥 Using sync processing for small JSON");
+    validate_jsonpath_query(json_text, query)
+}
+
+// ================================
+// WORKER THREAD PARA JSONs GRANDES (>2MB)
+// ================================
+async fn validate_large_jsonpath_worker(json_text: String, query: String) -> Result<String, String> {
+    println!("🏭 Starting worker thread for large JSON processing");
+    
+    // Ejecutar en worker thread para no bloquear UI
+    let result = task::spawn_blocking(move || {
+        println!("👷 Worker thread started");
+        
+        let client = get_client();
+        let result = client.apply_jsonpath_optimized(&json_text, &query);
+        
+        println!("👷 Worker thread completed");
+        result
+    }).await;
+    
+    match result {
+        Ok(Ok(json_result)) => {
+            println!("✅ Worker thread success");
+            Ok(json_result)
+        },
+        Ok(Err(e)) => {
+            println!("❌ JSONPath worker error: {}", e);
+            Err(format!("JSONPath worker error: {}", e))
+        },
+        Err(e) => {
+            println!("❌ Worker thread panic: {}", e);
+            Err(format!("Worker thread error: {}", e))
+        }
+    }
+}
+
+// ================================
+// ASYNC PROCESSING PARA JSONs MEDIANOS (500KB-2MB)
+// ================================
+async fn validate_medium_jsonpath_async(json_text: String, query: String) -> Result<String, String> {
+    println!("⚡ Starting async processing for medium JSON");
+    
+    // Yield control para no bloquear UI
+    tokio::task::yield_now().await;
+    
+    let client = get_client();
+    let result = client.apply_jsonpath_optimized(&json_text, &query);
+    
+    // Otro yield después del procesamiento
+    tokio::task::yield_now().await;
+    
+    match result {
+        Ok(json_result) => {
+            println!("✅ Async processing success");
+            Ok(json_result)
+        },
+        Err(e) => {
+            println!("❌ Async processing error: {}", e);
+            Err(format!("JSONPath async error: {}", e))
+        }
+    }
+}
+
+// ================================
+// COMANDO CON PROGRESS REPORTING - PASO 1B
+// ================================
+#[tauri::command]
+pub async fn validate_jsonpath_with_progress(
+    json_text: String, 
+    query: String,
+    window: tauri::Window
+) -> Result<String, String> {
+    let json_size = json_text.len();
+    
+    println!("📊 Starting JSONPath with progress tracking ({} chars)", json_size);
+    
+    // ===== PROGRESO 10%: INICIO =====
+    let _ = window.emit("jsonpath_progress", serde_json::json!({
+        "stage": "starting",
+        "progress": 10,
+        "message": format!("Starting JSON processing ({:.1}MB)", json_size as f64 / 1_000_000.0)
+    }));
+    
+    // Small delay para que UI se actualice
+    tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
+    
+    // ===== PROGRESO 30%: PARSING =====
+    let _ = window.emit("jsonpath_progress", serde_json::json!({
+        "stage": "parsing",
+        "progress": 30,
+        "message": "Parsing JSON structure..."
+    }));
+    
+    // Yield para UI
+    tokio::task::yield_now().await;
+    
+    // ===== PROGRESO 60%: APPLYING JSONPATH =====
+    let _ = window.emit("jsonpath_progress", serde_json::json!({
+        "stage": "applying",
+        "progress": 60,
+        "message": "Applying JSONPath query..."
+    }));
+    
+    // Procesar según tamaño
+    let result = if json_size > 2_000_000 {
+        // JSONs grandes: usar worker
+        let _ = window.emit("jsonpath_progress", serde_json::json!({
+            "stage": "worker",
+            "progress": 70,
+            "message": "Using worker thread for large JSON..."
+        }));
+        
+        validate_large_jsonpath_worker(json_text, query).await
+    } else {
+        // JSONs medianos: async normal
+        validate_medium_jsonpath_async(json_text, query).await
+    };
+    
+    // ===== PROGRESO 90%: FORMATTING =====
+    let _ = window.emit("jsonpath_progress", serde_json::json!({
+        "stage": "formatting",
+        "progress": 90,
+        "message": "Formatting results..."
+    }));
+    
+    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+    
+    // ===== PROGRESO 100%: COMPLETE =====
+    let _ = window.emit("jsonpath_progress", serde_json::json!({
+        "stage": "complete",
+        "progress": 100,
+        "message": "JSONPath applied successfully!"
+    }));
+    
+    match result {
+        Ok(json_result) => {
+            println!("✅ JSONPath with progress completed successfully");
+            Ok(json_result)
+        },
+        Err(e) => {
+            let _ = window.emit("jsonpath_progress", serde_json::json!({
+                "stage": "error",
+                "progress": 0,
+                "message": format!("Error: {}", e)
+            }));
+            
+            println!("❌ JSONPath with progress failed: {}", e);
+            Err(e)
+        }
+    }
+}
+
+// ================================
+// COMANDO PARA DETECTAR TAMAÑO ANTES DE PROCESAR
+// ================================
+#[tauri::command]
+pub fn get_json_processing_strategy(json_text: String) -> Result<String, String> {
+    let json_size = json_text.len();
+    
+    let strategy = if json_size < 500_000 {
+        "fast"
+    } else if json_size < 2_000_000 {
+        "async"
+    } else if json_size < 10_000_000 {
+        "worker"
+    } else {
+        "chunked"
+    };
+    
+    Ok(serde_json::json!({
+        "size": json_size,
+        "size_mb": json_size as f64 / 1_000_000.0,
+        "strategy": strategy,
+        "estimated_time_ms": match strategy {
+            "fast" => json_size / 10_000,      // ~100MB/s
+            "async" => json_size / 5_000,      // ~50MB/s
+            "worker" => json_size / 2_000,     // ~20MB/s
+            "chunked" => json_size / 1_000,    // ~10MB/s
+            _ => 1000
+        }
+    }).to_string())
 }

@@ -6,7 +6,7 @@
 /* ================================
    BACKDROP MODAL
    ================================ */
-   .jsonpath-modal-backdrop {
+.jsonpath-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -27,6 +27,7 @@
         opacity: 0;
         backdrop-filter: blur(0px);
     }
+
     to {
         opacity: 1;
         backdrop-filter: blur(12px);
@@ -60,6 +61,7 @@
         opacity: 0;
         transform: translateY(40px) scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -83,7 +85,8 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding-right: 50px; /* Espacio para el botón cerrar */
+    padding-right: 50px;
+    /* Espacio para el botón cerrar */
 }
 
 .header-left {
@@ -573,8 +576,13 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ================================
@@ -689,7 +697,7 @@
     .jsonpath-tool-container {
         border: 2px solid #6c5ce7;
     }
-    
+
     .form-input,
     .form-select,
     .template-btn,
@@ -705,7 +713,7 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     .loading-spin {
         animation: none;
     }
@@ -714,4 +722,469 @@
 /* Bloquear scroll del body cuando el modal está abierto */
 body:has(.jsonpath-modal-backdrop) {
     overflow: hidden;
+}
+
+
+
+
+/* 🚀 PASO 3: AGREGAR al final del archivo src/components/JSONPathTool.css */
+
+/* ================================
+   PERFORMANCE MODE - OPTIMIZACIONES CRÍTICAS
+   ================================ */
+
+/* Clases para optimización durante procesamiento */
+.jsonpath-tool-container.processing {
+    /* Deshabilitar efectos costosos durante carga */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: none !important;
+}
+
+.jsonpath-tool-container.processing * {
+    /* Deshabilitar animaciones durante procesamiento */
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 50ms !important;
+    /* Transiciones mínimas */
+}
+
+/* Performance mode - deshabilitar todos los efectos visuales */
+.jsonpath-tool-container.performance-mode {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    /* Sombra simple */
+}
+
+.performance-mode * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+    transition: color 0.1s ease, background-color 0.1s ease !important;
+}
+
+.performance-mode .jsonpath-modal-backdrop {
+    backdrop-filter: none !important;
+    background: rgba(26, 29, 58, 0.95) !important;
+    /* Opaco en lugar de blur */
+}
+
+/* ================================
+   OPTIMIZACIONES GPU - CRITICAL ELEMENTS
+   ================================ */
+
+/* Force GPU layers para elementos que cambian frecuentemente */
+.result-panel,
+.jsonpath-sidebar,
+.jsonpath-results,
+.result-content {
+    will-change: transform;
+    transform: translateZ(0);
+    /* Force GPU layer */
+    backface-visibility: hidden;
+}
+
+/* ================================
+   PROGRESS INDICATOR STYLES
+   ================================ */
+
+.progress-container {
+    position: relative;
+    width: 100%;
+    margin: 8px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(37, 42, 74, 0.5);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6c5ce7, #ff6b9d);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent);
+    animation: progress-shine 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-shine {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-text {
+    font-size: 12px;
+    color: #a0a3bd;
+    margin-top: 4px;
+    text-align: center;
+}
+
+/* ================================
+   PERFORMANCE TOGGLE BUTTON
+   ================================ */
+
+.performance-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.performance-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: rgba(37, 42, 74, 0.5);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 6px;
+    color: #a0a3bd;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 28px;
+}
+
+.performance-toggle:hover {
+    background: rgba(37, 42, 74, 0.7);
+    color: white;
+    border-color: #6c5ce7;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.2);
+}
+
+.performance-toggle.active {
+    background: rgba(108, 92, 231, 0.2);
+    border-color: #6c5ce7;
+    color: #6c5ce7;
+}
+
+.performance-toggle.active:hover {
+    background: rgba(108, 92, 231, 0.3);
+}
+
+/* ================================
+   STRATEGY INDICATOR
+   ================================ */
+
+.strategy-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: rgba(26, 29, 58, 0.5);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 4px;
+    font-size: 10px;
+    color: #a0a3bd;
+}
+
+.strategy-badge {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.strategy-fast {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.strategy-async {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.strategy-worker {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.strategy-chunked {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* ================================
+   LOADING STATES OPTIMIZED
+   ================================ */
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 29, 58, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+    /* Blur reducido */
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(108, 92, 231, 0.2);
+    border-top: 3px solid #6c5ce7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+.loading-text {
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* ================================
+   RESPONSIVE OPTIMIZATIONS
+   ================================ */
+
+/* Auto performance mode en móviles */
+@media (max-width: 768px) {
+    .jsonpath-tool-container {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .jsonpath-modal-backdrop {
+        backdrop-filter: none !important;
+        background: rgba(26, 29, 58, 0.95) !important;
+    }
+
+    /* Simplificar estilos en móvil */
+    * {
+        box-shadow: none !important;
+        animation: none !important;
+        transition: color 0.1s ease, background-color 0.1s ease !important;
+    }
+}
+
+/* Auto performance mode para reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .progress-fill::after {
+        animation: none;
+    }
+
+    .loading-spinner {
+        animation: none;
+        border: 3px solid #6c5ce7;
+        border-top: 3px solid rgba(108, 92, 231, 0.3);
+    }
+}
+
+/* ================================
+   MEMORY OPTIMIZATION HINTS
+   ================================ */
+
+/* Optimizar scroll performance */
+.result-content {
+    contain: layout style;
+    overflow-anchor: none;
+}
+
+/* Optimizar rendering */
+.result-panel {
+    contain: layout;
+    isolation: isolate;
+}
+
+
+/* 🚀 AGREGAR al final del archivo src/components/JSONPathTool.css */
+
+/* ================================
+   ESTILOS FALTANTES PARA FASTJSONVIEWER
+   ================================ */
+
+/* Estado activo para botones de modo */
+.copy-btn.active {
+    background: rgba(108, 92, 231, 0.3) !important;
+    border-color: #6c5ce7 !important;
+    color: #6c5ce7 !important;
+}
+
+/* Estilos específicos para el pre del JSON */
+.result-content pre {
+    margin: 0;
+    padding: 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #e2e8f0;
+    background: transparent;
+    overflow: auto;
+    max-height: 400px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-radius: 6px;
+}
+
+/* Scrollbar para el contenido JSON */
+.result-content pre::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.result-content pre::-webkit-scrollbar-track {
+    background: rgba(26, 29, 58, 0.3);
+    border-radius: 3px;
+}
+
+.result-content pre::-webkit-scrollbar-thumb {
+    background: rgba(108, 92, 231, 0.5);
+    border-radius: 3px;
+}
+
+.result-content pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(108, 92, 231, 0.7);
+}
+
+/* Flexbox mejorado para result-header */
+.result-header {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Indicadores de tamaño y modo */
+.size-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.mode-controls {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.mode-controls .copy-btn {
+    font-size: 10px;
+    padding: 3px 6px;
+    min-width: auto;
+}
+
+/* Performance optimizations */
+.result-content {
+    contain: layout style;
+    overflow-anchor: none;
+}
+
+
+/* ================================
+   COLORES PARA FASTJSONVIEWER
+   ================================ */
+
+   .result-content pre .json-key {
+    color: #ff79c6 !important;
+    font-weight: 600;
+}
+
+.result-content pre .json-string {
+    color: #50fa7b !important;
+}
+
+.result-content pre .json-number {
+    color: #bd93f9 !important;
+    font-weight: 500;
+}
+
+.result-content pre .json-boolean {
+    color: #ffb86c !important;
+    font-weight: 600;
+}
+
+.result-content pre .json-null {
+    color: #6272a4 !important;
+    font-style: italic;
+}
+
+.result-content pre .json-punctuation {
+    color: #f8f8f2 !important;
+    font-weight: 500;
+}
+
+
+/* ================================
+   FIX DEFINITIVO: Scroll completo
+   ================================ */
+
+   .result-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 16px;
+    min-height: 0 !important;
+    background: rgba(37, 42, 74, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    /* FORZAR altura específica */
+    max-height: calc(50vh - 40px) !important;
+}
+
+.result-content {
+    flex: 1;
+    background: rgba(26, 29, 58, 0.3);
+    overflow: hidden;
+    position: relative;
+    /* FORZAR que el contenido ocupe todo el espacio disponible */
+    height: 100% !important;
+}
+
+.result-content pre {
+    margin: 0 !important;
+    padding: 12px 12px 40px 12px !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    color: #e2e8f0 !important;
+    background: transparent !important;
+    overflow: auto !important;
+    /* QUITAR max-height fijo y usar altura del contenedor */
+    height: 100% !important;
+    max-height: none !important;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    box-sizing: border-box !important;
 }

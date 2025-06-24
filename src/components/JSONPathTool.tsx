@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import JsonViewer from './JsonViewer.tsx';
 import './JSONPathTool.css';
+import { listen } from '@tauri-apps/api/event';
+
 
 // Componente de iconos
 const Icon: React.FC<{ emoji: string; size?: number; className?: string }> = ({
@@ -58,11 +60,52 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     const [jsonPathResult, setJsonPathResult] = useState<string>('');
     const [message, setMessage] = useState<string>('Ready to make real API requests');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [jsonViewMode, setJsonViewMode] = useState<'raw' | 'formatted' | 'truncated'>('truncated');
+    const [showFullJson, setShowFullJson] = useState<boolean>(false);
 
     // 🔥 CONFIGURACIÓN FIJA - Solo Sandbox 3
     const availableEnvironments: Environment[] = [
         { key: 'sandbox3', name: 'Sandbox 3', prefix: 'sandbox3-' }
     ];
+
+    const [processingStrategy, setProcessingStrategy] = useState<string>('fast');
+    const [estimatedTime, setEstimatedTime] = useState<number>(0);
+    const [progressData, setProgressData] = useState<{
+        stage: string;
+        progress: number;
+        message: string;
+    } | null>(null);
+
+    useEffect(() => {
+        let unlisten: (() => void) | null = null;
+
+        const setupProgressListener = async () => {
+            unlisten = await listen('jsonpath_progress', (event) => {
+                const progress = event.payload as {
+                    stage: string;
+                    progress: number;
+                    message: string;
+                };
+
+                console.log('📊 Progress update:', progress);
+                setProgressData(progress);
+
+                // Actualizar mensaje con progreso
+                setMessage(`🔄 ${progress.message} (${progress.progress}%)`);
+            });
+        };
+
+        setupProgressListener();
+
+        // Cleanup
+        return () => {
+            if (unlisten) {
+                unlisten();
+            }
+        };
+    }, []);
+
+
 
     // 🔥 TODOS LOS ENDPOINTS GET DEL OPENAPI
     const availableServices: Record<string, ServiceConfig> = {
@@ -77,35 +120,35 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     example: '/health',
                     description: '🏥 Check service health status'
                 },
+                {
+                    name: 'Get Study by ID',
+                    pattern: '/studies/{study_id}',
+                    example: '/studies/KapID',
+                    description: '📄 Get study by ID without project context'
+                },
                 // === PROJECT ENDPOINTS ===
                 {
-                    name: 'Check Project Exists',
-                    pattern: '/Projects/{projectId}/exists',
-                    example: '/Projects/PROJECTID/exists',
-                    description: '✅ Check if project exists and can be read by user'
-                },
-                {
                     name: 'Get Project Details',
-                    pattern: '/Projects/{projectId}',
-                    example: '/Projects/PROJECTID',
+                    pattern: '/Projects/{ProjectID}',
+                    example: '/Projects/ProjectID',
                     description: '📄 Get project by ID with studies, waves and modules'
                 },
                 {
                     name: 'Get Short Project',
-                    pattern: '/shortprojects/{projectId}',
-                    example: '/shortprojects/PROJECTID',
+                    pattern: '/shortprojects/{ProjectID}',
+                    example: '/shortprojects/ProjectID',
                     description: '📋 Get short project object with studies, waves and modules'
                 },
                 {
                     name: 'Get Project Users',
-                    pattern: '/Projects/{projectId}/users',
-                    example: '/Projects/PROJECTID/users',
+                    pattern: '/Projects/{ProjectID}/users',
+                    example: '/Projects/ProjectID/users',
                     description: '👥 Get all users assigned to a project'
                 },
                 {
                     name: 'Get Studies for Navigation',
-                    pattern: '/projects/{projectId}/studies/navigationv2',
-                    example: '/projects/PROJECTID/studies/navigationv2',
+                    pattern: '/projects/{ProjectID}/studies/navigationv2',
+                    example: '/projects/ProjectID/studies/navigationv2',
                     description: '🗺️ Get studies and waves for navigation'
                 },
                 {
@@ -117,113 +160,95 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
                 // === STUDY ENDPOINTS ===
                 {
-                    name: 'Check Study Exists',
-                    pattern: '/studies/{studyId}/exists',
-                    example: '/studies/KAPID/exists',
-                    description: '✅ Check if study exists and can be read by user'
-                },
-                {
-                    name: 'Get Study by ID',
-                    pattern: '/studies/{study_id}',
-                    example: '/studies/KAPID',
-                    description: '📄 Get study by ID without project context'
-                },
-                {
                     name: 'Get Study with Project',
                     pattern: '/projects/{project_id}/studies/{study_id}',
-                    example: '/projects/PROJECTID/studies/KAPID',
+                    example: '/projects/ProjectID/studies/KapID',
                     description: '📋 Get study by ID within project context'
                 },
                 {
                     name: 'Get All Studies for Project',
                     pattern: '/Projects/{project_id}/studies',
-                    example: '/Projects/PROJECTID/studies',
+                    example: '/Projects/ProjectID/studies',
                     description: '📚 Get all studies for a specific project'
                 },
                 {
                     name: 'Get Study Languages',
                     pattern: '/Projects/{project_id}/studies/{study_id}/languages',
-                    example: '/Projects/PROJECTID/studies/KAPID/languages',
+                    example: '/Projects/ProjectID/studies/KapID/languages',
                     description: '🌍 Get all languages available for a study'
                 },
                 {
                     name: 'Get Study Simple Settings',
                     pattern: '/studies/{study_id}/simple_settings',
-                    example: '/studies/KAPID/simple_settings',
+                    example: '/studies/KapID/simple_settings',
                     description: '🔧 Get all simple settings for a study'
                 },
                 {
                     name: 'Get Study Master Property',
                     pattern: '/studies/{study_id}/master_property/{property_value}',
-                    example: '/studies/KAPID/master_property/{property_value}',
+                    example: '/studies/KapID/master_property/{property_value}',
                     description: '🏷️ Get master properties by study'
                 },
                 {
                     name: 'Get Simple Settings by Product Type',
                     pattern: '/projects/{project_id}/simple_settings_meta/{product_type_id}',
-                    example: '/projects/PROJECTID/simple_settings_meta/{product_type_id}',
+                    example: '/projects/ProjectID/simple_settings_meta/{product_type_id}',
                     description: '📋 Get simple settings metadata by product type'
                 },
 
                 // === WAVE ENDPOINTS ===
                 {
-                    name: 'Check Wave Exists',
-                    pattern: '/waves/{waveID}/exists',
-                    example: '/waves/WAVEID/exists',
-                    description: '✅ Check if wave exists and can be read by user'
-                },
-                {
                     name: 'Get Wave Details',
                     pattern: '/waves/{wave_id}',
-                    example: '/waves/WAVEID',
+                    example: '/waves/WaveID',
                     description: '📄 Get complete wave data by wave ID'
                 },
                 {
                     name: 'Get Short Wave',
                     pattern: '/waves/{wave_id}/shortwave',
-                    example: '/waves/WAVEID/shortwave',
+                    example: '/waves/WaveID/shortwave',
                     description: '📋 Get short wave details'
                 },
                 {
                     name: 'Get Waves for Study',
                     pattern: '/projects/{project_id}/studies/{study_id}/waves',
-                    example: '/projects/PROJECTID/studies/KAPID/waves',
+                    example: '/projects/ProjectID/studies/KapID/waves',
                     description: '📊 Get all waves for a specific study'
                 },
                 {
                     name: 'Get Wave Simple Settings',
                     pattern: '/waves/{wave_id}/simple_settings',
-                    example: '/waves/WAVEID/simple_settings',
+                    example: '/waves/WaveID/simple_settings',
                     description: '⚙️ Get all simple settings for a wave'
                 },
                 {
                     name: 'Get Wave Flag by Name',
                     pattern: '/waves/{wave_id}/flags/{flag_name}',
-                    example: '/waves/WAVEID/flags/{flag_name}',
+                    example: '/waves/WaveID/flags/{flag_name}',
                     description: '🏷️ Get wave flag status by name'
                 },
                 {
                     name: 'Get Wave Study Creation Objects',
                     pattern: '/waves/{wave_id}/GetObjectsForStudyCreation',
-                    example: '/waves/WAVEID/GetObjectsForStudyCreation',
+                    example: '/waves/WaveID/GetObjectsForStudyCreation',
                     description: '🏗️ Get objects needed for study creation'
                 },
                 {
                     name: 'Get Scripting Package Location',
                     pattern: '/waves/{wave_id}/scripting-package-location',
-                    example: '/waves/WAVEID/scripting-package-location',
+                    example: '/waves/WaveID/scripting-package-location',
                     description: '📦 Get URL to download scripting package'
                 },
                 {
                     name: 'Get Wave Simple Settings Metadata (Tesseract)',
                     pattern: '/tesseract/waves/{wave_id}/simple_settings_meta',
-                    example: '/tesseract/waves/WAVEID/simple_settings_meta',
+                    example: '/tesseract/waves/WaveID/simple_settings_meta',
                     description: '🔧 Get simple setting metadata for wave using Tesseract'
                 },
                 {
                     name: 'Get Wave Master Property (Tesseract)',
                     pattern: '/tesseract/waves/{wave_id}/master_property/{property_value}',
-                    example: '/tesseract/waves/WAVEID/master_property/{property_value}',
+                    example: '/tesseract/waves/WaveID/master_property/{property_value}',
                     description: '🏷️ Get master properties by wave using Tesseract'
                 },
 
@@ -235,21 +260,9 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '📋 Get list of list source items by type'
                 },
                 {
-                    name: 'Get All List Sources',
-                    pattern: '/lists_source',
-                    example: '/lists_source',
-                    description: '📚 Get all list source items (legacy mode)'
-                },
-                {
-                    name: 'Get Tesseract List Source',
-                    pattern: '/tesseract/lists_source/{list}',
-                    example: '/tesseract/lists_source/countries?productId=PROD123',
-                    description: '🔧 Get Tesseract list source items'
-                },
-                {
                     name: 'Get All Tesseract List Sources',
                     pattern: '/tesseract/lists_source',
-                    example: '/tesseract/lists_source?productId=PROD123',
+                    example: '/tesseract/lists_source?productId={productid}}',
                     description: '🔧 Get all Tesseract list source items'
                 },
                 {
@@ -261,19 +274,19 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                 {
                     name: 'Check Country Incidence Threshold (Tesseract)',
                     pattern: '/tesseract/country-incidence-threshold/{cdh_country_id}',
-                    example: '/tesseract/country-incidence-threshold/US?productId=PROD123',
+                    example: '/tesseract/country-incidence-threshold/US?productId={productid}}',
                     description: '🔧 Check incidence rate threshold using Tesseract'
                 },
                 {
                     name: 'Get Product Clients (Tesseract)',
                     pattern: '/tesseract/product_clients/{product_type_id}',
-                    example: '/tesseract/product_clients/PROD_TYPE_01',
+                    example: '/tesseract/product_clients/product_type_id',
                     description: '👥 Get clients by product type using Tesseract'
                 },
                 {
                     name: 'Get Simple Settings by Product & Locale (Tesseract)',
                     pattern: '/tesseract/simple_settings_meta/{product_type_id}',
-                    example: '/tesseract/simple_settings_meta/PROD_TYPE_01?locale=en-US',
+                    example: '/tesseract/simple_settings_meta/product_type_id?locale=en-US',
                     description: '🌍 Get simple settings by product type and locale'
                 },
 
@@ -281,19 +294,19 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                 {
                     name: 'Get Study Master Property (Tesseract)',
                     pattern: '/tesseract/studies/{study_id}/master_property/{property_value}',
-                    example: '/tesseract/studies/KAPID/master_property/client_name',
+                    example: '/tesseract/studies/KapID/master_property/client_name',
                     description: '🔧 Get study master properties using Tesseract'
                 },
                 {
                     name: 'Get Study Simple Settings Metadata (Tesseract)',
                     pattern: '/tesseract/studies/{study_id}/simple_settings_meta',
-                    example: '/tesseract/studies/KAPID/simple_settings_meta',
+                    example: '/tesseract/studies/KapID/simple_settings_meta',
                     description: '⚙️ Get study simple settings metadata using Tesseract'
                 },
                 {
                     name: 'Get Simple Settings by Product Type (Tesseract)',
                     pattern: '/tesseract/projects/{project_id}/simple_settings_meta/{product_type_id}',
-                    example: '/tesseract/projects/PROJECTID/simple_settings_meta/PROD_TYPE_01',
+                    example: '/tesseract/projects/ProjectID/simple_settings_meta/product_type_id',
                     description: '📋 Get simple settings by product type using Tesseract'
                 }
             ]
@@ -309,25 +322,13 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     example: '/health',
                     description: '🏥 Returns the current status of this service'
                 },
-                {
-                    name: 'Version Info',
-                    pattern: '/version',
-                    example: '/version',
-                    description: '📋 Returns the current version of this service'
-                },
-                {
-                    name: 'Environment Variables',
-                    pattern: '/environment',
-                    example: '/environment',
-                    description: '🌍 Returns the environment variables'
-                },
 
                 // === WAVE API MODULE ===
                 {
-                    name: 'Wave All Questions',
-                    pattern: '/waves/{wave_id}/all-questions',
-                    example: '/waves/W123456/all-questions',
-                    description: '❓ Returns all the wave questions'
+                    name: 'Wave Text Replacements',
+                    pattern: '/waves/{wave_id}/text_replacements',
+                    example: '/waves/W123456/text_replacements',
+                    description: '📝 Returns text replacements for a wave'
                 },
                 {
                     name: 'Wave Selected Questions',
@@ -336,10 +337,10 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '✅ Returns selected questions for a wave'
                 },
                 {
-                    name: 'Wave Text Replacements',
-                    pattern: '/waves/{wave_id}/text_replacements',
-                    example: '/waves/W123456/text_replacements',
-                    description: '📝 Returns text replacements for a wave'
+                    name: 'Wave All Questions',
+                    pattern: '/waves/{wave_id}/all-questions',
+                    example: '/waves/W123456/all-questions',
+                    description: '❓ Returns all the wave questions'
                 },
                 {
                     name: 'Wave Modules',
@@ -461,48 +462,142 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     // ================================
     // PASO 2: APLICAR JSONPATH AL JSON YA OBTENIDO (LOCAL)
     // ================================
-    const executeJsonPath = async (): Promise<void> => {
+
+
+    const detectProcessingStrategy = useCallback(async (jsonText: string) => {
+        if (!jsonText) return;
+
+        try {
+            const strategyResult = await invoke<string>('get_json_processing_strategy', {
+                jsonText: jsonText
+            });
+
+            const strategy = JSON.parse(strategyResult);
+            setProcessingStrategy(strategy.strategy);
+            setEstimatedTime(strategy.estimated_time_ms);
+
+            console.log('📊 Processing strategy:', strategy);
+
+            // Mostrar info de estrategia al usuario
+            const sizeText = strategy.size_mb < 1
+                ? `${(strategy.size_mb * 1000).toFixed(0)}KB`
+                : `${strategy.size_mb.toFixed(1)}MB`;
+
+            const timeText = strategy.estimated_time_ms < 1000
+                ? `~${strategy.estimated_time_ms}ms`
+                : `~${(strategy.estimated_time_ms / 1000).toFixed(1)}s`;
+
+            setMessage(`📊 JSON size: ${sizeText} | Strategy: ${strategy.strategy} | Est. time: ${timeText}`);
+
+        } catch (error) {
+            console.error('Strategy detection failed:', error);
+            setProcessingStrategy('fast');
+            setEstimatedTime(0);
+        }
+    }, []);
+
+
+
+    const executeJsonPath = useCallback(async (): Promise<void> => {
         if (!apiResponse || !jsonPathQuery.trim()) {
             setMessage('❌ Need both API response and JSONPath query');
             return;
         }
 
+        const jsonSize = apiResponse.length;
         setIsLoading(true);
-        setMessage('🔍 Applying JSONPath query...');
+        setJsonPathResult(''); // Limpiar resultados previos
+        setProgressData(null); // Reset progress
 
-        // 🚀 OPTIMIZACIÓN: Dar tiempo al UI para actualizar
-        await new Promise(resolve => setTimeout(resolve, 50));
+        console.log(`🚀 Starting JSONPath execution for ${jsonSize} chars`);
 
         try {
-            // 🚀 OPTIMIZACIÓN: Validar tamaño de JSON antes de procesar
-            if (apiResponse.length > 500000) { // Para JSONs > 500KB
-                setMessage('🔄 Processing large JSON data...');
-                await new Promise(resolve => setTimeout(resolve, 100));
+            // Detectar estrategia de procesamiento
+            await detectProcessingStrategy(apiResponse);
+
+            // 🚀 ESTRATEGIA BASADA EN TAMAÑO
+            if (jsonSize < 500_000) {
+                // Para JSONs pequeños: método rápido
+                await executeJsonPathFast();
+            } else if (jsonSize < 2_000_000) {
+                // Para JSONs medianos: con progress
+                await executeJsonPathWithProgress();
+            } else {
+                // Para JSONs grandes: async/worker
+                await executeJsonPathLarge();
             }
 
-            // Usar comando local para solo procesar JSONPath
-            // 🔥 CORRECCIÓN: usar jsonText (camelCase) en lugar de json_text (snake_case)
-            const result = await invoke<string>('validate_jsonpath_query', {
-                jsonText: apiResponse,  // 👈 Cambio aquí: jsonText en lugar de json_text
-                query: jsonPathQuery
-            });
-
-            // 🚀 OPTIMIZACIÓN: Para resultados grandes, dar tiempo al UI
-            if (result.length > 50000) {
-                setMessage('🔄 Formatting results...');
-                await new Promise(resolve => setTimeout(resolve, 50));
-            }
-
-            setJsonPathResult(result);
-            setMessage('✅ JSONPath applied successfully');
         } catch (error) {
+            console.error('❌ JSONPath execution failed:', error);
             const errorMessage = error instanceof Error ? error.message : String(error);
             setJsonPathResult(`JSONPath Error: ${errorMessage}`);
             setMessage(`❌ JSONPath failed: ${errorMessage}`);
         } finally {
             setIsLoading(false);
+            setProgressData(null);
         }
+    }, [apiResponse, jsonPathQuery, detectProcessingStrategy]);
+
+
+    // ================================
+    // FUNCIÓN PARA JSONs PEQUEÑOS (<500KB)
+    // ================================
+    const executeJsonPathFast = async (): Promise<void> => {
+        setMessage('⚡ Fast processing for small JSON...');
+
+        const result = await invoke<string>('validate_jsonpath_query', {
+            jsonText: apiResponse,
+            query: jsonPathQuery
+        });
+
+        const highlightedResult = formatJsonPathResult(result); // ← Esta línea debe estar
+        setJsonPathResult(highlightedResult);
+        setMessage('✅ JSONPath applied successfully (fast mode)');
     };
+
+    // ================================
+    // FUNCIÓN PARA JSONs MEDIANOS (500KB-2MB)
+    // ================================
+    const executeJsonPathWithProgress = async (): Promise<void> => {
+        setMessage('📊 Processing with progress tracking...');
+
+        const result = await invoke<string>('validate_jsonpath_with_progress', {
+            jsonText: apiResponse,
+            query: jsonPathQuery
+        });
+
+        const highlightedResult = formatJsonPathResult(result); // ← Esta línea debe estar
+        setJsonPathResult(highlightedResult);
+        setMessage('✅ JSONPath applied successfully (with progress)');
+    };
+
+    // ================================
+    // FUNCIÓN PARA JSONs GRANDES (>2MB)
+    // ================================
+    const executeJsonPathLarge = async (): Promise<void> => {
+        setMessage('🏭 Using async processing for large JSON...');
+
+        const result = await invoke<string>('validate_jsonpath_query_async', {
+            jsonText: apiResponse,
+            query: jsonPathQuery
+        });
+
+        const highlightedResult = formatJsonPathResult(result);
+        setJsonPathResult(highlightedResult);
+        setMessage('✅ Large JSON processed successfully (async mode)');
+    };
+
+    // ================================
+    // AUTO-DETECT STRATEGY CUANDO CAMBIA EL JSON
+    // ================================
+
+    // AGREGAR este useEffect después de los existentes:
+    useEffect(() => {
+        if (apiResponse && apiResponse.length > 0) {
+            detectProcessingStrategy(apiResponse);
+        }
+    }, [apiResponse, detectProcessingStrategy]);
+
 
     // ================================
     // FUNCIONES DE UTILIDAD
@@ -554,6 +649,336 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     }): void => {
         setEndpoint(template.example);
         setMessage(`📝 Using template: ${template.name} - ${template.description}`);
+    };
+
+
+    // 🎨 Función para syntax highlighting
+    // 🎨 Función para syntax highlighting
+    const applySyntaxHighlighting = (jsonString: string): string => {
+        try {
+            const parsed = JSON.parse(jsonString);
+            const formatted = JSON.stringify(parsed, null, 2);
+
+            let highlighted = formatted;
+
+            // 🔑 Keys (propiedades) - Rosa vibrante
+            highlighted = highlighted.replace(
+                /"([^"]+)"(\s*:)/g,
+                '<span class="json-key">"$1"</span>$2'
+            );
+
+            // 🟢 Strings (valores) - Verde - MEJORADO PARA ARRAYS
+            highlighted = highlighted.replace(
+                /:\s*"([^"]*)"/g,
+                ': <span class="json-string">"$1"</span>'
+            );
+
+            // 🟢 Strings en arrays (sin :) - Verde
+            highlighted = highlighted.replace(
+                /(\s+)"([^"]*)"(?=,|\s*\])/g,
+                '$1<span class="json-string">"$2"</span>'
+            );
+
+            // 🟣 Numbers - Púrpura
+            highlighted = highlighted.replace(
+                /:\s*(-?\d+\.?\d*)/g,
+                ': <span class="json-number">$1</span>'
+            );
+
+            // 🟣 Numbers en arrays - Púrpura  
+            highlighted = highlighted.replace(
+                /(\s+)(-?\d+\.?\d*)(?=,|\s*\])/g,
+                '$1<span class="json-number">$2</span>'
+            );
+
+            // 🟠 Booleans - Naranja
+            highlighted = highlighted.replace(
+                /:\s*(true|false)/g,
+                ': <span class="json-boolean">$1</span>'
+            );
+
+            // 🟠 Booleans en arrays - Naranja
+            highlighted = highlighted.replace(
+                /(\s+)(true|false)(?=,|\s*\])/g,
+                '$1<span class="json-boolean">$2</span>'
+            );
+
+            // ⚫ Null - Gris
+            highlighted = highlighted.replace(
+                /:\s*(null)/g,
+                ': <span class="json-null">$1</span>'
+            );
+
+            // ⚫ Null en arrays - Gris
+            highlighted = highlighted.replace(
+                /(\s+)(null)(?=,|\s*\])/g,
+                '$1<span class="json-null">$2</span>'
+            );
+
+            // ⚪ Brackets y Punctuation - Blanco
+            highlighted = highlighted.replace(
+                /([{}[\],])/g,
+                '<span class="json-punctuation">$1</span>'
+            );
+
+            return highlighted;
+
+        } catch (error) {
+            return jsonString;
+        }
+    };
+
+
+
+    // 🎯 Función para formatear resultados JSONPath
+    // 🎯 Función para formatear resultados JSONPath
+    const formatJsonPathResult = (result: string): string => {
+        console.log('🔍 formatJsonPathResult input:', result); // ← AGREGAR ESTA LÍNEA
+
+        if (!result || result.trim() === '') {
+            return '';
+        }
+
+        // Si el resultado es JSON válido, aplicar highlighting
+        try {
+            JSON.parse(result);
+            console.log('✅ JSON válido, aplicando highlighting'); // ← AGREGAR ESTA LÍNEA
+            return applySyntaxHighlighting(result);
+        } catch {
+            console.log('❌ No es JSON válido, procesando como valor simple'); // ← AGREGAR ESTA LÍNEA
+            // Si no es JSON, pero parece ser un valor simple
+            const trimmed = result.trim();
+
+            if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+                console.log('🟢 Detectado como string'); // ← AGREGAR ESTA LÍNEA
+                return `<span class="json-string">${trimmed}</span>`;
+            }
+
+            if (/^-?\d+\.?\d*$/.test(trimmed)) {
+                console.log('🟣 Detectado como number'); // ← AGREGAR ESTA LÍNEA
+                return `<span class="json-number">${trimmed}</span>`;
+            }
+
+            if (trimmed === 'true' || trimmed === 'false') {
+                console.log('🟠 Detectado como boolean'); // ← AGREGAR ESTA LÍNEA
+                return `<span class="json-boolean">${trimmed}</span>`;
+            }
+
+            if (trimmed === 'null') {
+                console.log('⚫ Detectado como null'); // ← AGREGAR ESTA LÍNEA
+                return `<span class="json-null">${trimmed}</span>`;
+            }
+
+            console.log('⚪ Devolviendo texto plano'); // ← AGREGAR ESTA LÍNEA
+            return trimmed;
+        }
+    };
+
+    // Función para truncar JSON grande
+    const getTruncatedJson = (jsonString: string, maxLength: number = 30000): string => {
+        try {
+            // PRIMERO formatear el JSON completo
+            const parsed = JSON.parse(jsonString);
+            const formatted = JSON.stringify(parsed, null, 2);
+            const highlighted = applySyntaxHighlighting(formatted);
+
+            // DESPUÉS truncar el resultado ya formateado
+            if (highlighted.length <= maxLength) {
+                return highlighted;
+            }
+
+            const truncated = highlighted.slice(0, maxLength);
+            const lastNewline = truncated.lastIndexOf('\n');
+            const safeEnd = lastNewline > 0 ? lastNewline : maxLength;
+
+            return truncated.slice(0, safeEnd) +
+                '\n\n<span class="json-truncated">... [JSON truncated for performance - Click "Full" to see complete content]</span>';
+
+        } catch (error) {
+            // Si no es JSON válido, devolver texto plano
+            return jsonString;
+        }
+    };
+
+    // Función para formatear JSON ligero
+    const formatJsonLight = (jsonString: string): string => {
+        try {
+            const parsed = JSON.parse(jsonString);
+
+            if (jsonString.length > 100000) {
+                const formatted = JSON.stringify(parsed, null, 1);
+                return applySyntaxHighlighting(formatted);
+            }
+
+            const formatted = JSON.stringify(parsed, null, 2);
+            return applySyntaxHighlighting(formatted);
+        } catch (error) {
+            return jsonString;
+        }
+    };
+
+
+    const FastJsonViewer = ({ data, title, onCopy }: {
+        data: string;
+        title: string;
+        onCopy: (text: string) => void;
+    }) => {
+        const jsonSize = data.length;
+        const isLarge = jsonSize > 200_000; // 200KB
+        const [localViewMode, setLocalViewMode] = useState<'raw' | 'formatted' | 'truncated'>(
+            isLarge ? 'truncated' : 'formatted'
+        );
+
+        if (!data) {
+            return (
+                <div className="result-panel">
+                    <div className="result-header">
+                        <h3>{title}</h3>
+                    </div>
+                    <div className="result-content" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#a0a3bd',
+                        fontStyle: 'italic',
+                        minHeight: '100px'
+                    }}>
+                        No data to display
+                    </div>
+                </div>
+            );
+        }
+
+        // Determinar qué mostrar según el modo
+        const getDisplayContent = () => {
+            // Si ya tiene highlighting HTML, devolverlo tal como está
+            if (data.includes('<span class="json-')) {
+                return data;
+            }
+
+            switch (localViewMode) {
+                case 'raw':
+                    return data; // JSON original sin formatear
+                case 'formatted':
+                    return applySyntaxHighlighting(data); // SIEMPRE con highlighting
+                case 'truncated':
+                    return isLarge ? getTruncatedJson(data, 30000) : applySyntaxHighlighting(data); // SIEMPRE con highlighting
+                default:
+                    return applySyntaxHighlighting(data); // SIEMPRE con highlighting
+            }
+        };
+
+        const displayContent = getDisplayContent();
+
+        return (
+            <div className="result-panel">
+                <div className="result-header">
+                    <h3>{title}</h3>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        {/* Indicador de tamaño */}
+                        <span style={{
+                            fontSize: '11px',
+                            color: isLarge ? '#f59e0b' : '#22c55e',
+                            background: isLarge ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                            padding: '2px 6px',
+                            borderRadius: '3px'
+                        }}>
+                            {(jsonSize / 1024).toFixed(1)}KB
+                        </span>
+
+                        {/* Botones de modo de vista para JSONs grandes */}
+                        {isLarge && (
+                            <>
+                                <button
+                                    onClick={() => setLocalViewMode('truncated')}
+                                    className={`copy-btn ${localViewMode === 'truncated' ? 'active' : ''}`}
+                                    style={{
+                                        fontSize: '10px',
+                                        padding: '3px 6px',
+                                        background: localViewMode === 'truncated' ? 'rgba(108, 92, 231, 0.3)' : undefined
+                                    }}
+                                    title="Show first 30KB (fast)"
+                                >
+                                    Preview
+                                </button>
+                                <button
+                                    onClick={() => setLocalViewMode('raw')}
+                                    className={`copy-btn ${localViewMode === 'raw' ? 'active' : ''}`}
+                                    style={{
+                                        fontSize: '10px',
+                                        padding: '3px 6px',
+                                        background: localViewMode === 'raw' ? 'rgba(108, 92, 231, 0.3)' : undefined
+                                    }}
+                                    title="Show raw JSON (fastest)"
+                                >
+                                    Raw
+                                </button>
+                                <button
+                                    onClick={() => setLocalViewMode('formatted')}
+                                    className={`copy-btn ${localViewMode === 'formatted' ? 'active' : ''}`}
+                                    style={{
+                                        fontSize: '10px',
+                                        padding: '3px 6px',
+                                        background: localViewMode === 'formatted' ? 'rgba(108, 92, 231, 0.3)' : undefined
+                                    }}
+                                    title="Show full formatted JSON (may be slow)"
+                                >
+                                    Full
+                                </button>
+                            </>
+                        )}
+
+                        {/* Botón Copy */}
+                        <button
+                            onClick={() => onCopy(data)} // Siempre copia el JSON completo
+                            className="copy-btn"
+                            title="Copy full JSON to clipboard"
+                        >
+                            <Icon emoji="📋" size={12} />
+                            Copy
+                        </button>
+                    </div>
+                </div>
+
+                {/* Contenido JSON */}
+                <div className="result-content" style={{ position: 'relative' }}>
+                    <pre
+                        style={{
+                            margin: 0,
+                            padding: '12px 12px 20px 12px',  // ← Más padding abajo
+                            fontSize: '12px',
+                            lineHeight: '1.4',
+                            color: '#e2e8f0',
+                            background: 'transparent',
+                            overflow: 'auto',
+                            maxHeight: '380px',              // ← Reducir altura para dar espacio
+                            fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                            boxSizing: 'border-box'          // ← Agregar esto
+                        }}
+                        dangerouslySetInnerHTML={{ __html: displayContent }}
+                    />
+
+                    {/* Indicador de contenido truncado */}
+                    {localViewMode === 'truncated' && isLarge && (
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '12px',
+                            right: '12px',
+                            background: 'rgba(108, 92, 231, 0.2)',
+                            color: '#6c5ce7',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '10px',
+                            border: '1px solid rgba(108, 92, 231, 0.3)'
+                        }}>
+                            📄 Showing preview - Click "Full" for complete JSON
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -727,6 +1152,21 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 />
                             </div>
 
+                            {/* Progress Indicator */}
+                            {progressData && (
+                                <div className="progress-container">
+                                    <div className="progress-bar">
+                                        <div
+                                            className="progress-fill"
+                                            style={{ width: `${progressData.progress}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="progress-text">
+                                        {progressData.message} - {progressData.progress}%
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Action Buttons */}
                             <div className="action-buttons">
                                 <button
@@ -758,23 +1198,18 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
                     {/* Right Panel - Results */}
                     <div className="jsonpath-results">
-                        {/* API Response with JSON Viewer */}
-                        <div className="result-panel">
-                            <JsonViewer
-                                data={apiResponse}
-                                title="🌐 API Response (Formatted JSON)"
-                                onCopy={copyToClipboard}
-                            />
-                        </div>
+                        {/* API Response with Optimized JSON Display */}
+                        <FastJsonViewer
+                            data={apiResponse}
+                            title="🌐 API Response (Formatted JSON)"
+                            onCopy={copyToClipboard}
+                        />
 
-                        {/* JSONPath Results with JSON Viewer */}
-                        <div className="result-panel">
-                            <JsonViewer
-                                data={jsonPathResult}
-                                title="⚡ JSONPath Results"
-                                onCopy={copyToClipboard}
-                            />
-                        </div>
+                        <FastJsonViewer
+                            data={jsonPathResult}
+                            title="⚡ JSONPath Results"
+                            onCopy={copyToClipboard}
+                        />
                     </div>
                 </div>
             </div>
