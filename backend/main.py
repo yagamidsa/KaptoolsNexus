@@ -3,8 +3,11 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from datetime import datetime
+import json
+import requests
+import xml.etree.ElementTree as ET
 import uvicorn
 import os
 import tempfile
@@ -2345,6 +2348,692 @@ async def debug_mdd_file_path_trace():
         os.unlink(temp_mdd_path)
         os.unlink(temp_ddf_path)
 
+
+
+# ================================
+# 1. MODELOS DE DATOS
+# ================================
+
+class ProductChunksResponse(BaseModel):
+    success: bool
+    message: str
+    report_content: str
+    product_name: str
+    total_chunks: int
+    chunks_by_type: Dict[str, int]
+    variables_found: int
+    new_chunks_created: int
+    existing_chunks_found: int
+
+class ExclusionsResponse(BaseModel):
+    success: bool
+    message: str
+    exclusions: List[str]
+    total_exclusions: int
+
+# ================================
+# 2. GESTIÓN DE EXCLUSIONES
+# ================================
+
+def get_exclusions_file_path(workspace_path: str) -> str:
+    """Obtiene la ruta del archivo de exclusiones"""
+    return os.path.join(workspace_path, "product_chunks_exclusions.json")
+
+def load_default_exclusions() -> List[str]:
+    """Carga exclusiones por defecto"""
+    return [
+        "PANELDETAILS_ENDTEXT", "ACTIVEINVOLVEMENT_TEXTS", "SEEVIDEO", "HEARVIDEO", 
+        "STANDARDTEXTS_ERRORS", "FACEBOOKMOBILE_OPTINB", "FACEBOOKMOBILE_OPTINA", 
+        "FACEBOOKDESKTOP_OPTINB", "FACEBOOKDESKTOP_OPTINA", "PANELDETAILS_ENDTEXT_NFIELD", 
+        "COMMS_BLOCK_QUOTA_MANUAL", "PERSONAL_BIOMETRIC_CHINA", "OVERSEAS_TRANSFER_CHINA", 
+        "TESTADMESSAGES", "COL1", "COL2", "COL3", "WORDS", "ADDESIGN_SLDRLABELS", 
+        "CONSENT", "FCENABLEDDUMMY", "ADINTRO_ROUGHTYPE_HELPER", "SPONT_BRAND_CUES_TEXTREPLACE", 
+        "CELEBRITYIMAGE_CONTROL", "CELEBRITYIMAGEDRIVER", "IMTYPERESPONSE", 
+        "PROMPTEDATTITUDES_CONTROL", "PROMPTEDATTITUDESDRIVER", "QSMARTPHONE", 
+        "SEG_OCCUPATIONTURKEYDRIVER", "SEG_OCCUPATION_TURKEY_TEXTPIPE", "ADNAME", 
+        "LINKDIGITALS_BRANDLOGOS", "NEWSFEEDQUOTA", "MOODFEELNEGATIVEDRIVER", 
+        "MOODFEELPOSITIVEDRIVER", "COMMSADVERTS", "RA1_GENERIC", "TOTALUNAIDEDSCTEXT", 
+        "INTRO_SAMSUNG", "WARNINGMESSAGE_SAMSUNG", "QELIGIBLE", "STLK_INT_LIKE_ASSIGN", 
+        "IATEXTS_NFIELD", "NIVEANESS_DRIVER", "NIVEANESS_DRIVER_CONTROL", 
+        "GENDER_RECODE_AMERICAN", "HAIRCOLOUR_HELPER_IMAGE", "HCLIENTCATEGORY", 
+        "AD_TYPE", "FPERSUASIONMOSTOFTEN_ANOTHER", "MOODFEELNEGATIVE_CONTROL", 
+        "MOODFEELPOSITIVE_CONTROL", "SPPERSUASIONMOSTOFTEN_ANOTHER", 
+        "WHATPRODUCTLOOKLIKE_CONTROL", "BRANDING_BENGALI", "BRANDING_GUJARATI", 
+        "BRANDING_HINDI", "BRANDING_KANNADA", "BRANDING_MALAYALAM", "BRANDING_MARATHI", 
+        "BRANDING_TAMIL", "BRANDING_TELUGU", "LANGUAGELIST_DRIVER", "VARIANTFULL_BENGALI", 
+        "VARIANTFULL_GUJARATI", "VARIANTFULL_HINDI", "VARIANTFULL_KANNADA", 
+        "VARIANTFULL_MALAYALAM", "VARIANTFULL_MARATHI", "VARIANTFULL_TAMIL", 
+        "VARIANTFULL_TELUGU", "VARIANTPARENT_BENGALI", "VARIANTPARENT_GUJARATI", 
+        "VARIANTPARENT_HINDI", "VARIANTPARENT_KANNADA", "VARIANTPARENT_MALAYALAM", 
+        "VARIANTPARENT_MARATHI", "VARIANTPARENT_TAMIL", "VARIANTPARENT_TELUGU", 
+        "ADVERTISINGIMPRINTTEXT", "FC_OPTINS_TEXTDETAILS", "FCSTATUS", "JWFC_TEXT_DETAILS", 
+        "SLOGAN_MISSINGANSWER", "SPONTANEOUSBRANDING_MISSINGANSWER", "BRANDS_LIST", 
+        "YOUTUBE_CONTROLCELL_DUMMY", "COMMS_BLOCK_MEDIA_CONTROL_NFIELD", "CLICKSPOT_LABELS", 
+        "VISITSITETYPEDRIVER", "PRPURINT", "CONCEPT_BLOCK_CONFIG", "CONCEPT_BLOCK_CONTROL", 
+        "EXCITMENT", "INCREMNT", "LIKBILTY", "MESSAGESTODISPLAY", "PRE_MDF_CONTROL", 
+        "PRTINCR_RESP", "PRVALMNY", "PURCHFRQ", "PURFRQIC_CONCEPT", "RELVANCE", 
+        "UNDERSTG", "UNIQNESS", "UNPRICEP", "UNPURINT", "BELVBLTY", "INERTIA_1", 
+        "LINKEDSLIDERREMAIN", "PSM_EXPENSIVE", "PSM_CHEAP", "PSM_TOO_CHEAP", 
+        "PSM_TOO_EXPENSIVE", "PSMPRICEPOINTS_DRIVER", "UNTVAR_TEXT_CONTROL", 
+        "USAGE_HOW_CONSUMED", "USAGE_WHEN_DAY", "USAGE_WHEN_GEN", "USAGE_WHEN_TIME", 
+        "USAGE_WHERE_BUY", "USAGE_WHERE_LOC", "USAGE_WHERE_WHAT", "USAGE_WHO_FOR", 
+        "USAGE_WHO_WITH", "USAGE_WHY", "INERTIA_2", "INERTIA_3", "INSIGHTRELEVANCEDRIVER", 
+        "INSIGHT_RELEVANCE2", "BRANDPURPOSE_SLDRENDLABELS", "ENJOYMENT_PLUS_HELPER", 
+        "IMCONTROL", "IMSTATEMENTS", "IMSTATEMENTS_DRIVER", 
+        "POSITIVE_EMOTIONS_INSTRUCTIONS_DURING", "TALKBACK_MISSINGANSWER", 
+        "WHATTYPEOFBRAND_MISSINGANSWER", "HHOLDCOMP_ERROR", "CAMPAIGN_MEDIATEXT", 
+        "CELEBRITYRECOGNITION_IMAGE_HELPER", "CHARACTERIMAGE_CONTROL", 
+        "CHARACTERIMAGEDRIVER", "COMMS_BLOCK_BAT_MEDIA_CONTROL_NFIELD", 
+        "LINKPLUSTVLOREALCORE6", "SPONTANEOUSBRANDING_LOOP_TEXTS", 
+        "MEDIA_CONTROL_NFIELD", "DATASHARING_CHINA", "DATATRANSFER_CHINA", 
+        "PERSONALINFORMATION", "SENSITIVEPICOLLECTION", "SENSITIVEPICOLLECTIONFACIALCODING", 
+        "AFFECTIVA_HELPER", "DUMMY", "DUMMY1", "DUMMY2", "DUMMY3", "DUMMY4", "DUMMY5", 
+        "TEST", "TESTVAR", "SKIP", "HIDDEN", "TEMP", "IGNORE", "_CONTROL", "_DRIVER", "_HELPER"
+    ]
+
+def load_exclusions_from_workspace(workspace_path: str) -> List[str]:
+    """Carga exclusiones desde archivo del workspace o usa defaults"""
+    exclusions_file = get_exclusions_file_path(workspace_path)
+    
+    if os.path.exists(exclusions_file):
+        try:
+            with open(exclusions_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('exclusions', load_default_exclusions())
+        except Exception as e:
+            print(f"Error loading exclusions file: {str(e)}")
+            return load_default_exclusions()
+    else:
+        # Crear archivo con defaults
+        default_exclusions = load_default_exclusions()
+        save_exclusions_to_workspace(workspace_path, default_exclusions)
+        return default_exclusions
+
+def save_exclusions_to_workspace(workspace_path: str, exclusions: List[str]) -> bool:
+    """Guarda exclusiones en archivo del workspace"""
+    try:
+        exclusions_file = get_exclusions_file_path(workspace_path)
+        
+        data = {
+            "exclusions": sorted(list(set(exclusions))),
+            "last_updated": datetime.now().isoformat(),
+            "total_count": len(exclusions)
+        }
+        
+        with open(exclusions_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        
+        return True
+    except Exception as e:
+        print(f"Error saving exclusions: {str(e)}")
+        return False
+
+# ================================
+# 3. LECTURA DE ARCHIVOS XML
+# ================================
+
+def read_chunk_db_xml(workspace_path: str) -> List[str]:
+    """Lee el CHUNK_DB.XML exactamente como la app original"""
+    xml_path = os.path.join(workspace_path, "outputs-dimensions-content", 
+                           "Template_Configuration", "CHUNK_DB.XML")
+    
+    if not os.path.exists(xml_path):
+        raise HTTPException(status_code=404, detail="CHUNK_DB.XML not found")
+    
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    
+    # Exactamente como la app original
+    data = []
+    for namechunk in root.iter("NAME"):
+        data.append(namechunk.text)
+    
+    my_set = set(data)
+    my_new_array = list(my_set)
+    my_new_array = list(map(str.upper, my_new_array))
+    
+    return my_new_array
+
+# ================================
+# 4. DESCARGA DE PRODUCTOS DESDE AZURE
+# ================================
+
+def download_product_json(token: str, product_name: str, workspace_path: str) -> Dict[str, Any]:
+    """Descarga el JSON del producto exactamente como la app original"""
+    product_name = product_name.strip().capitalize()
+    url = (f"https://sandbox3-kap-product-template.azurewebsites.net/api/producttemplate/product/"
+           f"{product_name}?languages=en-gb&refreshCache=true&version=")
+    
+    collection_id = "11433564-0587479e-07c6-4f16-95c9-6b7c59da0523"
+    headers = {"x-jetstream-devtoken": token}
+    
+    try:
+        response = requests.get(url.format(id=collection_id), headers=headers, verify=False)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    
+    if response.status_code == 200:
+        json_data = response.json()
+        # Guardar JSON como la app original
+        json_path = os.path.join(workspace_path, f"{product_name}.json")
+        with open(json_path, "w") as file:
+            json.dump(json_data, file, indent=4)
+        print(f"\n                JSON file success save.                \n")
+        return json_data
+    else:
+        error_msg = f"Failed to download Postman Collection (Verify Product Name Exists). HTTP status code: {response.status_code}"
+        raise HTTPException(status_code=response.status_code, detail=error_msg)
+
+# ================================
+# 5. EXTRACCIÓN DE VARIABLES
+# ================================
+
+def extract_variables_from_modules(json_data: Dict[str, Any], items_to_exclude: List[str]) -> Tuple[List[str], str]:
+    """Extrae variables exactamente como la app original desde modules->questions->groupName"""
+    variable_found = ""
+    
+    try:
+        # Lógica exacta de la app original
+        variable = ""
+        for link in json_data["modules"]:
+            for links in link["questions"]:
+                if links.get("contentType") != "Script":
+                    if links.get("contentType") != "InfoQuestion":
+                        if links.get("answers") or links.get("columns"):
+                            group_name = links.get("groupName")
+                            if group_name:
+                                variable += group_name + ","
+        
+        # Procesar como la app original
+        variable = variable[:-1]  # Quitar última coma
+        array = variable.split(",")
+        array = list(map(str.upper, array))
+        
+        # Aplicar exclusiones como la app original
+        array = [items for items in array if items not in items_to_exclude]
+        
+        return array, variable_found
+        
+    except KeyError as e:
+        print(f"Warning: Expected structure not found: {str(e)}")
+        return [], ""
+
+# ================================
+# 6. CREACIÓN DE ARCHIVOS MRS
+# ================================
+
+def create_mrs_files_with_labels(new_variables: List[str], workspace_path: str, json_data: Dict[str, Any]) -> int:
+    """Crea archivos .mrs con labels extraídos del JSON exactamente como la app original"""
+    # Crear carpeta MDD_Manipulation_Include como la app original
+    project_folder = os.path.join(workspace_path, "MDD_Manipulation_Include")
+    
+    if os.path.exists(project_folder):
+        shutil.rmtree(project_folder)
+    
+    os.mkdir(project_folder)
+    
+    chunks_created = 0
+    
+    for element in new_variables:
+        if not element:  # Skip empty elements
+            continue
+        
+        # Capitalizar como la app original
+        element_cap = element.capitalize()
+        
+        # Crear archivo .mrs como la app original
+        file_name = f"{element_cap}.mrs"
+        file_path = os.path.join(project_folder, file_name)
+        
+        # Generar Labels exactamente como la app original
+        labels = generate_labels_for_variable(element_cap, json_data)
+        
+        # Escribir archivo .mrs
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(labels)
+            
+            chunks_created += 1
+            print(f"Created chunk file with labels: {file_name}")
+            
+        except Exception as e:
+            print(f"Error creating file {file_name}: {str(e)}")
+            # Si hay error, crear archivo básico
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(f"' Error generating labels for: {element}\n' Basic content fallback\n{element}.Response.Value")
+                chunks_created += 1
+            except:
+                pass
+    
+    return chunks_created
+
+def generate_labels_for_variable(element_cap: str, json_data: Dict[str, Any]) -> str:
+    """Genera labels para una variable específica"""
+    labels = ""
+    
+    try:
+        # Buscar en modules->questions como la app original
+        for link in json_data["modules"]:
+            for links in link["questions"]:
+                if links.get("contentType") != "Script":
+                    if links.get("contentType") != "InfoQuestion":
+                        if links.get("contentType") != "LeftRightSliderQuestion":
+                            if links.get("groupName") == element_cap:
+                                
+                                # Procesar respuestas (answers)
+                                if links.get("answers"):
+                                    labels += generate_title_text(links.get("groupName"))
+                                    labels += generate_answer_labels(links, "answers")
+                                
+                                # Procesar columnas (columns) - para grids
+                                elif links.get("columns"):
+                                    labels += generate_title_text(links.get("groupName"))
+                                    labels += generate_column_labels(links)
+        
+        return labels
+        
+    except Exception as e:
+        print(f"Error generating labels for {element_cap}: {str(e)}")
+        return f"' Error generating labels for: {element_cap}\n' Basic content fallback\n{element_cap}.Response.Value"
+
+def generate_title_text(group_name: str) -> str:
+    """Genera el texto del título"""
+    return (
+        'sbSetTitleText(MDM,"'
+        + group_name
+        + '","Analysis",LOCALE,"'
+        + "("
+        + group_name.upper()
+        + ") "
+        + group_name.upper()
+        + '")'
+        + "\n"
+    )
+
+def generate_answer_labels(links: Dict[str, Any], field_type: str) -> str:
+    """Genera labels para respuestas"""
+    labels = ""
+    
+    for answ in links[field_type]:
+        if answ.get("text"):
+            for text in answ["text"]:
+                clean_text = clean_label_text(text.get("text", ""))
+                
+                labels += (
+                    'sbSetResponseText(MDM,"'
+                    + links.get("groupName")
+                    + '","Analysis",LOCALE,"_'
+                    + str(answ.get("code"))
+                    + '","'
+                    + clean_text
+                    + '")'
+                    + "\n"
+                )
+    
+    # Aplicar reemplazos especiales como la app original
+    return labels.replace("_997", "NA").replace("_998", "REF").replace("_999", "DK")
+
+def generate_column_labels(links: Dict[str, Any]) -> str:
+    """Genera labels para columnas (grids)"""
+    labels = ""
+    
+    for answ in links["columns"]:
+        if answ.get("text"):
+            for text in answ["text"]:
+                clean_text = clean_label_text(text.get("text", ""))
+                
+                labels += (
+                    'sbSetResponseText(MDM,"'
+                    + links.get("groupName")
+                    + "[..].slice"
+                    + '","Analysis",LOCALE,"_'
+                    + str(answ.get("code"))
+                    + '","'
+                    + clean_text
+                    + '")'
+                    + "\n"
+                )
+    
+    return labels
+
+def clean_label_text(text: str) -> str:
+    """Limpia el texto de los labels como la app original"""
+    return (
+        text.replace("\u039d", "")
+        .replace("[b]", "")
+        .replace("[/b]", "")
+        .replace("[i]", "")
+        .replace("[/i]", "")
+        .replace("[u]", "")
+        .replace("[/u]", "")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+        .replace("&#39;", "'")
+    )
+
+# ================================
+# 7. PROCESAMIENTO PRINCIPAL
+# ================================
+
+def process_variables_and_create_chunks(json_data: Dict[str, Any], existing_chunks: List[str], 
+                                      workspace_path: str, items_to_exclude: List[str]) -> Dict[str, Any]:
+    """Procesa variables y crea chunks exactamente como la app original"""
+    # Extraer variables del JSON
+    variables_array, variable_found = extract_variables_from_modules(json_data, items_to_exclude)
+    
+    # Comparar con chunks existentes como la app original
+    new_elements = ""
+    variables_found_existing = ""
+    
+    for num in variables_array:
+        found = False
+        for element in existing_chunks:
+            if element == num:
+                found = True
+                break
+        
+        if found:
+            variables_found_existing += f"found {num}\n"
+        else:
+            new_elements += num + ","
+    
+    # Procesar nuevos elementos
+    new_elements = new_elements[:-1]  # Quitar última coma
+    new_variables = new_elements.split(",") if new_elements else []
+    
+    # Crear archivos .mrs para variables nuevas con labels del JSON
+    chunks_created = create_mrs_files_with_labels(new_variables, workspace_path, json_data)
+    
+    # Análisis de resultados
+    analysis_results = {
+        "variables_processed": variables_array,
+        "existing_variables": variables_found_existing.split('\n') if variables_found_existing else [],
+        "new_variables": new_variables,
+        "chunks_created": chunks_created,
+        "existing_chunks_found": len([v for v in variables_found_existing.split('\n') if v.strip()]),
+        "new_chunks_created": len(new_variables),
+        "type_distribution": {
+            "CATEGORICAL": len(new_variables),
+            "TEXT": 0,
+            "NUMERIC": 0,
+            "GRID": 0,
+            "UNKNOWN": 0
+        }
+    }
+    
+    return analysis_results
+
+# ================================
+# 8. GENERACIÓN DE REPORTES
+# ================================
+
+def generate_original_style_report(product_name: str, analysis_results: Dict[str, Any], 
+                                 items_to_exclude: List[str]) -> str:
+    """Genera reporte en el estilo de la app original"""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    report_lines = [
+        "=" * 60,
+        "PRODUCT CHUNKS MANIPULATION REPORT",
+        "=" * 60,
+        f"Product: {product_name}",
+        f"Date: {timestamp}",
+        f"Total Variables Found: {len(analysis_results['variables_processed'])}",
+        f"Variables with Existing Chunks: {analysis_results['existing_chunks_found']}",
+        f"New Variables (Chunks Created): {analysis_results['new_chunks_created']}",
+        f"Total MRS Files Created: {analysis_results['chunks_created']}",
+        "",
+        "EXCLUSIONS APPLIED:",
+        "-" * 20
+    ]
+    
+    # Mostrar exclusiones aplicadas (primeras 10)
+    for exclusion in items_to_exclude[:10]:
+        report_lines.append(f"- {exclusion}")
+    
+    if len(items_to_exclude) > 10:
+        report_lines.append(f"... and {len(items_to_exclude) - 10} more exclusions")
+    
+    report_lines.extend([
+        "",
+        "EXISTING VARIABLES (FOUND IN CHUNK_DB.XML):",
+        "-" * 45
+    ])
+    
+    # Variables existentes
+    for existing in analysis_results['existing_variables']:
+        if existing.strip():
+            report_lines.append(f"✓ {existing}")
+    
+    report_lines.extend([
+        "",
+        "NEW VARIABLES (MRS FILES CREATED):",
+        "-" * 35
+    ])
+    
+    # Variables nuevas con archivos creados
+    for new_var in analysis_results['new_variables']:
+        if new_var.strip():
+            report_lines.append(f"+ {new_var}.mrs → Created in MDD_Manipulation_Include/")
+    
+    report_lines.extend([
+        "",
+        "PROCESSING SUMMARY:",
+        "-" * 20,
+        f"- Variables processed: {len(analysis_results['variables_processed'])}",
+        f"- Existing chunks found: {analysis_results['existing_chunks_found']}",
+        f"- New MRS files created: {analysis_results['new_chunks_created']}",
+        f"- MRS files location: MDD_Manipulation_Include/",
+        "",
+        "NOTES:",
+        "- Variables excluded by configuration are not processed",
+        "- MRS files are created only for variables not found in CHUNK_DB.XML",
+        "- Use the created MRS files for your survey manipulation",
+        "",
+        "=" * 60
+    ])
+    
+    return "\n".join(report_lines)
+
+# ================================
+# 9. ENDPOINTS API
+# ================================
+
+@app.post("/product-chunks/process")
+async def process_product_chunks_exact_original(
+    token: str = Form(..., description="Azure API token"),
+    product_name: str = Form(..., description="Product name"),
+    workspace_path: str = Form(..., description="Workspace path")
+) -> ProductChunksResponse:
+    """Procesa chunks de producto con la lógica EXACTA de la aplicación original"""
+    try:
+        # 1. Validaciones iniciales
+        if not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail="Workspace path does not exist")
+        
+        outputs_path = os.path.join(workspace_path, "outputs-dimensions-content")
+        if not os.path.exists(outputs_path):
+            raise HTTPException(status_code=400, detail="outputs-dimensions-content folder not found")
+        
+        print(f"🔍 Processing product: {product_name}")
+        print(f"📂 Workspace: {workspace_path}")
+        
+        # 2. Cargar exclusiones (del workspace específico)
+        items_to_exclude = load_exclusions_from_workspace(workspace_path)
+        print(f"📋 Loaded {len(items_to_exclude)} exclusion items from workspace")
+        
+        # 3. Leer CHUNK_DB.XML (exactamente como la app original)
+        existing_chunks = read_chunk_db_xml(workspace_path)
+        print(f"📋 Found {len(existing_chunks)} existing chunks in CHUNK_DB.XML")
+        
+        # 4. Descargar JSON del producto (exactamente como la app original)
+        print(f"⬇️ Downloading JSON for product: {product_name}")
+        json_data = download_product_json(token, product_name, workspace_path)
+        
+        # 5. Procesar variables y crear chunks (lógica exacta original)
+        analysis_results = process_variables_and_create_chunks(
+            json_data, existing_chunks, workspace_path, items_to_exclude
+        )
+        
+        # 6. Generar reporte
+        report_content = generate_original_style_report(product_name, analysis_results, items_to_exclude)
+        
+        # 7. Guardar reporte
+        report_filename = f"{product_name.capitalize()}_chunks_report.txt"
+        report_path = os.path.join(workspace_path, report_filename)
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(report_content)
+        
+        print(f"📄 Report saved: {report_filename}")
+        print(f"📁 MRS files created in: MDD_Manipulation_Include/")
+        print("\n✅ The process finished successfully!")
+        
+        return ProductChunksResponse(
+            success=True,
+            message=f"Successfully processed {len(analysis_results['variables_processed'])} variables. Created {analysis_results['new_chunks_created']} new MRS files. Found {analysis_results['existing_chunks_found']} existing chunks.",
+            report_content=report_content,
+            product_name=product_name,
+            total_chunks=analysis_results["chunks_created"],
+            chunks_by_type=analysis_results['type_distribution'],
+            variables_found=len(analysis_results['variables_processed']),
+            new_chunks_created=analysis_results['new_chunks_created'],
+            existing_chunks_found=analysis_results['existing_chunks_found']
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ An error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
+
+@app.get("/product-chunks/exclusions")
+async def get_exclusions(workspace_path: str) -> ExclusionsResponse:
+    """Obtiene la lista actual de exclusiones para un workspace"""
+    try:
+        if not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail="Workspace path does not exist")
+        
+        exclusions = load_exclusions_from_workspace(workspace_path)
+        
+        return ExclusionsResponse(
+            success=True,
+            message=f"Loaded {len(exclusions)} exclusion items",
+            exclusions=sorted(exclusions),
+            total_exclusions=len(exclusions)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load exclusions: {str(e)}")
+
+@app.post("/product-chunks/exclusions/update")
+async def update_exclusions(
+    workspace_path: str = Form(...),
+    exclusions_text: str = Form(...),
+    action: str = Form(default="replace")
+) -> ExclusionsResponse:
+    """Actualiza las exclusiones del workspace"""
+    try:
+        if not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail="Workspace path does not exist")
+        
+        # Parsear exclusiones del texto
+        if ',' in exclusions_text:
+            new_exclusions = [item.strip().upper() for item in exclusions_text.split(',')]
+        else:
+            new_exclusions = [item.strip().upper() for item in exclusions_text.split('\n')]
+        
+        new_exclusions = [item for item in new_exclusions if item]
+        
+        # Cargar exclusiones actuales
+        current_exclusions = load_exclusions_from_workspace(workspace_path)
+        
+        # Aplicar acción
+        if action == "add":
+            updated_exclusions = list(set(current_exclusions + new_exclusions))
+            message = f"Added {len(new_exclusions)} new exclusions"
+        elif action == "remove":
+            updated_exclusions = [item for item in current_exclusions if item not in new_exclusions]
+            removed_count = len(current_exclusions) - len(updated_exclusions)
+            message = f"Removed {removed_count} exclusions"
+        else:  # replace
+            updated_exclusions = new_exclusions
+            message = f"Replaced exclusions list with {len(new_exclusions)} items"
+        
+        # Guardar exclusiones actualizadas
+        if save_exclusions_to_workspace(workspace_path, updated_exclusions):
+            return ExclusionsResponse(
+                success=True,
+                message=message,
+                exclusions=sorted(updated_exclusions),
+                total_exclusions=len(updated_exclusions)
+            )
+        else:
+            raise HTTPException(status_code=500, detail="Failed to save exclusions")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update exclusions: {str(e)}")
+
+@app.post("/product-chunks/exclusions/reset")
+async def reset_exclusions_to_default(workspace_path: str = Form(...)) -> ExclusionsResponse:
+    """Resetea las exclusiones a los valores por defecto"""
+    try:
+        if not os.path.exists(workspace_path):
+            raise HTTPException(status_code=400, detail="Workspace path does not exist")
+        
+        default_exclusions = load_default_exclusions()
+        
+        if save_exclusions_to_workspace(workspace_path, default_exclusions):
+            return ExclusionsResponse(
+                success=True,
+                message=f"Reset to {len(default_exclusions)} default exclusions",
+                exclusions=sorted(default_exclusions),
+                total_exclusions=len(default_exclusions)
+            )
+        else:
+            raise HTTPException(status_code=500, detail="Failed to reset exclusions")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to reset exclusions: {str(e)}")
+
+@app.get("/product-chunks/test")
+async def test_product_chunks_exact_original():
+    """Test endpoint para verificar que el servicio funciona"""
+    return {
+        "service": "Product Chunks Processor (Exact Original Logic)",
+        "version": "2.0",
+        "status": "operational",
+        "features": [
+            "Download product JSON from Azure API",
+            "Extract variables from modules->questions->groupName", 
+            "Apply exclusions (dummy, etc.)",
+            "Compare with existing CHUNK_DB.XML",
+            "Create MRS files for new variables with real labels",
+            "Generate detailed analysis report",
+            "Manage exclusions per workspace"
+        ],
+        "endpoints": [
+            "/product-chunks/process",
+            "/product-chunks/exclusions",
+            "/product-chunks/exclusions/update", 
+            "/product-chunks/exclusions/reset",
+            "/product-chunks/test"
+        ],
+        "timestamp": datetime.now().isoformat()
+    }
+
+# ================================
+# FIN DEL MÓDULO PRODUCT CHUNKS PROCESSOR
+# ================================
+
 if __name__ == "__main__":
     print("🚀 Starting KapTools Nexus API...")
     print("📡 Backend will be available at: http://127.0.0.1:8000")
@@ -2360,3 +3049,5 @@ if __name__ == "__main__":
         port=8000,
         log_level="info"
     )
+
+
