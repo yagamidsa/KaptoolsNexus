@@ -325,6 +325,12 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
                 // === WAVE API MODULE ===
                 {
+                    name: 'Wave List Replacements',
+                    pattern: '/waves/{wave_id}/list_replacements',
+                    example: '/waves/W123456/list_replacements',
+                    description: '📋 Returns list replacements for a wave'
+                },
+                {
                     name: 'Wave Text Replacements',
                     pattern: '/waves/{wave_id}/text_replacements',
                     example: '/waves/W123456/text_replacements',
@@ -335,6 +341,12 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     pattern: '/waves/{wave_id}/questions',
                     example: '/waves/W123456/questions',
                     description: '✅ Returns selected questions for a wave'
+                },
+                {
+                    name: 'Wave Questionnaire Version',
+                    pattern: '/waves/{wave_id}/questionnaire-version',
+                    example: '/waves/W123456/questionnaire-version',
+                    description: '📄 Returns questionnaire version for wave'
                 },
                 {
                     name: 'Wave All Questions',
@@ -355,10 +367,58 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '📊 Returns quota definitions for a wave'
                 },
                 {
+                    name: 'Wave Quotable Questions',
+                    pattern: '/waves/{wave_id}/quotable-questions',
+                    example: '/waves/W123456/quotable-questions',
+                    description: '❓ Returns quotable questions for a wave'
+                },
+                {
+                    name: 'Wave Subgroup Questions',
+                    pattern: '/waves/{wave_id}/subgroup-questions',
+                    example: '/waves/W123456/subgroup-questions',
+                    description: '👥 Returns single/multi coded questions for wave (requires user_id header)'
+                },
+                {
+                    name: 'Wave Boostable Questions',
+                    pattern: '/waves/{wave_id}/boostable-questions',
+                    example: '/waves/W123456/boostable-questions',
+                    description: '🚀 Returns boostable questions for wave (requires user_id header)'
+                },
+                {
+                    name: 'Wave Media',
+                    pattern: '/waves/{wave_id}/media',
+                    example: '/waves/W123456/media',
+                    description: '🎬 Returns media for a wave'
+                },
+                {
+                    name: 'Wave Qlib Update Status',
+                    pattern: '/waves/{wave_id}/qlib-update-status',
+                    example: '/waves/W123456/qlib-update-status',
+                    description: '🔄 Returns qlib update status for wave'
+                },
+                {
+                    name: 'Wave EyeSquare Metadata',
+                    pattern: '/waves/{wave_id}/eye-square-metadata',
+                    example: '/waves/W123456/eye-square-metadata',
+                    description: '👁️ Returns EyeSquare metadata for wave'
+                },
+                {
+                    name: 'Sample Definition by Product',
+                    pattern: '/sample_definitions/{product_name}',
+                    example: '/sample_definitions/ProductName',
+                    description: '📊 Returns sample definition for a product'
+                },
+                {
                     name: 'Wave Qlib Content',
                     pattern: '/waves/{wave_id}/qlibcontent',
                     example: '/waves/W123456/qlibcontent',
                     description: '📚 Returns the qlib content for a wave'
+                },
+                {
+                    name: 'Wave Weightable Questions',
+                    pattern: '/waves/{wave_id}/weightable-questions',
+                    example: '/waves/W123456/weightable-questions',
+                    description: '⚖️ Returns the Weightable Questions for a wave (requires user_id header)'
                 },
                 {
                     name: 'Wave Details',

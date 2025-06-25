@@ -335,7 +335,7 @@ fn start_backend() {
         println!("🐍 Attempting to start Python backend...");
         
         let result = Command::new("python")
-            .args(&["backend/main.py"])
+            .args(&["../backend/main.py"])
             .spawn();
         
         match result {

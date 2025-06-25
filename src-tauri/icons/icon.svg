@@ -1,0 +1,31 @@
+
+            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="atomGradientSVG" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6c5ce7"/>
+                        <stop offset="100%" style="stop-color:#ff6b9d"/>
+                    </linearGradient>
+                    <filter id="glowSVG">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge> 
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <!-- Núcleo -->
+                <circle cx="256" cy="256" r="32" fill="url(#atomGradientSVG)" filter="url(#glowSVG)"/>
+                <!-- Órbitas -->
+                <ellipse cx="256" cy="256" rx="140" ry="60" 
+                        fill="none" stroke="url(#atomGradientSVG)" stroke-width="12" opacity="0.8"/>
+                <ellipse cx="256" cy="256" rx="60" ry="140" 
+                        fill="none" stroke="url(#atomGradientSVG)" stroke-width="12" opacity="0.8"/>
+                <ellipse cx="256" cy="256" rx="100" ry="100" 
+                        fill="none" stroke="url(#atomGradientSVG)" stroke-width="8" opacity="0.6"/>
+                <!-- Electrones -->
+                <circle cx="396" cy="256" r="16" fill="#f6ad55"/>
+                <circle cx="256" cy="116" r="16" fill="#f6ad55"/>
+                <circle cx="116" cy="256" r="16" fill="#f6ad55"/>
+                <circle cx="256" cy="396" r="16" fill="#f6ad55"/>
+            </svg>
+        

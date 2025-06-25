@@ -19,6 +19,7 @@ import { useExchangeRates } from './hooks/useExchangeRates';
 import ExchangeRateDisplay from './components/ExchangeRate';
 import './utils/test_backend.js';
 import JSONPathTool from './components/JSONPathTool';
+import ProductChunksModal from './components/ProductChunksModal';
 import "./App.css";
 
 
@@ -60,6 +61,7 @@ function App() {
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showQChunksModal, setShowQChunksModal] = useState(false);
   const [showCopilotModal, setShowCopilotModal] = useState(false);
+  const [showProductChunksModal, setShowProductChunksModal] = useState(false);
 
   // Estado de validación del workspace
   const [workspaceValidation, setWorkspaceValidation] = useState<WorkspaceValidation>({
@@ -79,6 +81,13 @@ function App() {
       desc: 'Digital sticky notes',
       icon: '📝',
       category: 'UTILITIES'
+    },
+    {
+      id: 'product-chunks',  // ← NUEVO ID
+      label: 'Product Chunks',
+      desc: 'Download JSON and Chunks Manipulation',
+      icon: '📊',
+      category: 'AZURE TOOLS'
     },
     // Git Operations
     {
@@ -531,6 +540,11 @@ function App() {
       setResponse(`🌿 Opening Review Branches for workspace: ${workspacePath}\n📁 Repositories: ${workspaceValidation.existing_repos.join(', ')}`);
     }
 
+    else if (itemId === 'product-chunks') {
+      setShowProductChunksModal(true);
+      setResponse(`📊 Opening Product Chunks Processor...\n🔧 Ready to download JSON and generate chunks report`);
+    }
+
     // Handle Azure Tools
     else if (itemId === 'product-data') {
       setShowProductDataModal(true);
@@ -949,6 +963,15 @@ function App() {
         onClose={handleClosePostItNotesModal}
         workspacePath={workspacePath}
       />
+
+      {/* Product Chunks Modal */}
+      {showProductChunksModal && (
+        <ProductChunksModal
+          isOpen={showProductChunksModal}
+          onClose={() => setShowProductChunksModal(false)}
+          workspacePath={workspacePath}
+        />
+      )}
 
       <ShortcutsNexus
         isOpen={showShortcutsModal}

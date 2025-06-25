@@ -2265,12 +2265,12 @@
  ================================ */
 
 .menu-item {
-  min-height: 44px;
-  padding: 7px 16px;
+  min-height: 40px;
+  padding: 6px 16px;
 }
 
 .item-label {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .item-desc {

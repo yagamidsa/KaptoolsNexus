@@ -5,7 +5,6 @@ use crate::jsonpath_types::*;
 use serde_json::Value;
 use std::sync::OnceLock;
 use tokio::task;
-use tauri::Manager;
 use tauri::Emitter;
 
 // ================================
@@ -152,49 +151,6 @@ pub async fn test_jsonpath_tool() -> Result<String, String> {
 // ================================
 // UTILIDADES ADICIONALES
 // ================================
-
-#[tauri::command]
-pub fn get_jsonpath_examples() -> Result<Vec<Value>, String> {
-    let examples = vec![
-        serde_json::json!({
-            "name": "Root Object",
-            "query": "$",
-            "description": "Returns the entire JSON object"
-        }),
-        serde_json::json!({
-            "name": "All Data Items",
-            "query": "$.data[*]",
-            "description": "Returns all items in the data array"
-        }),
-        serde_json::json!({
-            "name": "Extract Names",
-            "query": "$.data[*].name",
-            "description": "Extracts the 'name' field from all data items"
-        }),
-        serde_json::json!({
-            "name": "First Item",
-            "query": "$.data[0]",
-            "description": "Returns the first item in the data array"
-        }),
-        serde_json::json!({
-            "name": "Filter by Condition",
-            "query": "$.data[?(@.status=='active')]",
-            "description": "Returns items where status equals 'active'"
-        }),
-        serde_json::json!({
-            "name": "Nested Properties",
-            "query": "$.metadata.total",
-            "description": "Access nested properties"
-        }),
-        serde_json::json!({
-            "name": "Array Length",
-            "query": "$.data.length",
-            "description": "Get the length of an array"
-        }),
-    ];
-    
-    Ok(examples)
-}
 
 #[tauri::command]
 pub fn format_json(json_text: String) -> Result<String, String> {
