@@ -1,0 +1,1392 @@
+/* ================================
+   🔥 DUPLICATE MDD - ESTILO DOWNLOAD FILES CON PROGRESS CIRCULAR Y SVG NEON
+   ================================ */
+
+/* ================================
+   VARIABLES CSS DRACULA THEME + NEON
+   ================================ */
+:root {
+    --dracula-background: #282a36;
+    --dracula-current-line: #44475a;
+    --dracula-foreground: #f8f8f2;
+    --dracula-comment: #6272a4;
+    --dracula-cyan: #8be9fd;
+    --dracula-green: #50fa7b;
+    --dracula-orange: #ffb86c;
+    --dracula-pink: #ff79c6;
+    --dracula-purple: #bd93f9;
+    --dracula-red: #ff5555;
+    --dracula-yellow: #f1fa8c;
+    --dracula-darker: #1e1f29;
+    --dracula-glow: rgba(189, 147, 249, 0.4);
+    --dracula-shadow: rgba(0, 0, 0, 0.7);
+
+    /* 🔥 VARIABLES NEON */
+    --neon-purple: #bd93f9;
+    --neon-cyan: #8be9fd;
+    --neon-green: #50fa7b;
+    --neon-pink: #ff79c6;
+    --neon-red: #ff5555;
+    --neon-yellow: #f1fa8c;
+    --neon-orange: #ffb86c;
+}
+
+/* ================================
+     ✨ ESTILOS BASE PARA SVG NEON
+     ================================ */
+.neon-svg {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    filter: drop-shadow(0 0 8px currentColor);
+    transition: all 0.3s ease;
+}
+
+.neon-svg.large {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 12px currentColor);
+}
+
+.neon-svg.small {
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(0 0 6px currentColor);
+}
+
+.neon-svg:hover {
+    filter: drop-shadow(0 0 16px currentColor);
+    transform: scale(1.1);
+}
+
+/* 🔥 COLORES NEON ESPECÍFICOS */
+.neon-fire {
+    color: var(--neon-red);
+}
+
+.neon-folder {
+    color: var(--neon-cyan);
+}
+
+.neon-settings {
+    color: var(--neon-purple);
+}
+
+.neon-lightning {
+    color: var(--neon-yellow);
+}
+
+.neon-check {
+    color: var(--neon-green);
+}
+
+.neon-error {
+    color: var(--neon-red);
+}
+
+.neon-close {
+    color: var(--neon-pink);
+}
+
+.neon-back {
+    color: var(--neon-orange);
+}
+
+.neon-duplicate {
+    color: var(--neon-purple);
+}
+
+.neon-logs {
+    color: var(--neon-cyan);
+}
+
+.neon-stats {
+    color: var(--neon-green);
+}
+
+.neon-location {
+    color: var(--neon-cyan);
+}
+
+.neon-summary {
+    color: var(--neon-purple);
+}
+
+/* ================================
+     🌟 ANIMACIONES NEON
+     ================================ */
+@keyframes neonPulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 20px currentColor);
+    }
+}
+
+.neon-svg.pulse {
+    animation: neonPulse 2s ease-in-out infinite;
+}
+
+@keyframes neonRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.neon-svg.rotate {
+    animation: neonRotate 2s linear infinite;
+}
+
+/* ================================
+     🌟 MODAL OVERLAY Y CONTENEDOR
+     ================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(12px);
+    }
+}
+
+/* ================================
+     🎨 MODAL PRINCIPAL - ESTILO DOWNLOAD
+     ================================ */
+.duplicate-mdd-modal {
+    background: linear-gradient(145deg, var(--dracula-background), var(--dracula-darker));
+    border: 2px solid var(--dracula-purple);
+    border-radius: 32px;
+    /* 🔥 MÁS REDONDEADO */
+    box-shadow:
+        0 25px 80px var(--dracula-shadow),
+        0 0 0 1px rgba(189, 147, 249, 0.3),
+        inset 0 1px 0 rgba(248, 248, 242, 0.1);
+
+    width: 100%;
+    max-width: 700px;
+    /* 🔥 UN POCO MÁS ANCHO */
+    min-width: 500px;
+    max-height: 85vh;
+    /* 🔥 ALTURA AJUSTADA */
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ================================
+     🏷️ HEADER MODERNO CON SVG NEON
+     ================================ */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    /* 🔥 PADDING REDUCIDO */
+    background: linear-gradient(135deg, var(--dracula-purple), var(--dracula-pink));
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px 30px 0 0;
+    /* 🔥 MÁS REDONDEADO */
+}
+
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.1) 100%);
+    animation: headerShimmer 3s ease-in-out infinite;
+}
+
+@keyframes headerShimmer {
+
+    0%,
+    100% {
+        transform: translateX(-100%);
+    }
+
+    50% {
+        transform: translateX(100%);
+    }
+}
+
+.header-icon {
+    position: relative;
+    z-index: 1;
+}
+
+.modal-header h2 {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.close-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+}
+
+.close-button:hover {
+    background: rgba(255, 85, 85, 0.3);
+    transform: scale(1.1);
+}
+
+/* ================================
+     📦 MODAL BODY
+     ================================ */
+.modal-body {
+    flex: 1;
+    padding: 24px;
+    /* 🔥 PADDING REDUCIDO */
+    background: var(--dracula-background);
+    overflow-y: auto;
+    position: relative;
+}
+
+/* ================================
+     📁 SECCIÓN DE ARCHIVOS - ESTILO DOWNLOAD CON SVG NEON
+     ================================ */
+.section {
+    margin-bottom: 20px;
+    /* 🔥 MARGEN REDUCIDO */
+    position: relative;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    /* 🔥 FUENTE REDUCIDA */
+    font-weight: 600;
+    color: var(--dracula-foreground);
+    margin-bottom: 16px;
+    /* 🔥 MARGEN REDUCIDO */
+    padding-bottom: 8px;
+    /* 🔥 PADDING REDUCIDO */
+    border-bottom: 2px solid var(--dracula-current-line);
+    border-radius: 0 0 16px 16px;
+    /* 🔥 ESQUINAS REDONDEADAS */
+}
+
+
+/* ================================
+     🗂️ CONTENEDOR DE ARCHIVO - ESTILO MODERNO
+     ================================ */
+.file-input-container {
+    background: linear-gradient(135deg, var(--dracula-current-line), rgba(68, 71, 90, 0.8));
+    border: 2px solid var(--dracula-purple);
+    border-radius: 24px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 20px;
+    /* 🔥 PADDING REDUCIDO */
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.file-input-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(189, 147, 249, 0.1),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.file-input-container:hover::before {
+    left: 100%;
+}
+
+.file-display {
+    margin-bottom: 12px;
+    /* 🔥 MARGEN REDUCIDO */
+    min-height: 50px;
+    /* 🔥 ALTURA REDUCIDA */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(40, 42, 54, 0.6);
+    border-radius: 16px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 12px;
+    /* 🔥 PADDING REDUCIDO */
+    border: 1px dashed var(--dracula-comment);
+}
+
+.file-path {
+    color: var(--dracula-cyan);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+    margin: 4px 0;
+    padding: 6px 10px;
+    /* 🔥 PADDING REDUCIDO */
+    background: rgba(139, 233, 253, 0.1);
+    border-radius: 12px;
+    /* 🔥 MÁS REDONDEADO */
+    border: 1px solid rgba(139, 233, 253, 0.3);
+}
+
+.file-placeholder {
+    color: var(--dracula-comment);
+    font-style: italic;
+    text-align: center;
+}
+
+/* ================================
+     🔘 BOTÓN DE ARCHIVO - ESTILO DOWNLOAD
+     ================================ */
+.file-browse-btn {
+    background: linear-gradient(135deg, var(--dracula-green), var(--dracula-cyan));
+    border: none;
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 12px 20px;
+    /* 🔥 PADDING REDUCIDO */
+    color: var(--dracula-darker);
+    font-weight: 600;
+    font-size: 14px;
+    /* 🔥 FUENTE REDUCIDA */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(80, 250, 123, 0.3);
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.file-browse-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.file-browse-btn:hover::before {
+    left: 100%;
+}
+
+.file-browse-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(80, 250, 123, 0.4);
+}
+
+.file-browse-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ================================
+     ⚙️ CONFIGURACIÓN DE DUPLICACIÓN
+     ================================ */
+.duplication-settings {
+    background: linear-gradient(135deg,
+            rgba(189, 147, 249, 0.1),
+            rgba(255, 121, 198, 0.1));
+    border: 2px solid var(--dracula-purple);
+    border-radius: 24px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 20px;
+    /* 🔥 PADDING REDUCIDO */
+}
+
+.settings-grid {
+    display: grid;
+    gap: 20px;
+    /* 🔥 GAP REDUCIDO */
+    margin-bottom: 20px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.setting-item label {
+    display: block;
+    align-items: center !important;
+    color: var(--dracula-foreground);
+    font-weight: 600;
+    margin-bottom: 6px;
+    /* 🔥 MARGEN REDUCIDO */
+    font-size: 14px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.count-input-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--dracula-background);
+    border-radius: 16px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 4px;
+    border: 2px solid var(--dracula-current-line);
+    margin: 0 auto;
+    /* Centrar horizontalmente */
+    width: fit-content;
+    /* Ajustar al contenido */
+}
+
+.count-input {
+    background: transparent;
+    border: none;
+    color: var(--dracula-foreground);
+    font-size: 16px;
+    /* 🔥 FUENTE REDUCIDA */
+    font-weight: 600;
+    padding: 10px 14px;
+    /* 🔥 PADDING REDUCIDO */
+    text-align: center;
+    width: 80px;
+    outline: none;
+    border-radius: 12px;
+    /* 🔥 MÁS REDONDEADO */
+    /* ===== NUEVAS LÍNEAS PARA CENTRADO Y SELECCIÓN ===== */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    
+}
+
+/* Color de selección personalizado */
+.count-input::selection {
+    background-color: var(--dracula-purple);
+    color: white;
+}
+
+.count-input::-moz-selection {
+    background-color: var(--dracula-purple);
+    color: white;
+}
+
+.count-icon {
+    font-size: 20px;
+    color: var(--dracula-purple);
+    margin-right: 8px;
+}
+
+/* ================================
+     📊 INFORMACIÓN DE ARCHIVOS
+     ================================ */
+.file-info {
+    background: rgba(40, 42, 54, 0.6);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 16px;
+    /* 🔥 PADDING REDUCIDO */
+    border: 1px solid var(--dracula-current-line);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    /* 🔥 MARGEN REDUCIDO */
+    padding: 6px 0;
+    /* 🔥 PADDING REDUCIDO */
+    border-bottom: 1px solid rgba(68, 71, 90, 0.5);
+    border-radius: 8px;
+    /* 🔥 MÁS REDONDEADO */
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-label {
+    color: var(--dracula-comment);
+    font-weight: 500;
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.info-value {
+    color: var(--dracula-cyan);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+/* ================================
+     🏢 IBM SPSS INFO BADGE
+     ================================ */
+.ibm-spss-info {
+    margin-top: 16px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.spss-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--dracula-purple), var(--dracula-pink));
+    color: white;
+    padding: 10px 16px;
+    /* 🔥 PADDING REDUCIDO */
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    font-weight: 600;
+    margin-bottom: 12px;
+    /* 🔥 MARGEN REDUCIDO */
+    box-shadow: 0 8px 24px rgba(189, 147, 249, 0.3);
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.badge-icon {
+    font-size: 16px;
+    /* 🔥 ÍCONO REDUCIDO */
+}
+
+.spss-details {
+    background: rgba(189, 147, 249, 0.1);
+    border: 1px solid rgba(189, 147, 249, 0.3);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 12px;
+    /* 🔥 PADDING REDUCIDO */
+    color: var(--dracula-purple);
+    font-size: 12px;
+    /* 🔥 FUENTE REDUCIDA */
+    line-height: 1.5;
+    /* 🔥 ALTURA DE LÍNEA REDUCIDA */
+}
+
+/* ================================
+     🔄 PROGRESS CIRCULAR - SIN PORCENTAJE MEJORADO
+     ================================ */
+.processing-status {
+    text-align: center;
+    padding: 30px 20px;
+    /* 🔥 PADDING REDUCIDO */
+}
+
+.circular-progress {
+    position: relative;
+    width: 100px;
+    /* 🔥 TAMAÑO REDUCIDO */
+    height: 100px;
+    /* 🔥 TAMAÑO REDUCIDO */
+    margin: 0 auto 24px;
+    /* 🔥 MARGEN REDUCIDO */
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.5s ease;
+}
+
+.circular-progress.hide {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+.progress-ring {
+    width: 100px;
+    /* 🔥 TAMAÑO REDUCIDO */
+    height: 100px;
+    /* 🔥 TAMAÑO REDUCIDO */
+    transform: rotate(-90deg);
+}
+
+.progress-ring-bg,
+.progress-ring-fill {
+    fill: none;
+    stroke-width: 6;
+    /* 🔥 GROSOR REDUCIDO */
+    r: 44;
+    /* 🔥 RADIO AJUSTADO */
+    cx: 50;
+    /* 🔥 CENTRO AJUSTADO */
+    cy: 50;
+    /* 🔥 CENTRO AJUSTADO */
+}
+
+.progress-ring-bg {
+    stroke: var(--dracula-current-line);
+    opacity: 0.3;
+}
+
+.progress-ring-fill {
+    stroke: var(--dracula-purple);
+    stroke-linecap: round;
+    stroke-dasharray: 276;
+    /* 🔥 DASHARRAY AJUSTADO (2πr = 2π×44) */
+    stroke-dashoffset: 276;
+    animation: progressSpinImproved 1.5s ease-in-out infinite;
+    /* 🔥 ANIMACIÓN MEJORADA */
+    filter: drop-shadow(0 0 12px rgba(189, 147, 249, 0.8));
+}
+
+/* 🔥 ANIMACIÓN MEJORADA DEL PROGRESS */
+@keyframes progressSpinImproved {
+    0% {
+        stroke-dashoffset: 276;
+        stroke: var(--dracula-purple);
+    }
+
+    25% {
+        stroke-dashoffset: 207;
+        /* 75% del círculo */
+        stroke: var(--dracula-cyan);
+    }
+
+    50% {
+        stroke-dashoffset: 138;
+        /* 50% del círculo */
+        stroke: var(--dracula-green);
+    }
+
+    75% {
+        stroke-dashoffset: 69;
+        /* 25% del círculo */
+        stroke: var(--dracula-pink);
+    }
+
+    100% {
+        stroke-dashoffset: 276;
+        stroke: var(--dracula-purple);
+    }
+}
+
+/* 🔥 ANIMACIÓN ADICIONAL DE ROTACIÓN */
+.circular-progress {
+    animation: progressRotate 3s linear infinite;
+}
+
+@keyframes progressRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ================================
+     ⚡ ESTADO DE PROCESAMIENTO
+     ================================ */
+.processing-message {
+    font-size: 16px;
+    /* 🔥 FUENTE REDUCIDA */
+    font-weight: 600;
+    color: var(--dracula-foreground);
+    margin-bottom: 12px;
+    /* 🔥 MARGEN REDUCIDO */
+    animation: textPulse 2s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.processing-details {
+    background: rgba(68, 71, 90, 0.6);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 16px;
+    /* 🔥 PADDING REDUCIDO */
+    margin-bottom: 20px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.detail-label {
+    color: var(--dracula-comment);
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.detail-value {
+    color: var(--dracula-cyan);
+    font-weight: 600;
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+/* ================================
+     📋 LOGS DE PROCESAMIENTO
+     ================================ */
+.processing-logs {
+    margin-top: 20px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.logs-header {
+    color: var(--dracula-foreground);
+    font-weight: 600;
+    margin-bottom: 10px;
+    /* 🔥 MARGEN REDUCIDO */
+    font-size: 14px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.logs-content {
+    background: var(--dracula-darker);
+    border: 1px solid var(--dracula-current-line);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 12px;
+    /* 🔥 PADDING REDUCIDO */
+    max-height: 150px;
+    /* 🔥 ALTURA REDUCIDA */
+    overflow-y: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 11px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.log-entry {
+    color: var(--dracula-green);
+    margin-bottom: 3px;
+    /* 🔥 MARGEN REDUCIDO */
+    padding: 3px 0;
+    /* 🔥 PADDING REDUCIDO */
+    border-bottom: 1px solid rgba(68, 71, 90, 0.3);
+    animation: logEntrySlide 0.3s ease-out;
+    border-radius: 8px;
+    /* 🔥 MÁS REDONDEADO */
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+@keyframes logEntrySlide {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ================================
+     ✅ ESTADO COMPLETADO
+     ================================ */
+.completion-status {
+    text-align: center;
+    padding: 24px 20px;
+    /* 🔥 PADDING REDUCIDO */
+}
+
+.completion-message {
+    font-size: 18px;
+    /* 🔥 FUENTE REDUCIDA */
+    font-weight: 700;
+    color: var(--dracula-green);
+    margin-bottom: 20px;
+    /* 🔥 MARGEN REDUCIDO */
+    animation: completionBounce 0.6s ease-out;
+}
+
+@keyframes completionBounce {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* 🔥 COLUMNAS REDUCIDAS */
+    gap: 12px;
+    /* 🔥 GAP REDUCIDO */
+    margin-bottom: 20px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.result-item {
+    background: linear-gradient(135deg,
+            rgba(80, 250, 123, 0.1),
+            rgba(139, 233, 253, 0.1));
+    border: 2px solid var(--dracula-green);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 12px;
+    /* 🔥 PADDING REDUCIDO */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-label {
+    color: var(--dracula-comment);
+    font-weight: 500;
+    font-size: 12px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.result-value {
+    color: var(--dracula-green);
+    font-weight: 700;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+/* ================================
+     📂 UBICACIÓN DE SALIDA
+     ================================ */
+.output-location {
+    background: rgba(139, 233, 253, 0.1);
+    border: 2px solid var(--dracula-cyan);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 16px;
+    /* 🔥 PADDING REDUCIDO */
+    margin-bottom: 16px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.location-label {
+    color: var(--dracula-cyan);
+    font-weight: 600;
+    margin-bottom: 6px;
+    /* 🔥 MARGEN REDUCIDO */
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.location-path {
+    color: var(--dracula-foreground);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: rgba(40, 42, 54, 0.8);
+    padding: 8px;
+    /* 🔥 PADDING REDUCIDO */
+    border-radius: 12px;
+    /* 🔥 MÁS REDONDEADO */
+    word-break: break-all;
+    font-size: 11px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+/* ================================
+     📈 RESUMEN DE REGISTROS
+     ================================ */
+.record-summary {
+    background: rgba(189, 147, 249, 0.1);
+    border: 2px solid var(--dracula-purple);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 16px;
+    /* 🔥 PADDING REDUCIDO */
+}
+
+.summary-label {
+    color: var(--dracula-purple);
+    font-weight: 600;
+    margin-bottom: 6px;
+    /* 🔥 MARGEN REDUCIDO */
+    font-size: 13px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+.summary-content {
+    color: var(--dracula-foreground);
+    line-height: 1.5;
+    /* 🔥 ALTURA REDUCIDA */
+    font-size: 12px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+/* ================================
+     ❌ ESTADO DE ERROR
+     ================================ */
+.error-status {
+    text-align: center;
+    padding: 24px 20px;
+    /* 🔥 PADDING REDUCIDO */
+}
+
+.error-message {
+    background: rgba(255, 85, 85, 0.1);
+    border: 2px solid var(--dracula-red);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 16px;
+    /* 🔥 PADDING REDUCIDO */
+    color: var(--dracula-red);
+    font-weight: 600;
+    margin-bottom: 16px;
+    /* 🔥 MARGEN REDUCIDO */
+    animation: errorShake 0.5s ease-in-out;
+    font-size: 14px;
+    /* 🔥 FUENTE REDUCIDA */
+}
+
+@keyframes errorShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+.error-logs {
+    margin-top: 16px;
+    /* 🔥 MARGEN REDUCIDO */
+}
+
+.error-logs .logs-content {
+    border-color: var(--dracula-red);
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+}
+
+.error-logs .log-entry {
+    color: var(--dracula-red);
+    border-radius: 8px;
+    /* 🔥 MÁS REDONDEADO */
+}
+
+/* ================================
+     🔘 FOOTER Y BOTONES
+     ================================ */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    /* 🔥 PADDING REDUCIDO */
+    background: linear-gradient(135deg, var(--dracula-current-line), rgba(68, 71, 90, 0.8));
+    border-top: 1px solid var(--dracula-purple);
+    border-radius: 0 0 30px 30px;
+    /* 🔥 MÁS REDONDEADO */
+}
+
+.modal-button {
+    border: none;
+    border-radius: 20px;
+    /* 🔥 MÁS REDONDEADO */
+    padding: 12px 24px;
+    /* 🔥 PADDING REDUCIDO */
+    font-weight: 600;
+    font-size: 14px;
+    /* 🔥 FUENTE REDUCIDA */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    /* 🔥 ANCHO REDUCIDO */
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.modal-button:hover::before {
+    left: 100%;
+}
+
+.modal-button.primary {
+    background: linear-gradient(135deg, var(--dracula-purple), var(--dracula-pink));
+    color: white;
+    box-shadow: 0 8px 24px rgba(189, 147, 249, 0.3);
+}
+
+.modal-button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(189, 147, 249, 0.4);
+}
+
+.modal-button.secondary {
+    background: rgba(68, 71, 90, 0.8);
+    color: var(--dracula-foreground);
+    border: 2px solid var(--dracula-current-line);
+}
+
+.modal-button.secondary:hover {
+    background: var(--dracula-current-line);
+    border-color: var(--dracula-purple);
+}
+
+.modal-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ================================
+     📱 RESPONSIVE DESIGN
+     ================================ */
+@media (max-width: 768px) {
+    .duplicate-mdd-modal {
+        max-width: 95%;
+        min-width: 320px;
+        margin: 10px;
+        max-height: 90vh;
+        /* 🔥 ALTURA AJUSTADA */
+        border-radius: 24px;
+        /* 🔥 MÁS REDONDEADO */
+    }
+
+    .modal-header {
+        padding: 16px 20px;
+        /* 🔥 PADDING REDUCIDO */
+        border-radius: 24px 24px 0 0;
+        /* 🔥 MÁS REDONDEADO */
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+        /* 🔥 FUENTE REDUCIDA */
+    }
+
+    .modal-body {
+        padding: 20px;
+        /* 🔥 PADDING REDUCIDO */
+    }
+
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circular-progress {
+        width: 80px;
+        /* 🔥 TAMAÑO REDUCIDO */
+        height: 80px;
+        /* 🔥 TAMAÑO REDUCIDO */
+    }
+
+    .progress-ring {
+        width: 80px;
+        /* 🔥 TAMAÑO REDUCIDO */
+        height: 80px;
+        /* 🔥 TAMAÑO REDUCIDO */
+    }
+
+    .progress-ring-bg,
+    .progress-ring-fill {
+        r: 34;
+        /* 🔥 RADIO AJUSTADO */
+        cx: 40;
+        /* 🔥 CENTRO AJUSTADO */
+        cy: 40;
+        /* 🔥 CENTRO AJUSTADO */
+        stroke-width: 4;
+        /* 🔥 GROSOR REDUCIDO */
+    }
+
+    .progress-ring-fill {
+        stroke-dasharray: 214;
+        /* 🔥 DASHARRAY AJUSTADO (2π×34) */
+        stroke-dashoffset: 214;
+    }
+
+    @keyframes progressSpinImprovedMobile {
+        0% {
+            stroke-dashoffset: 214;
+            stroke: var(--dracula-purple);
+        }
+
+        25% {
+            stroke-dashoffset: 160;
+            stroke: var(--dracula-cyan);
+        }
+
+        50% {
+            stroke-dashoffset: 107;
+            stroke: var(--dracula-green);
+        }
+
+        75% {
+            stroke-dashoffset: 54;
+            stroke: var(--dracula-pink);
+        }
+
+        100% {
+            stroke-dashoffset: 214;
+            stroke: var(--dracula-purple);
+        }
+    }
+
+    .progress-ring-fill {
+        animation: progressSpinImprovedMobile 1.5s ease-in-out infinite;
+    }
+
+    .modal-footer {
+        padding: 16px 20px;
+        /* 🔥 PADDING REDUCIDO */
+        flex-direction: column;
+        gap: 10px;
+        /* 🔥 GAP REDUCIDO */
+        border-radius: 0 0 24px 24px;
+        /* 🔥 MÁS REDONDEADO */
+    }
+
+    .modal-button {
+        width: 100%;
+        min-width: auto;
+        padding: 10px 20px;
+        /* 🔥 PADDING REDUCIDO */
+        border-radius: 16px;
+        /* 🔥 MÁS REDONDEADO */
+    }
+
+    .section-title {
+        font-size: 14px;
+        /* 🔥 FUENTE REDUCIDA */
+        border-radius: 0 0 12px 12px;
+        /* 🔥 MÁS REDONDEADO */
+    }
+
+    .processing-message {
+        font-size: 14px;
+        /* 🔥 FUENTE REDUCIDA */
+    }
+
+    .completion-message {
+        font-size: 16px;
+        /* 🔥 FUENTE REDUCIDA */
+    }
+}
+
+/* ================================
+     🎯 ANIMACIÓN DE OCULTACIÓN DEL PROGRESS
+     ================================ */
+.circular-progress.hide {
+    animation: progressFadeOut 0.5s ease-out forwards;
+}
+
+@keyframes progressFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+        display: none;
+    }
+}
+
+/* ================================
+     💻 OPTIMIZACIÓN PARA LAPTOP (1366x768)
+     ================================ */
+@media (min-width: 769px) and (max-width: 1400px) {
+    .duplicate-mdd-modal {
+        max-width: 650px;
+        /* 🔥 ANCHO OPTIMIZADO PARA LAPTOP */
+        max-height: 80vh;
+        /* 🔥 ALTURA OPTIMIZADA */
+    }
+
+    .modal-body {
+        padding: 22px;
+        /* 🔥 PADDING INTERMEDIO */
+    }
+
+    .section {
+        margin-bottom: 18px;
+        /* 🔥 MARGEN INTERMEDIO */
+    }
+
+    .section-title {
+        font-size: 15px;
+        /* 🔥 FUENTE INTERMEDIA */
+        margin-bottom: 14px;
+        /* 🔥 MARGEN INTERMEDIO */
+    }
+
+    .processing-message {
+        font-size: 15px;
+        /* 🔥 FUENTE INTERMEDIA */
+    }
+
+    .completion-message {
+        font-size: 20px;
+        /* 🔥 FUENTE INTERMEDIA */
+    }
+
+    .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        /* 🔥 COLUMNAS AJUSTADAS */
+        gap: 10px;
+        /* 🔥 GAP REDUCIDO */
+    }
+
+    .logs-content {
+        max-height: 130px;
+        /* 🔥 ALTURA INTERMEDIA */
+    }
+}
+
+/* ================================
+     🖥️ OPTIMIZACIÓN PARA DESKTOP GRANDE (>1400px)
+     ================================ */
+@media (min-width: 1401px) {
+    .duplicate-mdd-modal {
+        max-width: 750px;
+        /* 🔥 ANCHO MAYOR PARA PANTALLAS GRANDES */
+        max-height: 85vh;
+    }
+
+    .modal-body {
+        padding: 28px;
+        /* 🔥 PADDING MAYOR */
+    }
+
+    .section {
+        margin-bottom: 24px;
+        /* 🔥 MARGEN MAYOR */
+    }
+
+    .section-title {
+        font-size: 17px;
+        /* 🔥 FUENTE MAYOR */
+        margin-bottom: 18px;
+        /* 🔥 MARGEN MAYOR */
+    }
+
+    .processing-message {
+        font-size: 17px;
+        /* 🔥 FUENTE MAYOR */
+    }
+
+    .completion-message {
+        font-size: 22px;
+        /* 🔥 FUENTE MAYOR */
+    }
+
+    .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        /* 🔥 COLUMNAS MAYORES */
+        gap: 14px;
+        /* 🔥 GAP MAYOR */
+    }
+
+    .logs-content {
+        max-height: 160px;
+        /* 🔥 ALTURA MAYOR */
+    }
+}

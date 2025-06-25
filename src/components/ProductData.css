@@ -350,7 +350,7 @@
 
 /* Select arrow */
 .pd-cyber-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23AEAEB2' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.pd-w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23AEAEB2' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 12px center;
     background-repeat: no-repeat;
     background-size: 16px;
@@ -562,7 +562,7 @@
     z-index: 1;
 }
 
-.results-grid {
+.pd-results-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-md);
@@ -768,7 +768,7 @@
     font-family: var(--font-family);
 }
 
-.error-icon {
+.pd-error-icon {
     width: 20px;
     height: 20px;
     color: var(--apple-error);
@@ -781,7 +781,7 @@
     line-height: 1.5;
 }
 
-.error-message {
+.pd-error-message {
     color: var(--apple-error);
     font-weight: 500;
     margin-bottom: var(--spacing-md);
@@ -865,7 +865,7 @@
         padding: var(--spacing-md);
     }
 
-    .results-grid {
+    .pd-results-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-sm);
     }

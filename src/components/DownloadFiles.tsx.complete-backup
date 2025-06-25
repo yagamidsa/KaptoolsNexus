@@ -171,8 +171,8 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
             <div className="download-modal">
                 {/* Header */}
                 <div className="download-df-modal-header">
-                    <div className="header-content">
-                        <div className="header-icon">
+                    <div className="df-header-content">
+                        <div className="df-header-icon">
                             {/* Azure Cloud SVG Icon */}
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                                 <path
@@ -193,7 +193,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 </defs>
                             </svg>
                         </div>
-                        <div className="header-text">
+                        <div className="df-header-text">
                             <h2>Azure File Download</h2>
                             <p>Download BEE, CeV and Link files</p>
                         </div>
@@ -227,7 +227,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                         />
                                     </svg>
                                 </div>
-                                <div className="progress-title">
+                                <div className="df-progress-title">
                                     <h3>Downloading Azure Files</h3>
                                     <p>Project: {formData.kapId} • Wave: {formData.waveId} • Server: {formData.server}</p>
                                 </div>
@@ -252,9 +252,9 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
 
                                 {/* Success Message */}
                                 {downloadComplete && downloadResult?.success && (
-                                    <div className="success-message">
+                                    <div className="df-success-message">
                                         <div className="success-icon">✅</div>
-                                        <div className="success-text">
+                                        <div className="df-success-text">
                                             <h4>Download Completed Successfully!</h4>
                                             <p>Files have been downloaded to your workspace. You can find them at:</p>
                                             <code>{workspacePath}/{formData.kapId}</code>
@@ -268,9 +268,9 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
 
                                 {/* Error Message */}
                                 {downloadComplete && !downloadResult?.success && (
-                                    <div className="error-message">
+                                    <div className="df-error-message">
                                         <div className="error-icon">❌</div>
-                                        <div className="error-text">
+                                        <div className="df-error-text">
                                             <h4>Download Failed</h4>
                                             <p>Please check your parameters and try again.</p>
                                         </div>
@@ -329,7 +329,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             ))}
                         </select>
                         {validationErrors.server && (
-                            <span className="error-text-validation">{validationErrors.server}</span>
+                            <span className="df-error-text-validation">{validationErrors.server}</span>
                         )}
                     </div>
 
@@ -355,7 +355,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             autoComplete="off"
                         />
                         {validationErrors.kapId && (
-                            <span className="error-text-validation">{validationErrors.kapId}</span>
+                            <span className="df-error-text-validation">{validationErrors.kapId}</span>
                         )}
                     </div>
 
@@ -385,7 +385,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             autoComplete="off"
                         />
                         {validationErrors.waveId && (
-                            <span className="error-text-validation">{validationErrors.waveId}</span>
+                            <span className="df-error-text-validation">{validationErrors.waveId}</span>
                         )}
                     </div>
 
@@ -427,7 +427,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             </label>
                         </div>
                         {validationErrors.token && (
-                            <span className="error-text-validation">{validationErrors.token}</span>
+                            <span className="df-error-text-validation">{validationErrors.token}</span>
                         )}
                     </div>
 

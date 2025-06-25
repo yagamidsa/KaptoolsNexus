@@ -388,12 +388,12 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         <div className="modal-overlay">
             <div className="modal-content duplicate-mdd-modal">
                 {/* Header */}
-                <div className="modal-header">
-                    <div className="header-icon">
+                <div className="dup-modal-header">
+                    <div className="dup-header-icon">
                         <NeonSVGs.Fire />
                     </div>
                     <h2> MDD DUPLICATOR - IBM SPSS</h2>
-                    <button className="close-button" onClick={onClose}>
+                    <button className="dup-close-button" onClick={onClose}>
                         <NeonSVGs.Close />
                     </button>
                 </div>
@@ -413,8 +413,8 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                                 <div className="file-display">
                                     {selectedMddFile ? (
                                         <div>
-                                            <div className="file-path">📋 MDD: {selectedMddFile}</div>
-                                            <div className="file-path">💾 DDF: {selectedDdfFile}</div>
+                                            <div className="dup-file-path">📋 MDD: {selectedMddFile}</div>
+                                            <div className="dup-file-path">💾 DDF: {selectedDdfFile}</div>
                                         </div>
                                     ) : (
                                         <span className="file-placeholder">📁 No MDD file selected...</span>
@@ -430,8 +430,8 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                             </div>
 
                             {error && (
-                                <div className="error-message">
-                                    <NeonSVGs.Error className="neon-svg small neon-error" /> {error}
+                                <div className="dup-error-message">
+                                    <NeonSVGs.Error className="dup-neon-svg dup-small neon-error" /> {error}
                                 </div>
                             )}
                         </div>
@@ -468,15 +468,15 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
 
                                 <div className="file-info">
                                     <div className="info-item">
-                                        <span className="info-label">📋 MDD File:</span>
+                                        <span className="dup-info-label">📋 MDD File:</span>
                                         <span className="info-value">{getFileName(selectedMddFile)}</span>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">💾 DDF File:</span>
+                                        <span className="dup-info-label">💾 DDF File:</span>
                                         <span className="info-value">{getFileName(selectedDdfFile)}</span>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">📂 Workspace:</span>
+                                        <span className="dup-info-label">📂 Workspace:</span>
                                         <span className="info-value">{workspacePath}</span>
                                     </div>
                                 </div>
@@ -528,7 +528,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
 
                             <div className="processing-logs">
                                 <div className="logs-header">
-                                    <NeonSVGs.Logs className="neon-svg small neon-logs" /> Processing Logs:
+                                    <NeonSVGs.Logs className="dup-neon-svg dup-small neon-logs" /> Processing Logs:
                                 </div>
                                 <div className="logs-content">
                                     {processingLogs.map((log, index) => (
@@ -553,16 +553,16 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                                 🎉 Successfully duplicated  MDD data using IBM SPSS Data Collection!
                             </div>
 
-                            <div className="results-grid">
+                            <div className="dup-results-grid">
                                 <div className="result-item">
                                     <span className="result-label">
-                                        <NeonSVGs.Stats className="neon-svg small neon-stats" /> Original records:
+                                        <NeonSVGs.Stats className="dup-neon-svg dup-small neon-stats" /> Original records:
                                     </span>
                                     <span className="result-value">{result.data?.original_records?.toLocaleString() || 'Unknown'}</span>
                                 </div>
                                 <div className="result-item">
                                     <span className="result-label">
-                                        <NeonSVGs.Duplicate className="neon-svg small neon-duplicate" /> Duplicated {duplicateCount}x:
+                                        <NeonSVGs.Duplicate className="dup-neon-svg dup-small neon-duplicate" /> Duplicated {duplicateCount}x:
                                     </span>
                                     <span className="result-value">{result.data?.total_records?.toLocaleString() || 'Unknown'} total records</span>
                                 </div>
@@ -578,7 +578,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
 
                             <div className="output-location">
                                 <div className="location-label">
-                                    <NeonSVGs.Location className="neon-svg small neon-location" /> Output Location:
+                                    <NeonSVGs.Location className="dup-neon-svg dup-small neon-location" /> Output Location:
                                 </div>
                                 <div className="location-path">{result.data?.output_path || workspacePath}</div>
                             </div>
@@ -586,7 +586,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                             {result.record_summary && (
                                 <div className="record-summary">
                                     <div className="summary-label">
-                                        <NeonSVGs.Summary className="neon-svg small neon-summary" /> Summary:
+                                        <NeonSVGs.Summary className="dup-neon-svg dup-small neon-summary" /> Summary:
                                     </div>
                                     <div className="summary-content">{result.record_summary}</div>
                                 </div>
@@ -604,14 +604,14 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                                 PROCESSING ERROR
                             </div>
 
-                            <div className="error-message">
-                                <NeonSVGs.Error className="neon-svg small neon-error" /> {error}
+                            <div className="dup-error-message">
+                                <NeonSVGs.Error className="dup-neon-svg dup-small neon-error" /> {error}
                             </div>
 
                             {processingLogs.length > 0 && (
                                 <div className="error-logs">
                                     <div className="logs-header">
-                                        <NeonSVGs.Logs className="neon-svg small neon-logs" /> Error Logs:
+                                        <NeonSVGs.Logs className="dup-neon-svg dup-small neon-logs" /> Error Logs:
                                     </div>
                                     <div className="logs-content">
                                         {processingLogs.map((log, index) => (
@@ -627,35 +627,35 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                 {/* Footer Actions */}
                 <div className="modal-footer">
                     {currentStep === 'idle' && (
-                        <button className="modal-button secondary" onClick={onClose}>
-                            <NeonSVGs.Close className="neon-svg small neon-close" /> Cancel
+                        <button className="dup-modal-button dup-secondary" onClick={onClose}>
+                            <NeonSVGs.Close className="dup-neon-svg dup-small neon-close" /> Cancel
                         </button>
                     )}
 
                     {currentStep === 'file-selected' && (
                         <>
-                            <button className="modal-button secondary" onClick={() => setCurrentStep('idle')}>
-                                <NeonSVGs.Back className="neon-svg small neon-back" /> Back
+                            <button className="dup-modal-button dup-secondary" onClick={() => setCurrentStep('idle')}>
+                                <NeonSVGs.Back className="dup-neon-svg dup-small neon-back" /> Back
                             </button>
                             <button
-                                className="modal-button primary"
+                                className="dup-modal-button dup-primary"
                                 onClick={startProcessing}
                                 disabled={loading}
                             >
-                                <NeonSVGs.Lightning className="neon-svg small neon-lightning" /> Start  Duplication (IBM SPSS)
+                                <NeonSVGs.Lightning className="dup-neon-svg dup-small neon-lightning" /> Start  Duplication (IBM SPSS)
                             </button>
                         </>
                     )}
 
                     {currentStep === 'processing' && (
-                        <button className="modal-button secondary" disabled>
-                            <NeonSVGs.Processing className="neon-svg small neon-duplicate" /> Processing with IBM SPSS...
+                        <button className="dup-modal-button dup-secondary" disabled>
+                            <NeonSVGs.Processing className="dup-neon-svg dup-small neon-duplicate" /> Processing with IBM SPSS...
                         </button>
                     )}
 
                     {(currentStep === 'completed' || currentStep === 'error') && (
-                        <button className="modal-button primary" onClick={onClose}>
-                            <NeonSVGs.Check className="neon-svg small neon-check" /> Done
+                        <button className="dup-modal-button dup-primary" onClick={onClose}>
+                            <NeonSVGs.Check className="dup-neon-svg dup-small neon-check" /> Done
                         </button>
                     )}
                 </div>

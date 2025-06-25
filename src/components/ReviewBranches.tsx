@@ -457,13 +457,13 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     ));
 
     const LoadingSpinner: React.FC = React.memo(() => (
-        <div className="loading-state">
+        <div className="rb-loading-state">
             <div className="rb-loading-spinner">
-                <div className="loading-spinner-container">
+                <div className="rb-loading-spinner-container">
                     <div className="spinner-ring"></div>
                 </div>
-                <div className="loading-text">Loading branches</div>
-                <div className="loading-subtext">Fetching latest Git information...</div>
+                <div className="rb-loading-text">Loading branches</div>
+                <div className="rb-loading-subtext">Fetching latest Git information...</div>
             </div>
         </div>
     ));
@@ -777,7 +777,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                             onClick={() => handleFileClick(file)}
                                             title="Click to view file changes"
                                         >
-                                            <div className="file-path">
+                                            <div className="rb-file-path">
                                                 <span className={`change-type ${getChangeTypeColor(file.change_type)}`}>
                                                     {file.change_type.toUpperCase()}
                                                 </span>

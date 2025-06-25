@@ -73,7 +73,7 @@
 }
 
 /* 🔥 HEADER */
-.modal-header {
+.cs-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -416,7 +416,7 @@
     color: #f59e0b;
 }
 
-.validation-message.error {
+.validation-message.cs-error {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
     color: #ef4444;
@@ -624,7 +624,7 @@
         max-width: none;
     }
 
-    .modal-header {
+    .cs-modal-header {
         padding: 20px 20px 16px;
     }
 
@@ -659,7 +659,7 @@
         border-radius: 12px;
     }
 
-    .modal-header {
+    .cs-modal-header {
         padding: 16px;
     }
 
@@ -693,14 +693,14 @@
 }
 
 /* 🔥 LOADING STATES */
-.create-structure-container.loading {
+.create-structure-container.cs-loading {
     pointer-events: none;
 }
 
-.create-structure-container.loading .modal-header,
-.create-structure-container.loading .cs-workspace-info,
-.create-structure-container.loading .file-section,
-.create-structure-container.loading .cs-input-group {
+.create-structure-container.cs-loading .cs-modal-header,
+.create-structure-container.cs-loading .cs-workspace-info,
+.create-structure-container.cs-loading .file-section,
+.create-structure-container.cs-loading .cs-input-group {
     opacity: 0.6;
 }
 

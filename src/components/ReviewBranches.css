@@ -455,28 +455,28 @@
    ================================ */
 
 /* Para usar en otros lugares - spinner pequeño */
-.spinner-ring.small {
+.spinner-ring.rb-small {
     width: 30px;
     height: 30px;
     border-width: 2px;
 }
 
-.spinner-ring.small::before {
+.spinner-ring.rb-small::before {
     border-width: 1px;
 }
 
 /* Para usar en otros lugares - spinner grande */
-.spinner-ring.large {
+.spinner-ring.rb-large {
     width: 80px;
     height: 80px;
     border-width: 4px;
 }
 
-.spinner-ring.large::before {
+.spinner-ring.rb-large::before {
     border-width: 3px;
 }
 
-.spinner-ring.large::after {
+.spinner-ring.rb-large::after {
     width: 100px;
     height: 100px;
 }
@@ -1074,7 +1074,7 @@
    ================================ */
 
 /* Estado de carga */
-.branch-name.clickable-branch.loading {
+.branch-name.clickable-branch.rb-loading {
     pointer-events: none;
     opacity: 0.7;
     animation: loadingPulse 1.5s ease-in-out infinite;
@@ -1093,19 +1093,19 @@
 }
 
 /* Estado de error */
-.branch-name.clickable-branch.error {
+.branch-name.clickable-branch.rb-error {
     color: var(--error-red);
     background: rgba(239, 68, 68, 0.1);
     border-color: rgba(239, 68, 68, 0.3);
 }
 
-.branch-name.clickable-branch.error:hover {
+.branch-name.clickable-branch.rb-error:hover {
     background: rgba(239, 68, 68, 0.15);
     border-color: rgba(239, 68, 68, 0.5);
 }
 
 /* Estado de éxito */
-.branch-name.clickable-branch.success {
+.branch-name.clickable-branch.rb-success {
     animation: successFlash 0.5s ease-out;
 }
 
@@ -3136,7 +3136,7 @@
     width: 3px;
 }
 
-.file-path {
+.rb-file-path {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -3525,7 +3525,7 @@
 /* ================================
    📁 FILES LIST - PATHS MÁS ANCHOS
    ================================ */
-.file-path {
+.rb-file-path {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -4647,7 +4647,7 @@
     box-shadow: 0 8px 25px rgba(189, 147, 249, 0.2);
 }
 
-.mode-button.active {
+.mode-button.rb-active {
     background: linear-gradient(135deg,
             rgba(80, 250, 123, 0.25) 0%,
             rgba(80, 250, 123, 0.4) 100%);
@@ -5846,7 +5846,7 @@
     box-shadow: 0 8px 25px rgba(189, 147, 249, 0.2);
 }
 
-.mode-button.active {
+.mode-button.rb-active {
     background: linear-gradient(135deg,
             rgba(80, 250, 123, 0.25) 0%,
             rgba(80, 250, 123, 0.4) 100%);
@@ -6434,9 +6434,9 @@
 }
 
 /* ESTADO ACTIVO */
-.mode-button.active,
-.diff-mode-toggle .mode-button.active,
-.mode-buttons-container .mode-button.active {
+.mode-button.rb-active,
+.diff-mode-toggle .mode-button.rb-active,
+.mode-buttons-container .mode-button.rb-active {
     background: linear-gradient(135deg,
             rgba(80, 250, 123, 0.25) 0%,
             rgba(80, 250, 123, 0.4) 100%) !important;
@@ -6553,7 +6553,7 @@
     box-shadow: 0 8px 25px rgba(189, 147, 249, 0.2);
 }
 
-.mode-button.active {
+.mode-button.rb-active {
     background: linear-gradient(135deg,
             rgba(80, 250, 123, 0.25) 0%,
             rgba(80, 250, 123, 0.4) 100%);
@@ -6983,9 +6983,9 @@
 }
 
 /* ESTADO ACTIVO - VERDE DRACULA */
-.diff-mode-toggle .mode-button.active,
-.rb-file-diff-overlay .diff-mode-toggle .mode-button.active,
-.file-diff-modal .diff-mode-toggle .mode-button.active {
+.diff-mode-toggle .mode-button.rb-active,
+.rb-file-diff-overlay .diff-mode-toggle .mode-button.rb-active,
+.file-diff-modal .diff-mode-toggle .mode-button.rb-active {
     background: linear-gradient(135deg,
             rgba(80, 250, 123, 0.25) 0%,
             rgba(80, 250, 123, 0.4) 100%) !important;

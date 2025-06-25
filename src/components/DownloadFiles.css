@@ -65,13 +65,13 @@
     background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(255, 107, 157, 0.05));
 }
 
-.header-content {
+.df-header-content {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-.header-icon {
+.df-header-icon {
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -273,7 +273,7 @@
 .cyber-select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c5ce7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.df-w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c5ce7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 40px;
@@ -409,7 +409,7 @@
     min-width: 0;
 }
 
-.info-label {
+.df-info-label {
     color: #a0a3bd;
     font-weight: 600;
     font-size: 11px;
@@ -433,7 +433,7 @@
     background: rgba(37, 42, 74, 0.3);
 }
 
-.modal-button {
+.df-modal-button {
     flex: 1;
     padding: 14px 20px;
     border-radius: 10px;
@@ -451,26 +451,26 @@
     overflow: hidden;
 }
 
-.modal-button.secondary {
+.df-modal-button.df-secondary {
     background: rgba(160, 163, 189, 0.1);
     border: 1px solid rgba(160, 163, 189, 0.3);
     color: #a0a3bd;
 }
 
-.modal-button.secondary:hover:not(:disabled) {
+.df-modal-button.df-secondary:hover:not(:disabled) {
     background: rgba(160, 163, 189, 0.2);
     border-color: #a0a3bd;
     transform: translateY(-1px);
 }
 
-.modal-button.primary {
+.df-modal-button.df-primary {
     background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
     border: none;
     color: white;
     box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
 }
 
-.modal-button.primary::before {
+.df-modal-button.df-primary::before {
     content: '';
     position: absolute;
     top: 0;
@@ -484,32 +484,32 @@
     transition: left 0.6s ease;
 }
 
-.modal-button.primary:hover:not(:disabled) {
+.df-modal-button.df-primary:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
     background: linear-gradient(135deg, #a29bfe, #fd79a8);
 }
 
-.modal-button.primary:hover:not(:disabled)::before {
+.df-modal-button.df-primary:hover:not(:disabled)::before {
     left: 100%;
 }
 
-.modal-button:disabled {
+.df-modal-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
 }
 
-.modal-button.primary:disabled {
+.df-modal-button.df-primary:disabled {
     background: linear-gradient(135deg, rgba(108, 92, 231, 0.5), rgba(255, 107, 157, 0.5));
     box-shadow: none;
 }
 
-.modal-button:active:not(:disabled) {
+.df-modal-button:active:not(:disabled) {
     transform: translateY(1px) scale(0.98);
 }
 
-.modal-button:focus-visible {
+.df-modal-button:focus-visible {
     outline: 2px solid #6c5ce7;
     outline-offset: 2px;
 }
@@ -531,7 +531,7 @@
     }
 }
 
-.modal-button.primary:disabled .df-loading-spinner {
+.df-modal-button.df-primary:disabled .df-loading-spinner {
     animation: spin 1s linear infinite, loading-pulse 2s ease infinite;
 }
 
@@ -879,7 +879,7 @@
     margin-top: 12px;
 }
 
-.error-message {
+.df-error-message {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 12px;
@@ -899,7 +899,7 @@
     }
 }
 
-.error-icon {
+.df-error-icon {
     font-size: 32px;
     margin-bottom: 12px;
     animation: error-shake 0.5s ease infinite alternate;
@@ -930,19 +930,19 @@
 }
 
 /* VALIDATION ERRORS */
-.form-group.error .cyber-input,
-.form-group.error .cyber-select {
+.form-group.df-error .cyber-input,
+.form-group.df-error .cyber-select {
     border-color: #ef4444;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
 }
 
-.form-group.success .cyber-input,
-.form-group.success .cyber-select {
+.form-group.df-success .cyber-input,
+.form-group.df-success .cyber-select {
     border-color: #00ff87;
     box-shadow: 0 0 0 2px rgba(0, 255, 135, 0.1);
 }
 
-.form-group.success .form-label {
+.form-group.df-success .form-label {
     color: #00ff87;
 }
 
@@ -983,19 +983,19 @@
         0 0 0 1px rgba(108, 92, 231, 0.1);
 }
 
-.form-group.loading .cyber-input,
-.form-group.loading .cyber-select {
+.form-group.df-loading .cyber-input,
+.form-group.df-loading .cyber-select {
     pointer-events: none;
     opacity: 0.7;
     background: rgba(26, 29, 58, 0.6);
 }
 
 /* MODAL STATES */
-.download-modal.loading {
+.download-modal.df-loading {
     pointer-events: none;
 }
 
-.download-modal.loading .download-modal-content {
+.download-modal.df-loading .download-modal-content {
     filter: blur(2px);
     opacity: 0.5;
 }
@@ -1106,11 +1106,11 @@
         padding: 20px 20px 16px;
     }
 
-    .header-content {
+    .df-header-content {
         gap: 12px;
     }
 
-    .header-icon {
+    .df-header-icon {
         width: 40px;
         height: 40px;
     }
@@ -1254,7 +1254,7 @@
 
     .cyber-input,
     .cyber-select,
-    .modal-button {
+    .df-modal-button {
         border-width: 2px;
     }
 }
@@ -1369,13 +1369,13 @@ body:has(.download-df-modal-backdrop) {
     background: rgba(108, 92, 231, 0.05);
 }
 
-.header-content {
+.df-header-content {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.header-icon {
+.df-header-icon {
     width: 40px;
     height: 40px;
     border-radius: 8px;
@@ -1441,8 +1441,8 @@ body:has(.download-df-modal-backdrop) {
     gap: 6px;
 }
 
-.form-group.error .cyber-input,
-.form-group.error .cyber-select {
+.form-group.df-error .cyber-input,
+.form-group.df-error .cyber-select {
     border-color: #ef4444;
     background: rgba(239, 68, 68, 0.05);
 }
@@ -1498,7 +1498,7 @@ body:has(.download-df-modal-backdrop) {
 .cyber-select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c5ce7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.df-w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c5ce7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 36px;
@@ -1585,7 +1585,7 @@ body:has(.download-df-modal-backdrop) {
     min-width: 0;
 }
 
-.info-label {
+.df-info-label {
     color: #a0a3bd;
     font-weight: 600;
     font-size: 10px;
@@ -1617,7 +1617,7 @@ body:has(.download-df-modal-backdrop) {
     background: rgba(37, 42, 74, 0.5);
 }
 
-.modal-button {
+.df-modal-button {
     flex: 1;
     padding: 12px 18px;
     border-radius: 8px;
@@ -1633,30 +1633,30 @@ body:has(.download-df-modal-backdrop) {
     letter-spacing: 0.5px;
 }
 
-.modal-button.secondary {
+.df-modal-button.df-secondary {
     background: rgba(160, 163, 189, 0.1);
     border: 1px solid rgba(160, 163, 189, 0.3);
     color: #a0a3bd;
 }
 
-.modal-button.secondary:hover:not(:disabled) {
+.df-modal-button.df-secondary:hover:not(:disabled) {
     background: rgba(160, 163, 189, 0.2);
     border-color: #a0a3bd;
 }
 
-.modal-button.primary {
+.df-modal-button.df-primary {
     background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
     border: none;
     color: white;
     box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
 }
 
-.modal-button.primary:hover:not(:disabled) {
+.df-modal-button.df-primary:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
 }
 
-.modal-button:disabled {
+.df-modal-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -1856,7 +1856,7 @@ body:has(.download-df-modal-backdrop) {
 }
 
 /* ERROR MESSAGE */
-.error-message {
+.df-error-message {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 8px;
@@ -1865,7 +1865,7 @@ body:has(.download-df-modal-backdrop) {
     text-align: center;
 }
 
-.error-icon {
+.df-error-icon {
     font-size: 24px;
     margin-bottom: 8px;
 }
@@ -1898,7 +1898,7 @@ body:has(.download-df-modal-backdrop) {
         padding: 18px 20px;
     }
 
-    .header-icon {
+    .df-header-icon {
         width: 36px;
         height: 36px;
     }

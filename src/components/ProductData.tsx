@@ -229,14 +229,14 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         return (
             <div className="error-panel-enhanced">
                 <div className="error-header">
-                    <svg viewBox="0 0 24 24" className="error-icon">
+                    <svg viewBox="0 0 24 24" className="pd-error-icon">
                         <path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" fill="none" />
                     </svg>
                     <h4>Error Details</h4>
                 </div>
 
                 <div className="error-content">
-                    <div className="error-message">
+                    <div className="pd-error-message">
                         {error}
                     </div>
 
@@ -489,7 +489,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                                 </div> 
 
 
-                            <div className="results-grid">
+                            <div className="pd-results-grid">
                                 <div className="pd-result-item">
                                     <label>
                                         <svg viewBox="0 0 24 24" className="result-icon">

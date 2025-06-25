@@ -72,7 +72,7 @@
     background: linear-gradient(135deg, rgba(26, 29, 58, 0.8) 0%, rgba(15, 20, 45, 0.6) 100%);
 }
 
-.header-content {
+.shortcuts-header-content {
     display: flex;
     align-items: center;
     gap: 40px;
@@ -206,7 +206,7 @@
 
 /* ❌ REMOVED: statPulse animation for performance */
 
-.close-button {
+.shortcuts-close-button {
     width: 44px;
     height: 44px;
     border: none;
@@ -236,7 +236,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.close-button:hover,
+.shortcuts-close-button:hover,
 .shortcuts-close-button:hover {
     background: rgba(255, 107, 157, 0.2);
     border-color: #ff6b9d;
@@ -413,7 +413,7 @@ svg[class*="search-icon"] {
     /* ❌ REMOVIDO: scale + box-shadow costosos */
 }
 
-.category-chip.active {
+.category-chip.shortcuts-active {
     background: linear-gradient(135deg, rgba(26, 29, 58, 0.9) 0%, rgba(108, 92, 231, 0.2) 100%);
     border-color: var(--category-color);
     transform: translateY(-2px);
@@ -436,7 +436,7 @@ svg[class*="search-icon"] {
     transition: all 0.3s ease;
 }
 
-.category-chip.active .chip-label,
+.category-chip.shortcuts-active .chip-label,
 .category-chip.shortcuts-active .chip-label {
     color: var(--category-color);
     text-shadow: 0 0 8px var(--category-color);
@@ -457,7 +457,7 @@ svg[class*="search-icon"] {
     transition: all 0.3s ease;
 }
 
-.category-chip.active .chip-count,
+.category-chip.shortcuts-active .chip-count,
 .category-chip.shortcuts-active .chip-count {
     background: var(--category-color);
     color: rgba(0, 0, 0, 0.8);
@@ -570,14 +570,14 @@ svg[class*="search-icon"] {
     /* ❌ REMOVIDO: background-image duplicado */
 }
 
-.neon-svg {
+.shortcuts-neon-svg {
     width: 20px;
     height: 20px;
     transition: transform 0.2s ease, filter 0.2s ease;
     filter: drop-shadow(0 0 8px var(--shortcut-color));
 }
 
-.shortcut-card:hover .neon-svg {
+.shortcut-card:hover .shortcuts-neon-svg {
     transform: scale(1.05);
     filter: brightness(1.2);
 }
@@ -929,7 +929,7 @@ button[onclick*="reset"]:active,
     .shortcut-title { font-size: 13px; }
     .shortcut-description { font-size: 10px; }
     .icon-wrapper { width: 35px; height: 35px; }
-    .neon-svg { width: 20px; height: 20px; }
+    .shortcuts-neon-svg { width: 20px; height: 20px; }
     .title-main { font-size: 22px; letter-spacing: 1.5px; }
 }
 
@@ -947,7 +947,7 @@ button[onclick*="reset"]:active,
     .shortcut-title { font-size: 12px; }
     .shortcut-description { font-size: 9px; }
     .icon-wrapper { width: 32px; height: 32px; }
-    .neon-svg { width: 18px; height: 18px; }
+    .shortcuts-neon-svg { width: 18px; height: 18px; }
     .title-main { font-size: 18px; letter-spacing: 1px; }
     .title-sub { font-size: 9px; letter-spacing: 3px; }
 }
@@ -969,7 +969,7 @@ button[onclick*="reset"]:active,
     .shortcut-title { font-size: 11px; }
     .shortcut-description { font-size: 8px; }
     .icon-wrapper { width: 28px; height: 28px; }
-    .neon-svg { width: 16px; height: 16px; }
+    .shortcuts-neon-svg { width: 16px; height: 16px; }
     .shortcuts-footer { padding: 10px 16px; }
     .footer-content { flex-direction: column; gap: 8px; }
 }
@@ -995,7 +995,7 @@ button[onclick*="reset"]:active,
     .shortcut-title { font-size: 10px; }
     .shortcut-description { font-size: 7px; }
     .icon-wrapper { width: 24px; height: 24px; }
-    .neon-svg { width: 14px; height: 14px; }
+    .shortcuts-neon-svg { width: 14px; height: 14px; }
     .launch-button { padding: 4px 8px; font-size: 7px; }
     .shortcuts-footer { padding: 8px 12px; }
     .category-chip { padding: 2px 4px; gap: 2px; border-radius: 3px; }

@@ -253,12 +253,12 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 {/* Success Message */}
                                 {downloadComplete && downloadResult?.success && (
                                     <div className="df-success-message">
-                                        <div className="success-icon">✅</div>
+                                        <div className="df-success-icon">✅</div>
                                         <div className="df-success-text">
                                             <h4>Download Completed Successfully!</h4>
                                             <p>Files have been downloaded to your workspace. You can find them at:</p>
                                             <code>{workspacePath}/{formData.kapId}</code>
-                                            <p className="success-details">
+                                            <p className="df-success-details">
                                                 {downloadResult.total_files} files downloaded •
                                                 Check your workspace folder to access the files
                                             </p>
@@ -269,7 +269,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 {/* Error Message */}
                                 {downloadComplete && !downloadResult?.success && (
                                     <div className="df-error-message">
-                                        <div className="error-icon">❌</div>
+                                        <div className="df-error-icon">❌</div>
                                         <div className="df-error-text">
                                             <h4>Download Failed</h4>
                                             <p>Please check your parameters and try again.</p>
@@ -282,14 +282,14 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             <div className="progress-actions">
                                 {downloadComplete ? (
                                     <button
-                                        className="modal-button primary"
+                                        className="df-modal-button df-primary"
                                         onClick={handleCloseModal}
                                     >
                                         Close
                                     </button>
                                 ) : (
                                     <button
-                                        className="modal-button secondary"
+                                        className="df-modal-button df-secondary"
                                         onClick={handleCloseModal}
                                         disabled={loading}
                                     >
@@ -444,7 +444,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                             </svg>
                         </div>
                         <div className="info-text">
-                            <span className="info-label">Download Location:</span>
+                            <span className="df-info-label">Download Location:</span>
                             <span className="info-path">{workspacePath}</span>
                         </div>
                     </div>
@@ -453,14 +453,14 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                 {/* Action Buttons */}
                 <div className="download-modal-actions">
                     <button
-                        className="modal-button secondary"
+                        className="df-modal-button df-secondary"
                         onClick={handleCloseModal}
                         disabled={loading}
                     >
                         Cancel
                     </button>
                     <button
-                        className="modal-button primary"
+                        className="df-modal-button df-primary"
                         onClick={handleDownload}
                         disabled={loading || !formData.kapId.trim() || !formData.waveId.trim() || !formData.token.trim()}
                     >

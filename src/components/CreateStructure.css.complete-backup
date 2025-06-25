@@ -1,885 +1,187 @@
-/* ================================
-   VARIABLES Y COLORES PROFESIONALES
-   ================================ */
-:root {
-    /* Colores base profesionales */
-    --navy-900: #0f1629;
-    --navy-800: #1a202c;
-    --navy-700: #2d3748;
-    --navy-600: #4a5568;
-    --navy-500: #718096;
+/* src/components/CreateStructure.css - DISEÑO SIMILAR A DOWNLOADFILES */
 
-    /* Colores de acento */
-    --gold-500: #f6ad55;
-    --gold-400: #fbb042;
-    --blue-400: #63b3ed;
-    --purple-400: #9f7aea;
-    --red-400: #fc8181;
-    --green-400: #68d391;
-
-    /* Gradientes profesionales */
-    --gradient-primary: linear-gradient(135deg, var(--navy-700) 0%, var(--navy-600) 100%);
-    --gradient-accent: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 100%);
-    --gradient-border: linear-gradient(135deg, var(--gold-400) 0%, var(--blue-400) 50%, var(--purple-400) 100%);
-
-    /* Sombras profesionales */
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.25);
-    --shadow-glow: 0 0 20px rgba(246, 173, 85, 0.3);
-}
-
-/* ================================
-   BACKDROP PRINCIPAL CENTRADO
-   ================================ */
-.cs-download-modal-backdrop,
+/* 🔥 BACKDROP PRINCIPAL */
 .create-structure-modal {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background:
-        radial-gradient(circle at 20% 80%, rgba(246, 173, 85, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(99, 179, 237, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(159, 122, 234, 0.02) 0%, transparent 50%),
-        linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, var(--navy-900) 100%);
-    backdrop-filter: blur(8px) saturate(1.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    animation: backdropSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    padding: 20px;
-}
-
-@keyframes backdropSlideIn {
-    from {
-        opacity: 0;
-        backdrop-filter: blur(0px);
-    }
-
-    to {
-        opacity: 1;
-        backdrop-filter: blur(8px) saturate(1.1);
-    }
-}
-
-/* ================================
-   MODAL PRINCIPAL CENTRADO
-   ================================ */
-.cs-download-modal,
-.create-structure-container {
-    background: var(--gradient-primary);
-    border: 1px solid rgba(246, 173, 85, 0.2);
-    border-radius: 16px;
-    backdrop-filter: blur(20px) saturate(1.2);
-    box-shadow:
-        var(--shadow-xl),
-        0 0 0 1px rgba(255, 255, 255, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow: hidden;
-    animation: modalEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-}
-
-/* Animación de entrada */
-@keyframes modalEnter {
-    from {
-        opacity: 0;
-        transform: translateY(-40px) scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* Animación de salida */
-.cs-download-modal.cs-closing,
-.create-structure-container.cs-closing {
-    animation: modalExit 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
-}
-
-@keyframes modalExit {
-    from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    to {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.95);
-    }
-}
-
-.cs-download-modal-backdrop.cs-closing,
-.create-structure-modal.cs-closing {
-    animation: backdropExit 0.3s ease-out forwards;
-}
-
-@keyframes backdropExit {
-    from {
-        opacity: 1;
-        backdrop-filter: blur(8px);
-    }
-
-    to {
-        opacity: 0;
-        backdrop-filter: blur(0px);
-    }
-}
-
-/* Borde sutil animado */
-.cs-download-modal::before,
-.create-structure-container::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    right: -1px;
-    bottom: -1px;
-    border-radius: 16px;
-    background: var(--gradient-border);
-    z-index: -1;
-    opacity: 0.3;
-    animation: borderGlow 4s ease-in-out infinite alternate;
-}
-
-@keyframes borderGlow {
-    from {
-        opacity: 0.2;
-    }
-
-    to {
-        opacity: 0.4;
-    }
-}
-
-/* ================================
-   HEADER PROFESIONAL
-   ================================ */
-.cs-download-modal-header,
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 28px 20px;
-    border-bottom: 1px solid rgba(246, 173, 85, 0.15);
-    background: linear-gradient(135deg, rgba(246, 173, 85, 0.05) 0%, rgba(99, 179, 237, 0.03) 100%);
-    position: relative;
-}
-
-.cs-header-content {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-}
-
-.cs-header-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: var(--gradient-accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--navy-900);
-    font-size: 20px;
-    font-weight: 600;
-    box-shadow: var(--shadow-glow);
-    animation: iconPulse 3s ease-in-out infinite;
-}
-
-@keyframes iconPulse {
-
-    0%,
-    100% {
-        box-shadow: var(--shadow-glow);
-        transform: scale(1);
-    }
-
-    50% {
-        box-shadow: 0 0 25px rgba(246, 173, 85, 0.4);
-        transform: scale(1.02);
-    }
-}
-
-.header-text h2,
-.cs-modal-title {
-    color: #ffffff;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.header-text p {
-    color: var(--navy-500);
-    font-size: 13px;
-    margin: 0;
-    font-weight: 500;
-}
-
-.cs-download-modal .cs-close-button {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: rgba(252, 129, 129, 0.1);
-    border: 1px solid rgba(252, 129, 129, 0.2);
-    color: var(--red-400);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.cs-download-modal .cs-close-button:hover {
-    background: rgba(252, 129, 129, 0.15);
-    border-color: rgba(252, 129, 129, 0.4);
-    color: #fc8181;
-    transform: rotate(90deg) scale(1.05);
-}
-
-/* ================================
-   CONTENIDO SCROLLABLE
-   ================================ */
-.cs-download-modal-content {
-    padding: 24px 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-height: calc(90vh - 200px);
-    overflow-y: auto;
-    transition: all 0.3s ease;
-}
-
-.cs-download-modal-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.cs-download-modal-content::-webkit-scrollbar-track {
-    background: rgba(45, 55, 72, 0.3);
-    border-radius: 3px;
-}
-
-.cs-download-modal-content::-webkit-scrollbar-thumb {
-    background: var(--gradient-accent);
-    border-radius: 3px;
-}
-
-.cs-download-modal-content::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-400) 100%);
-}
-
-.cs-content-hidden {
-    opacity: 0.4;
-    pointer-events: none;
-    filter: blur(1px);
-}
-
-/* ================================
-   WORKSPACE INFO CARD
-   ================================ */
-.cs-workspace-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
-    background: rgba(246, 173, 85, 0.08);
-    border: 1px solid rgba(246, 173, 85, 0.2);
-    border-radius: 12px;
-    font-size: 13px;
-    position: relative;
-}
-
-.workspace-title,
-.cs-info-label {
-    color: var(--gold-400);
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-}
-
-.workspace-path,
-.cs-info-path {
-    color: #ffffff;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-    font-size: 12px;
-    word-break: break-all;
-    background: rgba(15, 22, 41, 0.6);
-    padding: 8px 12px;
-    border-radius: 6px;
-    border-left: 3px solid var(--gold-400);
-}
-
-.cs-info-icon {
-    color: var(--blue-400);
-    display: flex;
-    align-items: center;
-    font-size: 18px;
-}
-
-.cs-info-text {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-width: 0;
-}
-
-/* ================================
-   FORM GROUPS PROFESIONALES
-   ================================ */
-.cs-form-group,
-.file-section,
-.cs-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    animation: formSlideUp 0.6s ease;
-    animation-fill-mode: both;
-}
-
-.cs-form-group:nth-child(1),
-.file-section:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.cs-form-group:nth-child(2),
-.file-section:nth-child(2) {
-    animation-delay: 0.15s;
-}
-
-.cs-form-group:nth-child(3),
-.file-section:nth-child(3) {
-    animation-delay: 0.2s;
-}
-
-.cs-form-group:nth-child(4),
-.file-section:nth-child(4) {
-    animation-delay: 0.25s;
-}
-
-@keyframes formSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.cs-form-label,
-.file-label,
-.input-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.cs-label-icon {
-    color: var(--gold-400);
-    font-size: 14px;
-}
-
-/* ================================
-   INPUTS Y SELECTS PROFESIONALES
-   ================================ */
-.cs-cyber-input,
-.cs-cyber-select,
-.project-input {
-    padding: 14px 16px;
-    background: rgba(15, 22, 41, 0.8);
-    border: 1.5px solid rgba(113, 128, 150, 0.3);
-    border-radius: 10px;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(8px);
-}
-
-.cs-cyber-input::placeholder,
-.project-input::placeholder {
-    color: var(--navy-500);
-    font-style: normal;
-}
-
-.cs-cyber-input:focus,
-.cs-cyber-select:focus,
-.project-input:focus {
-    outline: none;
-    border-color: var(--gold-400);
-    background: rgba(15, 22, 41, 0.95);
-    box-shadow:
-        0 0 0 3px rgba(246, 173, 85, 0.15),
-        var(--shadow-lg);
-    transform: translateY(-1px);
-}
-
-.cs-cyber-input:hover:not(:disabled),
-.cs-cyber-select:hover:not(:disabled),
-.project-input:hover:not(:disabled) {
-    border-color: rgba(246, 173, 85, 0.4);
-    box-shadow: var(--shadow-md);
-}
-
-.cs-cyber-input:disabled,
-.project-input:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background: rgba(15, 22, 41, 0.4);
-    border-color: rgba(113, 128, 150, 0.2);
-}
-
-/* ================================
-   FILE DROP ZONES
-   ================================ */
-.file-drop-zone {
-    border: 2px dashed rgba(113, 128, 150, 0.4);
-    border-radius: 12px;
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(45, 55, 72, 0.2);
-    position: relative;
-}
-
-.file-drop-zone:hover {
-    border-color: var(--gold-400);
-    background: rgba(246, 173, 85, 0.05);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-.file-drop-zone.has-file {
-    background: rgba(99, 179, 237, 0.08);
-    border-color: var(--blue-400);
-    border-style: solid;
-}
-
-.file-drop-zone.has-file.ddf-file {
-    background: rgba(104, 211, 145, 0.08);
-    border-color: var(--green-400);
-}
-
-.cs-file-icon {
-    font-size: 36px;
-    margin-bottom: 12px;
-    display: block;
-    opacity: 0.8;
-}
-
-.file-name {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--gold-400);
-    margin-bottom: 6px;
-}
-
-.file-size {
-    font-size: 12px;
-    color: var(--navy-500);
-    margin-top: 4px;
-}
-
-.file-instruction {
-    font-size: 14px;
-    font-weight: 500;
-    color: #ffffff;
-    margin-bottom: 6px;
-}
-
-.file-hint {
-    font-size: 12px;
-    color: var(--navy-500);
-    margin-top: 8px;
-}
-
-/* ================================
-   CHECKBOX PROFESIONAL
-   ================================ */
-.cs-token-checkbox {
-    margin-top: 10px;
-}
-
-.cs-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--navy-500);
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.cs-checkbox-label:hover {
-    color: #ffffff;
-}
-
-.cs-cyber-checkbox {
-    width: 18px;
-    height: 18px;
-    border: 1.5px solid rgba(113, 128, 150, 0.4);
-    border-radius: 4px;
-    background: rgba(15, 22, 41, 0.8);
-    cursor: pointer;
-    position: relative;
-    appearance: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cs-cyber-checkbox:checked {
-    background: var(--gradient-accent);
-    border-color: var(--gold-400);
-}
-
-.cs-cyber-checkbox:checked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--navy-900);
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.cs-cyber-checkbox:hover {
-    border-color: var(--gold-400);
-    box-shadow: 0 0 0 2px rgba(246, 173, 85, 0.1);
-}
-
-.cs-checkbox-text {
-    user-select: none;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 500;
-}
-
-/* ================================
-   BOTONES PROFESIONALES
-   ================================ */
-.cs-download-modal-actions,
-.actions-container {
-    display: flex;
-    gap: 12px;
-    padding: 20px 28px 24px;
-    border-top: 1px solid rgba(246, 173, 85, 0.1);
-    background: rgba(15, 22, 41, 0.3);
-}
-
-.cs-modal-button,
-.cs-action-button {
-    flex: 1;
-    padding: 14px 20px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.cs-modal-button.cs-secondary,
-.cs-action-button.cancel-button {
-    background: rgba(113, 128, 150, 0.2);
-    border: 1px solid rgba(113, 128, 150, 0.3);
-    color: var(--navy-500);
-}
-
-.cs-modal-button.cs-secondary:hover:not(:disabled),
-.cs-action-button.cancel-button:hover:not(:disabled) {
-    background: rgba(113, 128, 150, 0.3);
-    border-color: rgba(113, 128, 150, 0.5);
-    color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.cs-modal-button.cs-primary,
-.cs-action-button.cs-primary-button {
-    background: var(--gradient-accent);
-    color: var(--navy-900);
-    font-weight: 700;
-    box-shadow: var(--shadow-glow);
-}
-
-.cs-modal-button.cs-primary:hover:not(:disabled),
-.cs-action-button.cs-primary-button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow:
-        0 0 25px rgba(246, 173, 85, 0.4),
-        var(--shadow-lg);
-    background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-400) 100%);
-}
-
-.cs-modal-button:disabled,
-.cs-action-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none ;
-    box-shadow: none ;
-}
-
-.cs-loading-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(15, 22, 41, 0.3);
-    border-top: 2px solid var(--navy-900);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* ================================
-   PROGRESS OVERLAY
-   ================================ */
-.progress-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 22, 41, 0.97);
+    background: rgba(26, 29, 58, 0.8);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    border-radius: 16px;
-    animation: overlaySlideIn 0.4s ease-out;
+    animation: backdrop-appear 0.3s ease-out;
+    padding: 20px;
 }
 
-@keyframes overlaySlideIn {
+@keyframes backdrop-appear {
     from {
         opacity: 0;
         backdrop-filter: blur(0px);
     }
-
     to {
         opacity: 1;
         backdrop-filter: blur(12px);
     }
 }
 
-.cs-progress-modal {
+/* 🔥 MODAL PRINCIPAL */
+.create-structure-container {
+    background: rgba(37, 42, 74, 0.95);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(108, 92, 231, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     width: 100%;
-    max-width: 400px;
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    animation: progressSlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 520px;
+    animation: modal-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    position: relative;
 }
 
-@keyframes progressSlideUp {
+@keyframes modal-appear {
     from {
         opacity: 0;
-        transform: translateY(20px) scale(0.95);
+        transform: translateY(40px) scale(0.9);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
 }
 
-.cs-progress-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 28px;
-    width: 100%;
+.create-structure-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 16px;
+    pointer-events: none;
+    z-index: -1;
 }
 
-.cs-progress-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: var(--gradient-accent);
+/* 🔥 HEADER */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid rgba(108, 92, 231, 0.2);
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(255, 107, 157, 0.05));
+}
+
+.cs-modal-title {
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    background: linear-gradient(135deg, #ffffff, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cs-close-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(108, 92, 231, 0.1);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    color: #a0a3bd;
+    cursor: pointer;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--navy-900);
-    font-size: 20px;
-    font-weight: 600;
-    box-shadow: var(--shadow-glow);
-    animation: progressIconPulse 2s ease-in-out infinite;
+    font-size: 18px;
 }
 
-@keyframes progressIconPulse {
-
-    0%,
-    100% {
-        box-shadow: var(--shadow-glow);
-    }
-
-    50% {
-        box-shadow: 0 0 30px rgba(246, 173, 85, 0.5);
-    }
+.cs-close-button:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    transform: rotate(90deg);
 }
 
-.cs-progress-title {
-    flex: 1;
-    text-align: left;
+.cs-close-button:active {
+    transform: rotate(90deg) scale(0.95);
 }
 
-.progress-title h3 {
-    color: #ffffff;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+/* 🔥 PROGRESS BAR */
+.progress-container {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(108, 92, 231, 0.1);
 }
 
-.progress-title p {
-    color: var(--navy-500);
-    font-size: 12px;
-    margin: 0;
-    font-family: 'SF Mono', 'Monaco', monospace;
-}
-
-.cs-progress-content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-/* ================================
-   PROGRESS BAR - SOLUCION CORRECTA
-   ================================ */
-
-/* Contenedor principal del progress */
-.progress-container,
-.cs-progress-bar-container {
-    position: relative;
-    width: 100%;
-    margin-bottom: 12px;
-}
-
-/* Info del progress (texto arriba) */
 .progress-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #ffffff;
+    margin-bottom: 12px;
 }
 
-/* Track/fondo de la barra (contenedor gris) */
-.cs-progress-bar-track,
+.progress-info span:first-child {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.progress-info span:first-child.transferring {
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d, #00ff87);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: text-glow 2s ease infinite alternate;
+}
+
+@keyframes text-glow {
+    from {
+        background-position: 0% 50%;
+    }
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+.progress-info span:last-child {
+    color: #6c5ce7;
+    font-weight: 700;
+    font-size: 14px;
+}
+
 .cs-progress-bar-container {
-    width: 100%;
-    height: 10px;
-    background: rgba(45, 55, 72, 0.8);
-    border: 1px solid rgba(113, 128, 150, 0.3);
-    border-radius: 8px;
+    height: 6px;
+    background: rgba(26, 29, 58, 0.7);
+    border-radius: 3px;
     overflow: hidden;
     position: relative;
-    display: block;
 }
 
-/* La barra que se llena (elemento hijo) - GRADIENTE HERMOSO */
-.cs-progress-bar,
-.cs-progress-bar-fill {
+.progress-bar {
     height: 100%;
-    background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 25%, #EC4899 50%, #F97316 75%, #EAB308 100%);
-    border-radius: 7px;
-    transition: width 0.5s ease-out;
+    background: linear-gradient(90deg, #6c5ce7, #ff6b9d);
+    border-radius: 3px;
+    transition: width 0.3s ease;
     position: relative;
-    box-shadow:
-        0 0 20px rgba(139, 92, 246, 0.4),
-        0 0 40px rgba(236, 72, 153, 0.3),
-        0 4px 15px rgba(0, 0, 0, 0.2);
-    display: block;
-    /* NO pongas width aquí - viene del React style={{width: `${progress}%`}} */
+    overflow: hidden;
 }
 
-/* Efecto shine encima de la barra */
-.cs-progress-bar::after,
-.cs-progress-bar-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.4) 50%,
-            transparent 100%);
-    animation: progressShine 2s ease-in-out infinite;
-}
-
-@keyframes progressShine {
-    0% {
-        left: -100%;
-    }
-
-    100% {
-        left: 100%;
-    }
-}
-
-/* Estados de la barra */
-.cs-progress-bar.cs-complete,
-.cs-progress-bar-fill.cs-complete {
-    background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%);
-    box-shadow:
-        0 0 25px rgba(16, 185, 129, 0.5),
-        0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* ELIMINAMOS las animaciones automáticas que interfieren */
-/* La barra SOLO debe moverse cuando React actualiza el style={{width: `${progress}%`}} */
-
-.cs-progress-bar-fill::after,
-.cs-progress-bar::after {
+.progress-bar::after {
     content: '';
     position: absolute;
     top: 0;
@@ -890,486 +192,360 @@
             transparent 0%,
             rgba(255, 255, 255, 0.3) 50%,
             transparent 100%);
-    animation: progressShine 2s ease-in-out infinite;
+    animation: progress-shine 2s ease infinite;
 }
 
-@keyframes progressShine {
+@keyframes progress-shine {
     0% {
         left: -100%;
     }
-
     100% {
         left: 100%;
     }
 }
 
-.cs-progress-percentage {
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 700;
-    min-width: 45px;
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.progress-bar.complete {
+    background: linear-gradient(90deg, #00ff87, #6c5ce7);
+    box-shadow: 0 0 20px rgba(0, 255, 135, 0.5);
 }
 
-.cs-progress-step {
-    color: var(--navy-500);
-    font-size: 14px;
-    font-weight: 500;
+/* 🔥 WORKSPACE INFO */
+.cs-workspace-info {
+    margin-bottom: 24px;
+}
+
+.workspace-title {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 14px;
+    color: #ffffff;
     font-weight: 600;
-    color: #ffffff;
-}
-
-/* ================================
-   MENSAJES DE ESTADO
-   ================================ */
-.cs-success-message {
-    background: rgba(104, 211, 145, 0.1);
-    border: 1px solid rgba(104, 211, 145, 0.3);
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 20px;
-    animation: messageSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.cs-error-message {
-    background: rgba(252, 129, 129, 0.1);
-    border: 1px solid rgba(252, 129, 129, 0.3);
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 20px;
-    animation: messageSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px) scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.cs-success-icon,
-.cs-error-icon {
-    font-size: 28px;
-    margin-bottom: 12px;
-}
-
-.success-text h4 {
-    color: var(--green-400);
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-}
-
-.error-text h4 {
-    color: var(--red-400);
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-}
-
-.success-text p,
-.error-text p {
-    color: #ffffff;
-    font-size: 13px;
-    margin: 0 0 8px 0;
-    line-height: 1.4;
-}
-
-.success-text code {
-    background: rgba(15, 22, 41, 0.8);
-    border: 1px solid rgba(113, 128, 150, 0.2);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-family: 'SF Mono', 'Monaco', monospace;
     font-size: 12px;
-    color: #ffffff;
-    display: block;
-    margin: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.workspace-path {
+    color: #a0a3bd;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    padding: 12px 14px;
+    background: rgba(108, 92, 231, 0.1);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 8px;
     word-break: break-all;
 }
 
-/* ================================
-   LOGS CONTAINER
-   ================================ */
-.cs-logs-container {
-    background: rgba(15, 22, 41, 0.8);
-    border: 1px solid rgba(113, 128, 150, 0.3);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 20px;
-    max-height: 280px;
-    overflow: auto;
-    font-family: 'SF Mono', 'Monaco', monospace;
-    font-size: 12px;
+/* 🔥 FILE SECTIONS */
+.file-section {
+    margin-bottom: 24px;
 }
 
-.cs-log-entry {
-    margin-bottom: 4px;
-    padding: 2px 0;
-    animation: logSlide 0.3s ease-out;
-}
-
-@keyframes logSlide {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.cs-log-entry.cs-error {
-    color: var(--red-400);
-}
-
-.cs-log-entry.cs-success {
-    color: var(--green-400);
-}
-
-.cs-log-entry.warning {
-    color: var(--gold-400);
-}
-
-.cs-log-entry.info {
+.file-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #ffffff;
-}
-
-.cursor-blink {
-    color: var(--blue-400);
-    animation: cursorBlink 1s infinite;
-}
-
-@keyframes cursorBlink {
-
-    0%,
-    50% {
-        opacity: 1;
-    }
-
-    51%,
-    100% {
-        opacity: 0;
-    }
-}
-
-/* ================================
-   VALIDACIÓN Y ESTADOS
-   ================================ */
-.cs-form-group.cs-error .cs-cyber-input,
-.cs-form-group.cs-error .project-input {
-    border-color: var(--red-400);
-    box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.15);
-}
-
-.cs-form-group.cs-success .cs-cyber-input,
-.cs-form-group.cs-success .project-input {
-    border-color: var(--green-400);
-    box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.15);
-}
-
-.cs-error-text-validation {
-    color: var(--red-400);
-    font-size: 11px;
-    margin-top: 4px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.cs-error-text-validation::before {
-    content: '⚠';
-    font-weight: bold;
-}
-
-.cs-success-text-validation {
-    color: var(--green-400);
-    font-size: 11px;
-    margin-top: 4px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.cs-success-text-validation::before {
-    content: '✓';
-    font-weight: bold;
-}
-
-.validation-message {
+    font-weight: 600;
     font-size: 12px;
-    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d, #00ff87);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: label-glow 3s ease infinite alternate;
+}
+
+@keyframes label-glow {
+    from {
+        background-position: 0% 50%;
+    }
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+.file-drop-zone {
+    padding: 20px;
+    border: 2px dashed rgba(108, 92, 231, 0.3);
+    border-radius: 12px;
+    background: rgba(26, 29, 58, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 80px;
+}
+
+.file-drop-zone:hover {
+    border-color: rgba(108, 92, 231, 0.6);
+    background: rgba(26, 29, 58, 0.5);
+    transform: translateY(-2px);
+}
+
+.file-drop-zone.has-file {
+    border-color: rgba(0, 255, 135, 0.5);
+    background: rgba(0, 255, 135, 0.1);
+    border-style: solid;
+}
+
+.file-drop-zone.has-file.ddf-file {
+    border-color: rgba(255, 107, 157, 0.5);
+    background: rgba(255, 107, 157, 0.1);
+}
+
+.cs-file-icon {
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: rgba(108, 92, 231, 0.2);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+}
+
+.file-drop-zone.has-file .cs-file-icon {
+    background: rgba(0, 255, 135, 0.2);
+    border-color: rgba(0, 255, 135, 0.4);
+}
+
+.file-drop-zone.has-file.ddf-file .cs-file-icon {
+    background: rgba(255, 107, 157, 0.2);
+    border-color: rgba(255, 107, 157, 0.4);
+}
+
+.file-name {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.file-size {
+    color: #a0a3bd;
+    font-size: 12px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.file-instruction {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.file-hint {
+    color: #a0a3bd;
+    font-size: 12px;
+}
+
+/* 🔥 INPUT GROUP */
+.cs-input-group {
+    margin-bottom: 24px;
+}
+
+.input-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.project-input {
+    padding: 14px 16px;
+    background: rgba(26, 29, 58, 0.7);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.project-input:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    background: rgba(26, 29, 58, 0.9);
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1);
+}
+
+.project-input::placeholder {
+    color: rgba(160, 163, 189, 0.6);
+}
+
+.input-hint {
+    color: #a0a3bd;
+    font-size: 11px;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* 🔥 VALIDATION MESSAGES */
+.validation-message {
     margin-top: 8px;
-    padding: 6px 12px;
+    padding: 8px 12px;
     border-radius: 6px;
-    animation: validationSlide 0.3s ease-out;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .validation-message.warning {
-    color: var(--gold-400);
-    background: rgba(246, 173, 85, 0.1);
-    border: 1px solid rgba(246, 173, 85, 0.2);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
 }
 
-@keyframes validationSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.validation-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
 }
 
-/* ================================
-   DEBUG INFO PANEL
-   ================================ */
-.debug-info {
-    font-size: 10px;
-    color: var(--navy-500);
-    margin-top: 12px;
-    padding: 10px;
-    background: rgba(15, 22, 41, 0.6);
-    border-radius: 6px;
-    font-family: 'SF Mono', 'Monaco', monospace;
-    border-left: 3px solid var(--purple-400);
+/* 🔥 LOGS CONTAINER */
+.cs-logs-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 16px;
+    background: rgba(20, 23, 41, 0.8);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
-.debug-info div {
-    margin-bottom: 2px;
+.cs-logs-container::-webkit-scrollbar {
+    width: 6px;
 }
 
-/* ================================
-   RESPONSIVE DESIGN
-   ================================ */
-@media (max-width: 768px) {
-
-    .cs-download-modal,
-    .create-structure-container {
-        margin: 10px;
-        max-width: none;
-        max-height: 95vh;
-    }
-
-    .cs-download-modal-header,
-    .modal-header {
-        padding: 20px 20px 16px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .cs-close-button {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-    }
-
-    .cs-header-content {
-        gap: 12px;
-    }
-
-    .cs-header-icon {
-        width: 42px;
-        height: 42px;
-        font-size: 18px;
-    }
-
-    .header-text h2,
-    .cs-modal-title {
-        font-size: 1.1rem;
-    }
-
-    .cs-download-modal-content {
-        padding: 20px;
-        gap: 16px;
-        max-height: calc(95vh - 180px);
-    }
-
-    .cs-download-modal-actions,
-    .actions-container {
-        flex-direction: column;
-        padding: 16px 20px 20px;
-        gap: 10px;
-    }
-
-    .cs-progress-modal {
-        padding: 24px 20px;
-    }
-
-    .cs-progress-header {
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .cs-progress-icon {
-        width: 42px;
-        height: 42px;
-        font-size: 18px;
-    }
-
-    .progress-title h3 {
-        font-size: 1rem;
-    }
-
-    .cs-progress-actions {
-        flex-direction: column;
-        margin-top: 20px;
-        gap: 10px;
-    }
-
-    .file-drop-zone {
-        padding: 24px 16px;
-    }
-
-    .cs-file-icon {
-        font-size: 28px;
-    }
+.cs-logs-container::-webkit-scrollbar-track {
+    background: rgba(26, 29, 58, 0.3);
+    border-radius: 3px;
 }
 
-@media (max-width: 480px) {
-
-    .cs-download-modal-backdrop,
-    .create-structure-modal {
-        padding: 5px;
-    }
-
-    .cs-download-modal,
-    .create-structure-container {
-        margin: 5px;
-        border-radius: 12px;
-    }
-
-    .cs-download-modal-header,
-    .modal-header {
-        padding: 16px;
-    }
-
-    .cs-close-button {
-        top: 16px;
-        right: 16px;
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .cs-download-modal-content {
-        padding: 16px;
-        gap: 14px;
-    }
-
-    .cs-form-label,
-    .file-label,
-    .input-label {
-        font-size: 11px;
-    }
-
-    .cs-cyber-input,
-    .cs-cyber-select,
-    .project-input {
-        padding: 12px 14px;
-        font-size: 13px;
-    }
-
-    .cs-workspace-info {
-        padding: 12px 14px;
-        font-size: 12px;
-        gap: 10px;
-    }
-
-    .workspace-path,
-    .cs-info-path {
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-
-    .cs-modal-button,
-    .cs-action-button {
-        padding: 12px 16px;
-        font-size: 12px;
-    }
-
-    .file-drop-zone {
-        padding: 20px 12px;
-    }
-
-    .cs-file-icon {
-        font-size: 24px;
-        margin-bottom: 8px;
-    }
-
-    .file-name {
-        font-size: 14px;
-    }
-
-    .file-instruction {
-        font-size: 13px;
-    }
-
-    .file-hint {
-        font-size: 11px;
-    }
+.cs-logs-container::-webkit-scrollbar-thumb {
+    background: rgba(108, 92, 231, 0.5);
+    border-radius: 3px;
 }
 
-/* ================================
-   LANDSCAPE MOBILE
-   ================================ */
-@media (max-height: 500px) and (orientation: landscape) {
-
-    .cs-download-modal,
-    .create-structure-container {
-        max-height: 95vh;
-    }
-
-    .cs-download-modal-content {
-        max-height: calc(95vh - 160px);
-    }
-
-    .cs-progress-modal {
-        max-height: 85vh;
-        overflow-y: auto;
-    }
-
-    .cs-logs-container {
-        max-height: 120px;
-    }
+.cs-logs-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(108, 92, 231, 0.7);
 }
 
-/* ================================
-   EFECTOS HOVER MEJORADOS
-   ================================ */
-.cs-form-group:hover .cs-cyber-input:not(:disabled),
-.cs-form-group:hover .cs-cyber-select:not(:disabled),
-.cs-form-group:hover .project-input:not(:disabled) {
-    box-shadow: var(--shadow-md);
+.cs-logs-container div {
+    margin-bottom: 4px;
+    padding: 2px 0;
 }
 
-.cs-modal-button.cs-primary::after,
-.cs-action-button.cs-primary-button::after {
+/* Log message styling */
+.cs-logs-container div:contains("✅") {
+    color: #00ff87;
+}
+
+.cs-logs-container div:contains("❌") {
+    color: #ef4444;
+}
+
+.cs-logs-container div:contains("🚀") {
+    color: #6c5ce7;
+}
+
+.cs-logs-container div:contains("🔍") {
+    color: #00bcd4;
+}
+
+.cs-logs-container div:contains("📦") {
+    color: #ff6b9d;
+}
+
+.cs-logs-container div:contains("🌐") {
+    color: #fbbf24;
+}
+
+.cs-logs-container div:contains("🎉") {
+    color: #00ff87;
+    font-weight: 600;
+}
+
+.cursor-blink {
+    color: #6c5ce7;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* 🔥 ACTION BUTTONS */
+.actions-container {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(108, 92, 231, 0.1);
+    background: rgba(37, 42, 74, 0.5);
+}
+
+.cs-action-button {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cancel-button {
+    background: rgba(160, 163, 189, 0.1);
+    border: 1px solid rgba(160, 163, 189, 0.3);
+    color: #a0a3bd;
+}
+
+.cancel-button:hover:not(:disabled) {
+    background: rgba(160, 163, 189, 0.2);
+    border-color: #a0a3bd;
+    transform: translateY(-1px);
+}
+
+.cs-primary-button {
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    border: none;
+    color: white;
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+}
+
+.cs-primary-button::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1380,299 +556,164 @@
             transparent 0%,
             rgba(255, 255, 255, 0.2) 50%,
             transparent 100%);
-    transition: left 0.5s ease;
+    transition: left 0.6s ease;
 }
 
-.cs-modal-button.cs-primary:hover:not(:disabled)::after,
-.cs-action-button.cs-primary-button:hover:not(:disabled)::after {
+.cs-primary-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
+    background: linear-gradient(135deg, #a29bfe, #fd79a8);
+}
+
+.cs-primary-button:hover:not(:disabled)::before {
     left: 100%;
 }
 
-/* ================================
-   FOCUS VISIBLE PARA ACCESIBILIDAD
-   ================================ */
-.cs-modal-button:focus-visible,
-.cs-action-button:focus-visible {
-    outline: 2px solid var(--gold-400);
-    outline-offset: 2px;
+.complete-button {
+    background: linear-gradient(135deg, #00ff87, #6c5ce7);
+    border-radius: 8px;
+    border: none;
+    width: 120px;
+    color: white;
+    box-shadow: 0 6px 20px rgba(0, 255, 135, 0.3);
 }
 
-.cs-close-button:focus-visible {
-    outline: 2px solid var(--red-400);
-    outline-offset: 2px;
+.complete-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 135, 0.5);
 }
 
-.cs-cyber-input:focus-visible,
-.cs-cyber-select:focus-visible,
-.project-input:focus-visible {
-    outline: 2px solid var(--gold-400);
-    outline-offset: 2px;
+.cs-action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.cs-cyber-checkbox:focus-visible {
-    outline: 2px solid var(--gold-400);
-    outline-offset: 2px;
+.cs-action-button:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
 }
 
-/* ================================
-   OPTIMIZACIONES DE PERFORMANCE
-   ================================ */
-.cs-download-modal,
-.create-structure-container,
-.progress-overlay {
-    will-change: transform, opacity;
+/* 🔥 DEBUG INFO */
+.debug-info {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(20, 23, 41, 0.6);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 11px;
 }
 
-.cs-progress-bar-fill,
-.cs-progress-bar {
-    will-change: width;
+.debug-info div {
+    color: #a0a3bd;
+    margin-bottom: 4px;
 }
 
-.cs-loading-spinner {
-    will-change: transform;
+.debug-info div:last-child {
+    margin-bottom: 0;
 }
 
-/* ================================
-   MODO REDUCIDO DE MOVIMIENTO
-   ================================ */
-@media (prefers-reduced-motion: reduce) {
+/* 🔥 RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .create-structure-modal {
+        padding: 15px;
+    }
+    
+    .create-structure-container {
+        margin: 10px;
+        max-width: none;
+    }
 
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms ;
-        animation-iteration-count: 1 ;
-        transition-duration: 0.01ms ;
+    .modal-header {
+        padding: 20px 20px 16px;
+    }
+
+    .cs-modal-title {
+        font-size: 1.2rem;
+    }
+
+    .file-drop-zone {
+        padding: 16px;
+        min-height: 70px;
+    }
+
+    .cs-file-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .actions-container {
+        flex-direction: column;
+        padding: 16px 20px 20px;
     }
 }
 
-/* ================================
-   ALTO CONTRASTE
-   ================================ */
-@media (prefers-contrast: high) {
+@media (max-width: 480px) {
+    .create-structure-modal {
+        padding: 10px;
+    }
+    
+    .create-structure-container {
+        margin: 5px;
+        border-radius: 12px;
+    }
 
-    .cs-download-modal,
+    .modal-header {
+        padding: 16px;
+    }
+
+    .cs-modal-title {
+        font-size: 1.1rem;
+    }
+
+    .actions-container {
+        padding: 16px;
+    }
+}
+
+/* 🔥 ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-contrast: high) {
     .create-structure-container {
         border: 2px solid #ffffff;
     }
 
-    .cs-cyber-input,
-    .cs-cyber-select,
-    .project-input {
-        border-width: 2px;
-    }
-
-    .cs-modal-button,
+    .project-input,
     .cs-action-button {
         border-width: 2px;
     }
 }
 
-/* ================================
-   TEMA OSCURO NATIVO
-   ================================ */
-@media (prefers-color-scheme: dark) {
-
-    .cs-download-modal,
-    .create-structure-container {
-        background: linear-gradient(145deg,
-                rgba(10, 15, 25, 0.95) 0%,
-                rgba(15, 20, 35, 0.98) 50%,
-                rgba(10, 15, 25, 0.95) 100%);
-        border-color: rgba(246, 173, 85, 0.3);
-    }
-
-    .cs-cyber-input,
-    .cs-cyber-select,
-    .project-input {
-        background: rgba(5, 10, 20, 0.9);
-    }
+/* 🔥 LOADING STATES */
+.create-structure-container.loading {
+    pointer-events: none;
 }
 
-/* ================================
-   PRINT STYLES
-   ================================ */
-@media print {
-
-    .cs-download-modal-backdrop,
-    .create-structure-modal {
-        display: none;
-    }
+.create-structure-container.loading .modal-header,
+.create-structure-container.loading .cs-workspace-info,
+.create-structure-container.loading .file-section,
+.create-structure-container.loading .cs-input-group {
+    opacity: 0.6;
 }
 
-/* ================================
-   BODY LOCK
-   ================================ */
-body:has(.download-modal-backdrop),
+/* 🔥 UTILITY CLASSES */
 body:has(.create-structure-modal) {
     overflow: hidden;
 }
 
-/* ================================
-   UTILIDADES FINALES
-   ================================ */
-.cs-download-modal-content {
-    scroll-behavior: smooth;
+.create-structure-modal::-webkit-scrollbar {
+    display: none;
 }
 
-.cs-form-group.cs-loading .cs-cyber-input,
-.cs-form-group.cs-loading .cs-cyber-select,
-.cs-form-group.cs-loading .project-input {
-    pointer-events: none;
-    opacity: 0.7;
-    background: rgba(15, 22, 41, 0.6);
-}
-
-.cs-progress-complete {
-    animation: completeCelebration 1s ease-out;
-}
-
-@keyframes completeCelebration {
-    0% {
-        transform: scale(1);
-    }
-
-    25% {
-        transform: scale(1.02);
-    }
-
-    50% {
-        transform: scale(1);
-    }
-
-    75% {
-        transform: scale(1.01);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* ================================
-   EFECTOS DE TRANSFERENCIA
-   ================================ */
-.transferring {
-    background: var(--gradient-accent);
-    background-size: 200% 200%;
-    animation: dataTransfer 2s ease infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-@keyframes dataTransfer {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-/* ================================
-   ESTADOS ADICIONALES
-   ================================ */
-.cs-action-button.complete-button {
-    background: linear-gradient(135deg, var(--green-400) 0%, #4caf50 100%);
-    color: var(--navy-900);
-    box-shadow: 0 0 20px rgba(104, 211, 145, 0.3);
-}
-
-.cs-action-button.complete-button:hover {
-    background: linear-gradient(135deg, #4caf50 0%, var(--green-400) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(104, 211, 145, 0.4);
-}
-
-.input-hint {
-    font-size: 11px;
-    color: var(--navy-500);
-    margin-top: 4px;
-    font-style: italic;
-}
-
-/* ================================
-   MEJORAS FINALES DE UX
-   ================================ */
-.cs-workspace-info::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(246, 173, 85, 0.1) 50%,
-            transparent 100%);
-    animation: workspaceShimmer 3s infinite;
-}
-
-@keyframes workspaceShimmer {
-    0% {
-        left: -100%;
-    }
-
-    100% {
-        left: 100%;
-    }
-}
-
-.cs-success-details {
-    font-size: 11px ;
-    color: var(--green-400) ;
-    font-weight: 600;
-    margin-top: 8px ;
-}
-
-/* ================================
-   ANIMACIONES DE ENTRADA ESCALONADAS
-   ================================ */
-.cs-download-modal-content.cs-animate-in .cs-form-group,
-.cs-download-modal-content.cs-animate-in .file-section,
-.cs-download-modal-content.cs-animate-in .cs-input-group {
-    animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation-fill-mode: both;
-}
-
-.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(1),
-.cs-download-modal-content.cs-animate-in .file-section:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(2),
-.cs-download-modal-content.cs-animate-in .file-section:nth-child(2) {
-    animation-delay: 0.15s;
-}
-
-.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(3),
-.cs-download-modal-content.cs-animate-in .file-section:nth-child(3) {
-    animation-delay: 0.2s;
-}
-
-.cs-download-modal-content.cs-animate-in .cs-form-group:nth-child(4),
-.cs-download-modal-content.cs-animate-in .file-section:nth-child(4) {
-    animation-delay: 0.25s;
-}
-
-.cs-download-modal-content.cs-animate-in .cs-workspace-info {
-    animation-delay: 0.3s;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.create-structure-modal {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

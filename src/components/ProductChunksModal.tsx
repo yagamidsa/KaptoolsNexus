@@ -99,29 +99,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
         }
     };
 
-    const resetExclusions = async () => {
-        if (!confirm('Are you sure you want to reset exclusions to default values?')) return;
-        
-        try {
-            const formData = new FormData();
-            formData.append('workspace_path', workspacePath);
-
-            const response = await fetch('http://localhost:8000/product-chunks/exclusions/reset', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (response.ok) {
-                const data: ExclusionsData = await response.json();
-                setExclusions(data.exclusions);
-                setExclusionsText(data.exclusions.join(', '));
-                alert(`✅ Reset to ${data.total_exclusions} default exclusions!`);
-            }
-        } catch (err) {
-            setError('Failed to reset exclusions');
-        }
-    };
-
+    
     const handleSubmit = async () => {
         if (!token.trim() || !productName.trim()) {
             setError('Please fill in all fields');
@@ -157,20 +135,6 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
         } finally {
             setIsProcessing(false);
         }
-    };
-
-    const handleDownloadReport = () => {
-        if (!result) return;
-
-        const blob = new Blob([result.report_content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${result.product_name}_chunks_report.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     };
 
     const handleReset = () => {
@@ -276,22 +240,6 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                             <span>💾</span>
                                             <span>Save Changes</span>
                                         </button>
-                                        <button
-                                            onClick={resetExclusions}
-                                            className="exclusions-action-button secondary"
-                                            disabled={loadingExclusions}
-                                        >
-                                            <span>🔄</span>
-                                            <span>Reset to Defaults</span>
-                                        </button>
-                                        <button
-                                            onClick={loadExclusions}
-                                            className="exclusions-action-button tertiary"
-                                            disabled={loadingExclusions}
-                                        >
-                                            <span>↻</span>
-                                            <span>Reload</span>
-                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -320,7 +268,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                         value={productName}
                                         onChange={(e) => setProductName(e.target.value)}
                                         className="input-field"
-                                        placeholder="Enter product name (e.g., KapTest)"
+                                        placeholder="Enter product name (e.g., Linkplustv)"
                                         disabled={isProcessing}
                                     />
                                 </div>
@@ -368,7 +316,6 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                         <div className="results-container">
                             {/* Success Message */}
                             <div className="success-message">
-                                <span>✅</span>
                                 <div>
                                     <h3 className="success-title">Processing Complete!</h3>
                                     <p className="success-description">{result.message}</p>
@@ -427,13 +374,6 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
 
                             {/* Action Buttons */}
                             <div className="action-buttons">
-                                <button
-                                    onClick={handleDownloadReport}
-                                    className="action-button download-button"
-                                >
-                                    <span>⬇️</span>
-                                    <span>Download Report</span>
-                                </button>
                                 <button
                                     onClick={handleReset}
                                     className="action-button reset-button"

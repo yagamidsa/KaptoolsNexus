@@ -2265,8 +2265,8 @@
  ================================ */
 
 .menu-item {
-  min-height: 40px;
-  padding: 6px 16px;
+  min-height: 35px;
+  padding: 3px 13px;
 }
 
 .item-label {

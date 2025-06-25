@@ -21,7 +21,7 @@ interface ShortcutsNexusProps {
 // 🎨 NEON SVG ICONS COLLECTION
 const NeonIcons = {
     sandbox: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`sandbox-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.2" />
@@ -52,7 +52,7 @@ const NeonIcons = {
     ),
 
     control: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`control-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -75,7 +75,7 @@ const NeonIcons = {
     ),
 
     ai: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`ai-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.2" />
@@ -98,7 +98,7 @@ const NeonIcons = {
     ),
 
     data: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`data-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -120,7 +120,7 @@ const NeonIcons = {
     ),
 
     survey: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`survey-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -143,7 +143,7 @@ const NeonIcons = {
     ),
 
     analytics: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`analytics-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.2" />
@@ -163,7 +163,7 @@ const NeonIcons = {
     ),
 
     production: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`production-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -185,7 +185,7 @@ const NeonIcons = {
     ),
 
     support: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`support-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -206,7 +206,7 @@ const NeonIcons = {
     ),
 
     utilities: (color: string) => (
-        <svg viewBox="0 0 24 24" fill="none" className="neon-svg">
+        <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
             <defs>
                 <linearGradient id={`utilities-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor={color} stopOpacity="0.2" />

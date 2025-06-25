@@ -268,7 +268,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
         <div className="create-structure-modal">
             <div className="create-structure-container">
                 {/* Header con efectos neon */}
-                <div className="modal-header">
+                <div className="cs-modal-header">
                     <h2 className="cs-modal-title">
                         🏗️ Create Project Structure
                     </h2>

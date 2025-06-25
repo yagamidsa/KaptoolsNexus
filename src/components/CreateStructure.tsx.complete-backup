@@ -269,10 +269,10 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
             <div className="create-structure-container">
                 {/* Header con efectos neon */}
                 <div className="modal-header">
-                    <h2 className="modal-title">
+                    <h2 className="cs-modal-title">
                         🏗️ Create Project Structure
                     </h2>
-                    <button onClick={handleClose} className="close-button">
+                    <button onClick={handleClose} className="cs-close-button">
                         ✕
                     </button>
                 </div>
@@ -286,7 +286,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                             </span>
                             <span>{Math.round(progress)}%</span>
                         </div>
-                        <div className="progress-bar-container">
+                        <div className="cs-progress-bar-container">
                             <div 
                                 className={`progress-bar ${progress === 100 ? 'complete' : ''}`}
                                 style={{ width: `${progress}%` }}
@@ -298,7 +298,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                 {step === 'select' && (
                     <div>
                         {/* Workspace Info con efectos */}
-                        <div className="workspace-info">
+                        <div className="cs-workspace-info">
                             <h4 className="workspace-title">🎯 Target Workspace</h4>
                             <p className="workspace-path">{workspacePath}</p>
                         </div>
@@ -311,7 +311,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                                 onClick={handleMddFileSelect}
                                 className={`file-drop-zone ${selectedMddFile ? 'has-file' : ''}`}
                             >
-                                <span className="file-icon">
+                                <span className="cs-file-icon">
                                     {selectedMddFile ? '📋' : '📂'}
                                 </span>
                                 {selectedMddFile ? (
@@ -341,7 +341,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                                 className={`file-drop-zone ${selectedDdfFile ? 'has-file ddf-file' : ''}`}
                                 style={{ opacity: selectedMddFile ? 1 : 0.6 }}
                             >
-                                <span className="file-icon">
+                                <span className="cs-file-icon">
                                     {selectedDdfFile ? '💾' : '📂'}
                                 </span>
                                 {selectedDdfFile ? (
@@ -371,7 +371,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
 
                         {/* Project Name Input */}
                         {selectedMddFile && (
-                            <div className="input-group">
+                            <div className="cs-input-group">
                                 <label className="input-label">
                                     🏷️ Project Name
                                 </label>
@@ -392,7 +392,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
 
                 {/* Logs Container con efectos neon */}
                 {step === 'creating' && (
-                    <div className="logs-container">
+                    <div className="cs-logs-container">
                         {logs.map((log, index) => (
                             <div key={index} className={getLogClass(log)}>
                                 {log}
@@ -404,7 +404,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
 
                 {/* Action Buttons con efectos neon */}
                 <div className="actions-container">
-                    <button onClick={handleClose} className="action-button cancel-button">
+                    <button onClick={handleClose} className="cs-action-button cancel-button">
                         Cancel
                     </button>
                     
@@ -412,7 +412,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                         <button
                             onClick={createStructure}
                             disabled={!selectedMddFile || !selectedDdfFile || !projectName.trim() || loading}
-                            className="action-button primary-button"
+                            className="cs-action-button cs-primary-button"
                         >
                             🚀 Create Structure
                         </button>
