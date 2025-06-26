@@ -1,13 +1,13 @@
 mod jsonpath_types;
 mod jsonpath_client;
 mod jsonpath_commands;
+mod database;
+
 
 // Re-exportar para facilitar el uso
 use jsonpath_commands::*;
-
-
-
 use std::process::Command;
+use database::*;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -708,7 +708,14 @@ pub fn run() {
             test_commands,
             open_network_path_fast,
             open_kap_data_processing,
-            open_sa_distribution
+            open_sa_distribution,
+            validate_database_connection,
+            get_dashboard_data,
+            get_current_user,
+            update_user_connection,
+            test_dashboard_connection,
+            initialize_user_session,
+            get_dashboard_data_enhanced
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

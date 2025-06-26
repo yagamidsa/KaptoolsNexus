@@ -20,7 +20,7 @@ import JSONPathTool from './components/JSONPathTool';
 import ProductChunksModal from './components/ProductChunksModal';
 import "./App.css";
 import copilotIcon from './assets/copilot.png';
-
+import Dashboard from './components/Dashboard';
 
 interface MenuItem {
   id: string;
@@ -60,7 +60,7 @@ function App() {
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showQChunksModal, setShowQChunksModal] = useState(false);
   const [showProductChunksModal, setShowProductChunksModal] = useState(false);
-
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const [workspaceValidation, setWorkspaceValidation] = useState<WorkspaceValidation>({
     valid: false,
@@ -253,6 +253,35 @@ function App() {
     setActiveView('main');
     setSelectedItem('');
     setResponse('🔗 JSONPath Tool closed');
+  };
+
+
+  useEffect(() => {
+    const handleF4Key = (e: KeyboardEvent) => {
+      if (e.key === 'F4') {
+        e.preventDefault();
+        console.log('🔑 F4 pressed - toggling dashboard');
+
+        if (showDashboard) {
+          // Si está abierto, cerrarlo
+          setShowDashboard(false);
+          setResponse('📊 KAPTools Dashboard closed');
+        } else {
+          // Si está cerrado, abrirlo
+          setShowDashboard(true);
+          setResponse('📊 KAPTools Dashboard opened - Press F4 to close');
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleF4Key);
+    return () => document.removeEventListener('keydown', handleF4Key);
+  }, [showDashboard]);
+
+  const handleCloseDashboard = () => {
+    setShowDashboard(false);
+    setSelectedItem('');
+    setResponse('📊 KAPTools Dashboard closed');
   };
 
 
@@ -1008,6 +1037,11 @@ function App() {
           setSelectedItem('');
           setResponse('🌐 Command Shortcuts Portal closed');
         }}
+      />
+
+      <Dashboard
+        isOpen={showDashboard}
+        onClose={handleCloseDashboard}
       />
 
     </div>
