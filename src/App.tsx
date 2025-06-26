@@ -263,13 +263,15 @@ function App() {
         console.log('🔑 F4 pressed - toggling dashboard');
 
         if (showDashboard) {
-          // Si está abierto, cerrarlo
+          // ✅ FIX: Si está abierto, cerrarlo
           setShowDashboard(false);
           setResponse('📊 KAPTools Dashboard closed');
+          console.log('📊 Dashboard closed via F4');
         } else {
-          // Si está cerrado, abrirlo
+          // ✅ FIX: Si está cerrado, abrirlo
           setShowDashboard(true);
           setResponse('📊 KAPTools Dashboard opened - Press F4 to close');
+          console.log('📊 Dashboard opened via F4');
         }
       }
     };
@@ -282,6 +284,7 @@ function App() {
     setShowDashboard(false);
     setSelectedItem('');
     setResponse('📊 KAPTools Dashboard closed');
+    console.log('📊 Dashboard closed via close button');
   };
 
 
