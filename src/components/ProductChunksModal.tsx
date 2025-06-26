@@ -38,7 +38,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
     onClose,
     workspacePath
 }) => {
-    const [token, setToken] = useState('');
+    const [token, setToken] = useState('tW9GnMVNZwhm99yE0tE7ZOyJHmUfRgEAkJksgAjArB3BGNu0immVwEhjD1uBSYsL');
     const [productName, setProductName] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -47,6 +47,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
     const [exclusions, setExclusions] = useState<string[]>([]);
     const [exclusionsText, setExclusionsText] = useState('');
     const [loadingExclusions, setLoadingExclusions] = useState(false);
+    
 
     useEffect(() => {
         if (isOpen && !exclusions.length) {

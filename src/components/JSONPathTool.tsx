@@ -53,7 +53,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     const [environment, setEnvironment] = useState<string>('sandbox3');
     const [selectedService, setSelectedService] = useState<string>('study-definition');
     const [endpoint, setEndpoint] = useState<string>('/health');
-    const [token, setToken] = useState<string>('');
+    const [token, setToken] = useState('tW9GnMVNZwhm99yE0tE7ZOyJHmUfRgEAkJksgAjArB3BGNu0immVwEhjD1uBSYsL');
     const [jsonPathQuery, setJsonPathQuery] = useState<string>('$');
     const [showToken, setShowToken] = useState<boolean>(false);
     const [apiResponse, setApiResponse] = useState<string>('');
