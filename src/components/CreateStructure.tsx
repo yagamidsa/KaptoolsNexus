@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './CreateStructure.css'; // ✅ Importar el CSS neon
+import './CreateStructure.css'; 
 
 interface CreateStructureProps {
     isOpen: boolean;
@@ -25,7 +25,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
         setLogs(prev => [...prev, `[${timestamp}] ${message}`]);
     };
 
-    // Clasificar logs por tipo para aplicar estilos
+    
     const getLogClass = (log: string) => {
         if (log.includes('❌')) return 'log-entry error';
         if (log.includes('✅') || log.includes('🎉')) return 'log-entry success';
@@ -267,7 +267,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
     return (
         <div className="create-structure-modal">
             <div className="create-structure-container">
-                {/* Header con efectos neon */}
+                
                 <div className="cs-modal-header">
                     <h2 className="cs-modal-title">
                         🏗️ Create Project Structure
@@ -277,7 +277,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                     </button>
                 </div>
 
-                {/* Progress Bar con efectos neon */}
+                
                 {step === 'creating' && (
                     <div className="progress-container">
                         <div className="progress-info">
@@ -297,13 +297,13 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
 
                 {step === 'select' && (
                     <div>
-                        {/* Workspace Info con efectos */}
+                        
                         <div className="cs-workspace-info">
                             <h4 className="workspace-title">🎯 Target Workspace</h4>
                             <p className="workspace-path">{workspacePath}</p>
                         </div>
 
-                        {/* MDD File Selection */}
+                        
                         <div className="file-section">
                             <h4 className="file-label">Select MDD File (Metadata)</h4>
                             
@@ -332,7 +332,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                             </div>
                         </div>
 
-                        {/* DDF File Selection */}
+                        
                         <div className="file-section">
                             <h4 className="file-label">Select DDF File (Data)</h4>
                             
@@ -361,7 +361,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                                 )}
                             </div>
                             
-                            {/* Validation Message */}
+                            
                             {selectedMddFile && !selectedDdfFile && (
                                 <div className="validation-message warning">
                                     ⚠️ DDF file should have the same base name as MDD: {projectName}.ddf
@@ -369,7 +369,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                             )}
                         </div>
 
-                        {/* Project Name Input */}
+                        
                         {selectedMddFile && (
                             <div className="cs-input-group">
                                 <label className="input-label">
@@ -390,7 +390,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                     </div>
                 )}
 
-                {/* Logs Container con efectos neon */}
+                
                 {step === 'creating' && (
                     <div className="cs-logs-container">
                         {logs.map((log, index) => (
@@ -402,7 +402,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                     </div>
                 )}
 
-                {/* Action Buttons con efectos neon */}
+                
                 <div className="actions-container">
                     <button onClick={handleClose} className="cs-action-button cancel-button">
                         Cancel
@@ -429,7 +429,7 @@ const CreateStructure: React.FC<CreateStructureProps> = ({
                     )}
                 </div>
 
-                {/* Debug Info Panel */}
+                
                 {step === 'creating' && (
                     <div className="debug-info">
                         <div>📋 MDD: {selectedMddFile?.name}</div>

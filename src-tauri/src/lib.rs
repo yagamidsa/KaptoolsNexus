@@ -327,22 +327,66 @@ async fn test_commands() -> Result<String, String> {
     Ok(format!("{}\n{}\n{}", ps_status, winforms_status, shell_status))
 }
 
-// Función para iniciar el backend Python (si es necesario)
+
 fn start_backend() {
     use std::thread;
+    use std::process::Stdio;
     
     thread::spawn(|| {
-        println!("🐍 Attempting to start Python backend...");
+        println!("🚀 Starting backend...");
         
-        let result = Command::new("python")
-            .args(&["../backend/main.py"])
-            .spawn();
-        
-        match result {
-            Ok(_) => println!("✅ Python backend started"),
-            Err(e) => println!("⚠️ Could not start Python backend: {}", e),
+        // Intentar con ruta absoluta basada en el ejecutable actual
+        if let Ok(exe_path) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_path.parent() {
+                let backend_path = exe_dir.join("kaptools-backend.exe");
+                
+                println!("🔍 Looking for backend at: {:?}", backend_path);
+                
+                match std::process::Command::new(&backend_path)
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .spawn()
+                {
+                    Ok(_) => println!("✅ Backend started via PyInstaller executable"),
+                    Err(e) => println!("❌ Backend startup failed: {}", e)
+                }
+            }
         }
     });
+}
+
+// Nueva función para esperar a que el backend esté listo
+fn wait_for_backend_ready() {
+    use std::thread;
+    use std::time::Duration;
+    
+    println!("⏳ Waiting for backend to be ready...");
+    
+    for attempt in 1..=30 {
+        // Usar curl si está disponible, o powershell como fallback
+        let test_result = Command::new("powershell")
+            .args(&[
+                "-Command",
+                "try { $response = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -TimeoutSec 2 -UseBasicParsing; if ($response.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }"
+            ])
+            .output();
+        
+        match test_result {
+            Ok(output) if output.status.success() => {
+                println!("✅ Backend is ready! (attempt {})", attempt);
+                return;
+            },
+            _ => {
+                if attempt % 5 == 0 {
+                    println!("   Still waiting for backend... ({}/30)", attempt);
+                }
+                thread::sleep(Duration::from_secs(1));
+            }
+        }
+    }
+    
+    println!("⚠️ Backend may not be fully ready, but continuing...");
+    println!("💡 If you see connection errors, the backend may still be starting up");
 }
 
 
@@ -429,6 +473,45 @@ async fn check_workspace_folders(workspace_path: String) -> Result<serde_json::V
 //     test_commands
 // ])
 
+
+#[tauri::command]
+async fn test_backend_connection() -> Result<String, String> {
+    use std::time::Duration;
+    
+    println!("🔗 Testing backend connection...");
+    
+    // Crear cliente HTTP
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+    
+    // Intentar conectar al backend
+    match client.get("http://127.0.0.1:8000/").send().await {
+        Ok(response) => {
+            if response.status().is_success() {
+                match response.text().await {
+                    Ok(text) => {
+                        println!("✅ Backend connection successful");
+                        Ok(format!("✅ Neural Link established!\n🎯 Backend is running correctly!\n📡 Response: {}", text))
+                    }
+                    Err(e) => Err(format!("Failed to read response: {}", e))
+                }
+            } else {
+                Err(format!("Backend returned status: {}", response.status()))
+            }
+        }
+        Err(e) => {
+            println!("❌ Backend connection failed: {}", e);
+            Err(format!("❌ Neural Link connection failed\n\n🔍 Diagnostics:\n• Backend may not be running\n• Port 8000 may be blocked\n• Network connectivity issue\n\n💡 Solutions:\n1. Check if backend process is running\n2. Restart with: ./START-FINAL.bat\n3. Manual start: ./kaptools-backend.exe\n\n🛠️ Debug info: {}", e))
+        }
+    }
+}
+
+
+
+// En src-tauri/src/lib.rs, reemplaza la función run() con esto (usando el nombre correcto):
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     println!("🚀 Starting KapTools Nexus...");
@@ -440,6 +523,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_shell::init())  // ← NUEVA LÍNEA AGREGADA
         .invoke_handler(tauri::generate_handler![
             greet, 
             open_folder, 
@@ -450,6 +534,7 @@ pub fn run() {
             select_mdd_file,
             read_file_as_base64,
             open_copilot_365,
+            test_backend_connection,
             execute_jsonpath_query,
             get_available_services,
             get_available_environments,

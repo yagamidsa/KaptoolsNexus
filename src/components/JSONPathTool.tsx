@@ -5,7 +5,7 @@ import './JSONPathTool.css';
 import { listen } from '@tauri-apps/api/event';
 
 
-// Componente de iconos
+
 const Icon: React.FC<{ emoji: string; size?: number; className?: string }> = ({
     emoji,
     size = 16,
@@ -16,7 +16,7 @@ const Icon: React.FC<{ emoji: string; size?: number; className?: string }> = ({
     </span>
 );
 
-// Interfaces para tipos de datos
+
 interface Environment {
     key: string;
     name: string;
@@ -43,12 +43,12 @@ interface ApiResponse {
     execution_time_ms: number;
 }
 
-// 🔥 INTERFAZ CON onClose
+
 interface JSONPathToolProps {
     onClose: () => void;
 }
 
-// 🔥 COMPONENTE ACTUALIZADO CON TODOS LOS ENDPOINTS
+
 const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     const [environment, setEnvironment] = useState<string>('sandbox3');
     const [selectedService, setSelectedService] = useState<string>('study-definition');
@@ -63,7 +63,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     const [jsonViewMode, setJsonViewMode] = useState<'raw' | 'formatted' | 'truncated'>('truncated');
     const [showFullJson, setShowFullJson] = useState<boolean>(false);
 
-    // 🔥 CONFIGURACIÓN FIJA - Solo Sandbox 3
+    
     const availableEnvironments: Environment[] = [
         { key: 'sandbox3', name: 'Sandbox 3', prefix: 'sandbox3-' }
     ];
@@ -90,14 +90,14 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                 console.log('📊 Progress update:', progress);
                 setProgressData(progress);
 
-                // Actualizar mensaje con progreso
+                
                 setMessage(`🔄 ${progress.message} (${progress.progress}%)`);
             });
         };
 
         setupProgressListener();
 
-        // Cleanup
+        
         return () => {
             if (unlisten) {
                 unlisten();
@@ -107,13 +107,12 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
 
 
-    // 🔥 TODOS LOS ENDPOINTS GET DEL OPENAPI
+    
     const availableServices: Record<string, ServiceConfig> = {
         'study-definition': {
             name: 'Study Definition',
             base_url: 'studydef.azurewebsites.net',
             templates: [
-                // === BASIC SERVICE ENDPOINTS ===
                 {
                     name: 'Health Check',
                     pattern: '/health',
@@ -126,7 +125,6 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     example: '/studies/KapID',
                     description: '📄 Get study by ID without project context'
                 },
-                // === PROJECT ENDPOINTS ===
                 {
                     name: 'Get Project Details',
                     pattern: '/Projects/{ProjectID}',
@@ -158,7 +156,6 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '🐚 Get available shell count for projects'
                 },
 
-                // === STUDY ENDPOINTS ===
                 {
                     name: 'Get Study with Project',
                     pattern: '/projects/{project_id}/studies/{study_id}',
@@ -196,7 +193,6 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '📋 Get simple settings metadata by product type'
                 },
 
-                // === WAVE ENDPOINTS ===
                 {
                     name: 'Get Wave Details',
                     pattern: '/waves/{wave_id}',
@@ -252,7 +248,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '🏷️ Get master properties by wave using Tesseract'
                 },
 
-                // === MISCELLANEOUS ENDPOINTS ===
+                
                 {
                     name: 'Get List Source Items',
                     pattern: '/lists_source/{list}',
@@ -290,7 +286,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '🌍 Get simple settings by product type and locale'
                 },
 
-                // === TESSERACT ENDPOINTS ===
+                
                 {
                     name: 'Get Study Master Property (Tesseract)',
                     pattern: '/tesseract/studies/{study_id}/master_property/{property_value}',
@@ -315,7 +311,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
             name: 'Questionnaire Factory',
             base_url: 'kap-qfactory.azurewebsites.net',
             templates: [
-                // === MISC MODULES ===
+                
                 {
                     name: 'Health Check',
                     pattern: '/health',
@@ -323,7 +319,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '🏥 Returns the current status of this service'
                 },
 
-                // === WAVE API MODULE ===
+                
                 {
                     name: 'Wave List Replacements',
                     pattern: '/waves/{wave_id}/list_replacements',
@@ -427,7 +423,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     description: '📄 Returns all the details for a wave'
                 },
 
-                // === PRODUCT TEMPLATE MODULE ===
+    
                 {
                     name: 'Product Templates List',
                     pattern: '/producttemplateslist',
@@ -444,7 +440,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         }
     };
 
-    // 🔥 EFECTO PARA CERRAR CON ESC
+    
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -456,7 +452,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         return () => document.removeEventListener('keydown', handleEscape);
     }, [onClose]);
 
-    // 🔥 FUNCIÓN PARA CAMBIAR ENDPOINT CUANDO CAMBIA EL SERVICIO
+    
     useEffect(() => {
         const service = availableServices[selectedService];
         if (service && service.templates.length > 0) {
@@ -464,9 +460,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         }
     }, [selectedService]);
 
-    // ================================
-    // PASO 1: SOLO HACER REQUEST AL ENDPOINT (SIN JSONPATH)
-    // ================================
+    
     const fetchApiData = async (): Promise<void> => {
         if (!token.trim()) {
             setMessage('❌ Please enter a valid dev token');
@@ -482,13 +476,13 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         setMessage('🔄 Fetching API data...');
 
         try {
-            // Usar el comando existente pero con JSONPath = "$" (root) para obtener todo
+            
             const requestData = {
                 environment,
                 service: selectedService,
                 endpoint,
                 token,
-                jsonpath_query: '$' // Solo root object para obtener todo el JSON
+                jsonpath_query: '$' 
             };
 
             console.log('📡 Fetching API data:', requestData);
@@ -501,7 +495,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
             if (response.success) {
                 setApiResponse(response.raw_response || '');
-                setJsonPathResult(''); // Limpiar resultados previos
+                setJsonPathResult(''); 
                 setMessage(`✅ Data fetched successfully (${response.execution_time_ms}ms) - ${response.url_used}`);
             } else {
                 setApiResponse(response.error || 'Unknown error');
@@ -519,9 +513,9 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         }
     };
 
-    // ================================
-    // PASO 2: APLICAR JSONPATH AL JSON YA OBTENIDO (LOCAL)
-    // ================================
+    
+    
+    
 
 
     const detectProcessingStrategy = useCallback(async (jsonText: string) => {
@@ -538,7 +532,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
             console.log('📊 Processing strategy:', strategy);
 
-            // Mostrar info de estrategia al usuario
+            
             const sizeText = strategy.size_mb < 1
                 ? `${(strategy.size_mb * 1000).toFixed(0)}KB`
                 : `${strategy.size_mb.toFixed(1)}MB`;
@@ -566,24 +560,24 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
         const jsonSize = apiResponse.length;
         setIsLoading(true);
-        setJsonPathResult(''); // Limpiar resultados previos
-        setProgressData(null); // Reset progress
+        setJsonPathResult(''); 
+        setProgressData(null); 
 
         console.log(`🚀 Starting JSONPath execution for ${jsonSize} chars`);
 
         try {
-            // Detectar estrategia de procesamiento
+            
             await detectProcessingStrategy(apiResponse);
 
-            // 🚀 ESTRATEGIA BASADA EN TAMAÑO
+            
             if (jsonSize < 500_000) {
-                // Para JSONs pequeños: método rápido
+                
                 await executeJsonPathFast();
             } else if (jsonSize < 2_000_000) {
-                // Para JSONs medianos: con progress
+                
                 await executeJsonPathWithProgress();
             } else {
-                // Para JSONs grandes: async/worker
+                
                 await executeJsonPathLarge();
             }
 
@@ -599,9 +593,9 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     }, [apiResponse, jsonPathQuery, detectProcessingStrategy]);
 
 
-    // ================================
-    // FUNCIÓN PARA JSONs PEQUEÑOS (<500KB)
-    // ================================
+    
+    
+    
     const executeJsonPathFast = async (): Promise<void> => {
         setMessage('⚡ Fast processing for small JSON...');
 
@@ -610,14 +604,14 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
             query: jsonPathQuery
         });
 
-        const highlightedResult = formatJsonPathResult(result); // ← Esta línea debe estar
+        const highlightedResult = formatJsonPathResult(result); 
         setJsonPathResult(highlightedResult);
         setMessage('✅ JSONPath applied successfully (fast mode)');
     };
 
-    // ================================
-    // FUNCIÓN PARA JSONs MEDIANOS (500KB-2MB)
-    // ================================
+    
+    
+    
     const executeJsonPathWithProgress = async (): Promise<void> => {
         setMessage('📊 Processing with progress tracking...');
 
@@ -626,14 +620,14 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
             query: jsonPathQuery
         });
 
-        const highlightedResult = formatJsonPathResult(result); // ← Esta línea debe estar
+        const highlightedResult = formatJsonPathResult(result); 
         setJsonPathResult(highlightedResult);
         setMessage('✅ JSONPath applied successfully (with progress)');
     };
 
-    // ================================
-    // FUNCIÓN PARA JSONs GRANDES (>2MB)
-    // ================================
+    
+    
+    
     const executeJsonPathLarge = async (): Promise<void> => {
         setMessage('🏭 Using async processing for large JSON...');
 
@@ -647,11 +641,11 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         setMessage('✅ Large JSON processed successfully (async mode)');
     };
 
-    // ================================
-    // AUTO-DETECT STRATEGY CUANDO CAMBIA EL JSON
-    // ================================
+    
+    
+    
 
-    // AGREGAR este useEffect después de los existentes:
+    
     useEffect(() => {
         if (apiResponse && apiResponse.length > 0) {
             detectProcessingStrategy(apiResponse);
@@ -659,9 +653,9 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     }, [apiResponse, detectProcessingStrategy]);
 
 
-    // ================================
-    // FUNCIONES DE UTILIDAD
-    // ================================
+    
+    
+    
     const testConnectivity = async (): Promise<void> => {
         setMessage('🔍 Testing connectivity...');
         try {
@@ -700,7 +694,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         setMessage('Ready to make real API requests');
     };
 
-    // 🔥 FUNCIÓN PARA USAR TEMPLATE
+    
     const useTemplate = (template: {
         name: string;
         pattern: string;
@@ -712,8 +706,8 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     };
 
 
-    // 🎨 Función para syntax highlighting
-    // 🎨 Función para syntax highlighting
+    
+    
     const applySyntaxHighlighting = (jsonString: string): string => {
         try {
             const parsed = JSON.parse(jsonString);
@@ -721,61 +715,61 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
             let highlighted = formatted;
 
-            // 🔑 Keys (propiedades) - Rosa vibrante
+            
             highlighted = highlighted.replace(
                 /"([^"]+)"(\s*:)/g,
                 '<span class="json-key">"$1"</span>$2'
             );
 
-            // 🟢 Strings (valores) - Verde - MEJORADO PARA ARRAYS
+            
             highlighted = highlighted.replace(
                 /:\s*"([^"]*)"/g,
                 ': <span class="json-string">"$1"</span>'
             );
 
-            // 🟢 Strings en arrays (sin :) - Verde
+            
             highlighted = highlighted.replace(
                 /(\s+)"([^"]*)"(?=,|\s*\])/g,
                 '$1<span class="json-string">"$2"</span>'
             );
 
-            // 🟣 Numbers - Púrpura
+            
             highlighted = highlighted.replace(
                 /:\s*(-?\d+\.?\d*)/g,
                 ': <span class="json-number">$1</span>'
             );
 
-            // 🟣 Numbers en arrays - Púrpura  
+            
             highlighted = highlighted.replace(
                 /(\s+)(-?\d+\.?\d*)(?=,|\s*\])/g,
                 '$1<span class="json-number">$2</span>'
             );
 
-            // 🟠 Booleans - Naranja
+            
             highlighted = highlighted.replace(
                 /:\s*(true|false)/g,
                 ': <span class="json-boolean">$1</span>'
             );
 
-            // 🟠 Booleans en arrays - Naranja
+            
             highlighted = highlighted.replace(
                 /(\s+)(true|false)(?=,|\s*\])/g,
                 '$1<span class="json-boolean">$2</span>'
             );
 
-            // ⚫ Null - Gris
+            
             highlighted = highlighted.replace(
                 /:\s*(null)/g,
                 ': <span class="json-null">$1</span>'
             );
 
-            // ⚫ Null en arrays - Gris
+            
             highlighted = highlighted.replace(
                 /(\s+)(null)(?=,|\s*\])/g,
                 '$1<span class="json-null">$2</span>'
             );
 
-            // ⚪ Brackets y Punctuation - Blanco
+            
             highlighted = highlighted.replace(
                 /([{}[\],])/g,
                 '<span class="json-punctuation">$1</span>'
@@ -790,59 +784,59 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
 
 
 
-    // 🎯 Función para formatear resultados JSONPath
-    // 🎯 Función para formatear resultados JSONPath
+    
+    
     const formatJsonPathResult = (result: string): string => {
-        console.log('🔍 formatJsonPathResult input:', result); // ← AGREGAR ESTA LÍNEA
+        console.log('🔍 formatJsonPathResult input:', result); 
 
         if (!result || result.trim() === '') {
             return '';
         }
 
-        // Si el resultado es JSON válido, aplicar highlighting
+        
         try {
             JSON.parse(result);
-            console.log('✅ JSON válido, aplicando highlighting'); // ← AGREGAR ESTA LÍNEA
+            console.log('✅ JSON válido, aplicando highlighting'); 
             return applySyntaxHighlighting(result);
         } catch {
-            console.log('❌ No es JSON válido, procesando como valor simple'); // ← AGREGAR ESTA LÍNEA
-            // Si no es JSON, pero parece ser un valor simple
+            console.log('❌ No es JSON válido, procesando como valor simple'); 
+            
             const trimmed = result.trim();
 
             if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-                console.log('🟢 Detectado como string'); // ← AGREGAR ESTA LÍNEA
+                console.log('🟢 Detectado como string'); 
                 return `<span class="json-string">${trimmed}</span>`;
             }
 
             if (/^-?\d+\.?\d*$/.test(trimmed)) {
-                console.log('🟣 Detectado como number'); // ← AGREGAR ESTA LÍNEA
+                console.log('🟣 Detectado como number'); 
                 return `<span class="json-number">${trimmed}</span>`;
             }
 
             if (trimmed === 'true' || trimmed === 'false') {
-                console.log('🟠 Detectado como boolean'); // ← AGREGAR ESTA LÍNEA
+                console.log('🟠 Detectado como boolean'); 
                 return `<span class="json-boolean">${trimmed}</span>`;
             }
 
             if (trimmed === 'null') {
-                console.log('⚫ Detectado como null'); // ← AGREGAR ESTA LÍNEA
+                console.log('⚫ Detectado como null'); 
                 return `<span class="json-null">${trimmed}</span>`;
             }
 
-            console.log('⚪ Devolviendo texto plano'); // ← AGREGAR ESTA LÍNEA
+            console.log('⚪ Devolviendo texto plano'); 
             return trimmed;
         }
     };
 
-    // Función para truncar JSON grande
+    
     const getTruncatedJson = (jsonString: string, maxLength: number = 30000): string => {
         try {
-            // PRIMERO formatear el JSON completo
+            
             const parsed = JSON.parse(jsonString);
             const formatted = JSON.stringify(parsed, null, 2);
             const highlighted = applySyntaxHighlighting(formatted);
 
-            // DESPUÉS truncar el resultado ya formateado
+            
             if (highlighted.length <= maxLength) {
                 return highlighted;
             }
@@ -855,12 +849,12 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                 '\n\n<span class="json-truncated">... [JSON truncated for performance - Click "Full" to see complete content]</span>';
 
         } catch (error) {
-            // Si no es JSON válido, devolver texto plano
+            
             return jsonString;
         }
     };
 
-    // Función para formatear JSON ligero
+    
     const formatJsonLight = (jsonString: string): string => {
         try {
             const parsed = JSON.parse(jsonString);
@@ -884,7 +878,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
         onCopy: (text: string) => void;
     }) => {
         const jsonSize = data.length;
-        const isLarge = jsonSize > 200_000; // 200KB
+        const isLarge = jsonSize > 200_000; 
         const [localViewMode, setLocalViewMode] = useState<'raw' | 'formatted' | 'truncated'>(
             isLarge ? 'truncated' : 'formatted'
         );
@@ -909,22 +903,22 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
             );
         }
 
-        // Determinar qué mostrar según el modo
+        
         const getDisplayContent = () => {
-            // Si ya tiene highlighting HTML, devolverlo tal como está
+            
             if (data.includes('<span class="json-')) {
                 return data;
             }
 
             switch (localViewMode) {
                 case 'raw':
-                    return data; // JSON original sin formatear
+                    return data; 
                 case 'formatted':
-                    return applySyntaxHighlighting(data); // SIEMPRE con highlighting
+                    return applySyntaxHighlighting(data); 
                 case 'truncated':
-                    return isLarge ? getTruncatedJson(data, 30000) : applySyntaxHighlighting(data); // SIEMPRE con highlighting
+                    return isLarge ? getTruncatedJson(data, 30000) : applySyntaxHighlighting(data); 
                 default:
-                    return applySyntaxHighlighting(data); // SIEMPRE con highlighting
+                    return applySyntaxHighlighting(data); 
             }
         };
 
@@ -935,7 +929,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                 <div className="result-header">
                     <h3>{title}</h3>
                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        {/* Indicador de tamaño */}
+                        
                         <span style={{
                             fontSize: '11px',
                             color: isLarge ? '#f59e0b' : '#22c55e',
@@ -946,7 +940,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                             {(jsonSize / 1024).toFixed(1)}KB
                         </span>
 
-                        {/* Botones de modo de vista para JSONs grandes */}
+                        
                         {isLarge && (
                             <>
                                 <button
@@ -988,9 +982,9 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                             </>
                         )}
 
-                        {/* Botón Copy */}
+                        
                         <button
-                            onClick={() => onCopy(data)} // Siempre copia el JSON completo
+                            onClick={() => onCopy(data)} 
                             className="copy-btn"
                             title="Copy full JSON to clipboard"
                         >
@@ -1000,27 +994,27 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     </div>
                 </div>
 
-                {/* Contenido JSON */}
+                
                 <div className="result-content" style={{ position: 'relative' }}>
                     <pre
                         style={{
                             margin: 0,
-                            padding: '12px 12px 20px 12px',  // ← Más padding abajo
+                            padding: '12px 12px 20px 12px',  
                             fontSize: '12px',
                             lineHeight: '1.4',
                             color: '#e2e8f0',
                             background: 'transparent',
                             overflow: 'auto',
-                            maxHeight: '380px',              // ← Reducir altura para dar espacio
+                            maxHeight: '380px',              
                             fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
                             whiteSpace: 'pre-wrap',
                             wordBreak: 'break-word',
-                            boxSizing: 'border-box'          // ← Agregar esto
+                            boxSizing: 'border-box'          
                         }}
                         dangerouslySetInnerHTML={{ __html: displayContent }}
                     />
 
-                    {/* Indicador de contenido truncado */}
+                    
                     {localViewMode === 'truncated' && isLarge && (
                         <div style={{
                             position: 'absolute',
@@ -1044,7 +1038,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
     return (
         <div className="jsonpath-modal-backdrop">
             <div className="jsonpath-tool-container">
-                {/* Header */}
+                
                 <div className="jsonpath-header">
                     <div className="header-content">
                         <div className="header-left">
@@ -1064,7 +1058,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                         </div>
                     </div>
 
-                    {/* 🔥 BOTÓN CERRAR */}
+                    
                     <button
                         className="jsonpath-close-button"
                         onClick={onClose}
@@ -1074,12 +1068,12 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                     </button>
                 </div>
 
-                {/* Main Content */}
+                
                 <div className="jsonpath-main">
-                    {/* Left Panel - Configuration */}
+                    
                     <div className="jsonpath-sidebar">
                         <div className="sidebar-content">
-                            {/* Environment - Solo Sandbox 3 */}
+                            
                             <div className="form-group">
                                 <label className="form-label">
                                     <Icon emoji="🌍" size={14} className="label-icon" />
@@ -1098,7 +1092,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 </select>
                             </div>
 
-                            {/* Service */}
+                            
                             <div className="form-group">
                                 <label className="form-label">
                                     <Icon emoji="⚙️" size={14} className="label-icon" />
@@ -1117,7 +1111,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 </select>
                             </div>
 
-                            {/* Endpoint Templates */}
+                            
                             <div className="form-group">
                                 <label className="form-label">
                                     📋 Endpoint Templates ({availableServices[selectedService]?.templates.length || 0})
@@ -1143,7 +1137,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 </select>
                             </div>
 
-                            {/* Endpoint */}
+                            
                             <div className="form-group">
                                 <label className="form-label">
                                     <Icon emoji="📄" size={14} className="label-icon" />
@@ -1174,7 +1168,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 </button>
                             </div>
 
-                            {/* Token */}
+                            
                             <div className="form-group">
                                 <label className="form-label">
                                     <Icon emoji="🔑" size={14} className="label-icon" />
@@ -1197,7 +1191,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 </div>
                             </div>
 
-                            {/* JSONPath Query */}
+                            
                             <div className="form-group">
                                 <label className="form-label">
                                     <Icon emoji="🔍" size={14} className="label-icon" />
@@ -1212,7 +1206,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 />
                             </div>
 
-                            {/* Progress Indicator */}
+                            
                             {progressData && (
                                 <div className="progress-container">
                                     <div className="progress-bar">
@@ -1227,7 +1221,7 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                                 </div>
                             )}
 
-                            {/* Action Buttons */}
+                            
                             <div className="action-buttons">
                                 <button
                                     onClick={executeJsonPath}
@@ -1256,9 +1250,9 @@ const JSONPathTool: React.FC<JSONPathToolProps> = ({ onClose }) => {
                         </div>
                     </div>
 
-                    {/* Right Panel - Results */}
+                    
                     <div className="jsonpath-results">
-                        {/* API Response with Optimized JSON Display */}
+                        
                         <FastJsonViewer
                             data={apiResponse}
                             title="🌐 API Response (Formatted JSON)"

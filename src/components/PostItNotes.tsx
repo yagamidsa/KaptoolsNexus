@@ -1,4 +1,3 @@
-// src/components/PostItNotes.tsx
 import { useState, useEffect } from 'react';
 import './PostItNotes.css';
 
@@ -25,7 +24,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
     const [draggedNote, setDraggedNote] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
 
-    // Load notes from localStorage when component mounts
+    
     useEffect(() => {
         const savedNotes = localStorage.getItem('postit-notes');
         if (savedNotes) {
@@ -38,26 +37,26 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     }, []);
 
-    // Save notes to localStorage
+    
     const saveNotes = (notesToSave: Note[]) => {
         localStorage.setItem('postit-notes', JSON.stringify(notesToSave));
         setNotes(notesToSave);
     };
 
-    // Generate random position for new note - Responsive
+    
     const getRandomPosition = (): { x: number; y: number } => {
         const noteWidth = window.innerWidth <= 768 ? 200 : window.innerWidth <= 1024 ? 220 : 280;
         const noteHeight = window.innerWidth <= 768 ? 140 : window.innerWidth <= 1024 ? 160 : 200;
         
-        // En móviles, no usar posicionamiento aleatorio
+    
         if (window.innerWidth <= 768) {
-            return { x: 0, y: 0 }; // Se manejará con CSS
+            return { x: 0, y: 0 }; 
         }
         
         const boardWidth = window.innerWidth - 100;
         const boardHeight = window.innerHeight - 200;
         
-        // Ajustar para pantallas más pequeñas
+        
         const padding = window.innerWidth <= 1024 ? 10 : 20;
         const maxX = Math.max(boardWidth - noteWidth - (padding * 2), 0);
         const maxY = Math.max(boardHeight - noteHeight - (padding * 2), 0);
@@ -68,7 +67,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         };
     };
 
-    // Add new note
+    
     const addNote = () => {
         const newNote: Note = {
             id: Date.now(),
@@ -89,7 +88,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         const updatedNotes = [newNote, ...notes];
         saveNotes(updatedNotes);
         
-        // Focus the title of the new note
+    
         setTimeout(() => {
             const titleElement = document.querySelector(`[data-note-id="${newNote.id}"] .note-title`) as HTMLTextAreaElement;
             if (titleElement) {
@@ -98,9 +97,9 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }, 100);
     };
 
-    // Show notification
+    
     const showNotification = (message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
-        // Remove existing notification if there is one
+        
         const existingNotification = document.querySelector('.copy-notification');
         if (existingNotification) {
             existingNotification.remove();
@@ -110,7 +109,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         notification.className = `copy-notification copy-notification-${type}`;
         notification.textContent = message;
         
-        // Base styles
+        
         let baseStyles = `
             position: fixed;
             top: 20px;
@@ -130,7 +129,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             text-align: center;
         `;
 
-        // Add type-specific styles
+        
         if (type === 'success') {
             baseStyles += 'border-color: rgba(76, 175, 80, 0.5); background: rgba(76, 175, 80, 0.15);';
         } else if (type === 'warning') {
@@ -142,7 +141,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         notification.style.cssText = baseStyles;
         document.body.appendChild(notification);
 
-        // Remove after 3 seconds
+        
         setTimeout(() => {
             notification.style.animation = 'slideOutNotification 0.3s ease-in';
             setTimeout(() => {
@@ -153,15 +152,15 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }, 3000);
     };
 
-    // Show confirmation dialog
+    
     const showConfirmation = (title: string, message: string, onConfirm: () => void) => {
-        // Remove existing confirmation
+        
         const existingConfirmation = document.querySelector('.custom-confirmation');
         if (existingConfirmation) {
             existingConfirmation.remove();
         }
 
-        // Create confirmation dialog
+        
         const confirmationHTML = `
             <div class="custom-confirmation" style="
                 position: fixed;
@@ -240,7 +239,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             </div>
         `;
 
-        // Add animations
+        
         const style = document.createElement('style');
         style.textContent = `
             @keyframes confirmationFadeIn {
@@ -270,7 +269,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             style.remove();
         };
 
-        // Handle button clicks
+        
         const cancelBtn = confirmation.querySelector('.cancel-btn');
         const confirmBtn = confirmation.querySelector('.confirm-btn');
 
@@ -284,14 +283,14 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             onConfirm();
         });
 
-        // Close on backdrop click
+        
         confirmation.querySelector('.confirmation-backdrop')?.addEventListener('click', () => {
             closeConfirmation();
             showNotification('✖️ Deletion cancelled', 'info');
         });
     };
 
-    // Delete note with confirmation
+    
     const deleteNote = (id: number) => {
         showConfirmation(
             '🗑️ Delete this note?',
@@ -304,7 +303,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         );
     };
 
-    // Duplicate note
+    
     const duplicateNote = (id: number) => {
         const originalNote = notes.find(note => note.id === id);
         if (originalNote) {
@@ -330,7 +329,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // Update note content
+    
     const updateNote = (id: number, field: keyof Note, value: string) => {
         const updatedNotes = notes.map(note => 
             note.id === id ? { ...note, [field]: value } : note
@@ -338,7 +337,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         saveNotes(updatedNotes);
     };
 
-    // Change note color
+    
     const changeNoteColor = (id: number) => {
         const colors: NoteColor[] = ['yellow', 'pink', 'blue', 'green', 'purple', 'orange'];
         const note = notes.find(note => note.id === id);
@@ -349,7 +348,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // Copy note content to clipboard (content only, no title)
+    
     const copyNoteContent = async (id: number) => {
         const note = notes.find(note => note.id === id);
         if (note) {
@@ -364,7 +363,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
                 await navigator.clipboard.writeText(textToCopy);
                 showNotification('📋 Content copied to clipboard', 'success');
             } catch {
-                // Fallback for browsers that don't support clipboard API
+                
                 try {
                     const textArea = document.createElement('textarea');
                     textArea.value = textToCopy;
@@ -380,16 +379,16 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // Handle note movement - Responsive
+    
     const handleMouseDown = (e: React.MouseEvent, note: Note) => {
         const target = e.target as HTMLElement;
         if (target.classList.contains('note-content') || 
             target.classList.contains('note-title') ||
             target.classList.contains('postit-note-action')) {
-            return; // Don't move if editing or using buttons
+            return; 
         }
 
-        // Disable dragging on mobile
+        
         if (window.innerWidth <= 768) {
             return;
         }
@@ -405,7 +404,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             const boardRect = document.querySelector('.notes-board')?.getBoundingClientRect();
             if (!boardRect) return;
 
-            // Responsive note width
+            
             const noteWidth = window.innerWidth <= 1024 ? 220 : 280;
             const noteHeight = window.innerWidth <= 1024 ? 160 : 200;
 

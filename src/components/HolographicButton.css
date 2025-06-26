@@ -71,7 +71,7 @@
         0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-/* Primary variant */
+
 .holo-btn-primary {
     background: linear-gradient(135deg, #6c5ce7 0%, #ff6b9d 100%);
 }
@@ -80,7 +80,7 @@
     background: linear-gradient(135deg, #7c6ce8 0%, #ff7bae 100%);
 }
 
-/* Secondary variant */
+
 .holo-btn-secondary {
     background: linear-gradient(135deg, #252a4a 0%, #1a1d3a 100%);
     border: 2px solid #6c5ce7;
@@ -92,7 +92,7 @@
     border-color: #ff6b9d;
 }
 
-/* Loading state */
+
 .holo-btn.holo-loading {
     pointer-events: none;
     background: linear-gradient(135deg, #6c5ce7 0%, #ff6b9d 100%);
@@ -125,17 +125,17 @@
     opacity: 0.3;
 }
 
-/* Click effect */
+
 .holo-btn:active {
     transform: scale(0.98) translateY(-1px);
 }
 
-/* Remove particles and other complex effects */
+
 .holo-particles {
     display: none;
 }
 
-/* Estado disabled */
+
 .holo-btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -162,7 +162,7 @@
     display: none;
 }
 
-/* RESPONSIVE DESIGN */
+
 @media (max-width: 1024px) {
     .holo-btn {
         min-width: 120px;

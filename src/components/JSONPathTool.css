@@ -1,11 +1,3 @@
-/* 
- * src/components/JSONPathTool.css 
- * Estilos para la herramienta JSONPath Tool compatible con KapTools Nexus - MEJORADO COMPLETO
- */
-
-/* ================================
-   BACKDROP MODAL
-   ================================ */
 .jsonpath-modal-backdrop {
     position: fixed;
     top: 0;
@@ -34,9 +26,7 @@
     }
 }
 
-/* ================================
-   CONTENEDOR PRINCIPAL
-   ================================ */
+
 .jsonpath-tool-container {
     width: 95vw;
     max-width: 1400px;
@@ -68,9 +58,7 @@
     }
 }
 
-/* ================================
-   HEADER - CORREGIDO CON BOTÓN CERRAR
-   ================================ */
+
 .jsonpath-header {
     background: linear-gradient(90deg, rgba(37, 42, 74, 0.8), rgba(108, 92, 231, 0.3));
     backdrop-filter: blur(20px);
@@ -86,7 +74,7 @@
     justify-content: space-between;
     width: 100%;
     padding-right: 50px;
-    /* Espacio para el botón cerrar */
+
 }
 
 .header-left {
@@ -143,9 +131,7 @@
     font-size: 12px;
 }
 
-/* ================================
-   BOTÓN CERRAR - CORREGIDO POSICIÓN
-   ================================ */
+
 .jsonpath-close-button {
     position: absolute;
     top: 16px;
@@ -181,18 +167,14 @@
     outline-offset: 2px;
 }
 
-/* ================================
-   LAYOUT PRINCIPAL
-   ================================ */
+
 .jsonpath-main {
     display: flex;
     flex: 1;
     min-height: 0;
 }
 
-/* ================================
-   SIDEBAR (Panel izquierdo)
-   ================================ */
+
 .jsonpath-sidebar {
     width: 320px;
     flex-shrink: 0;
@@ -258,9 +240,7 @@
     color: white;
 }
 
-/* ================================
-   BOTÓN TEMPLATE - NUEVO
-   ================================ */
+
 .template-btn {
     padding: 8px 12px;
     background: rgba(37, 42, 74, 0.5);
@@ -294,9 +274,7 @@
     transform: translateY(0);
 }
 
-/* ================================
-   TOKEN INPUT CONTAINER
-   ================================ */
+
 .token-input-container {
     position: relative;
 }
@@ -325,9 +303,7 @@
     outline-offset: 2px;
 }
 
-/* ================================
-   EJEMPLOS JSONPATH
-   ================================ */
+
 .examples-container {
     max-height: 120px;
     overflow-y: auto;
@@ -381,9 +357,7 @@
     letter-spacing: 0.5px;
 }
 
-/* ================================
-   BOTONES DE ACCIÓN
-   ================================ */
+
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -456,9 +430,7 @@
     outline-offset: 2px;
 }
 
-/* ================================
-   PANEL DE RESULTADOS
-   ================================ */
+
 .jsonpath-results {
     flex: 1;
     display: flex;
@@ -543,9 +515,7 @@
     position: relative;
 }
 
-/* ================================
-   SCROLLBARS PERSONALIZADOS
-   ================================ */
+
 .jsonpath-sidebar::-webkit-scrollbar,
 .examples-container::-webkit-scrollbar {
     width: 6px;
@@ -568,9 +538,7 @@
     background: rgba(108, 92, 231, 0.7);
 }
 
-/* ================================
-   ANIMACIONES MEJORADAS
-   ================================ */
+
 .loading-spin {
     animation: spin 1s linear infinite;
 }
@@ -585,9 +553,7 @@
     }
 }
 
-/* ================================
-   RESPONSIVE DESIGN
-   ================================ */
+
 @media (max-width: 1200px) {
     .jsonpath-tool-container {
         width: 98vw;
@@ -690,9 +656,7 @@
     }
 }
 
-/* ================================
-   MEJORAS DE ACCESIBILIDAD
-   ================================ */
+
 @media (prefers-contrast: high) {
     .jsonpath-tool-container {
         border: 2px solid #6c5ce7;
@@ -719,7 +683,7 @@
     }
 }
 
-/* Bloquear scroll del body cuando el modal está abierto */
+
 body:has(.jsonpath-modal-backdrop) {
     overflow: hidden;
 }
@@ -727,34 +691,32 @@ body:has(.jsonpath-modal-backdrop) {
 
 
 
-/* 🚀 PASO 3: AGREGAR al final del archivo src/components/JSONPathTool.css */
 
-/* ================================
-   PERFORMANCE MODE - OPTIMIZACIONES CRÍTICAS
-   ================================ */
 
-/* Clases para optimización durante procesamiento */
+
+
+
 .jsonpath-tool-container.processing {
-    /* Deshabilitar efectos costosos durante carga */
+
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transition: none !important;
 }
 
 .jsonpath-tool-container.processing * {
-    /* Deshabilitar animaciones durante procesamiento */
+
     animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 50ms !important;
-    /* Transiciones mínimas */
+
 }
 
-/* Performance mode - deshabilitar todos los efectos visuales */
+
 .jsonpath-tool-container.performance-mode {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-    /* Sombra simple */
+
 }
 
 .performance-mode * {
@@ -768,27 +730,23 @@ body:has(.jsonpath-modal-backdrop) {
 .performance-mode .jsonpath-modal-backdrop {
     backdrop-filter: none !important;
     background: rgba(26, 29, 58, 0.95) !important;
-    /* Opaco en lugar de blur */
+
 }
 
-/* ================================
-   OPTIMIZACIONES GPU - CRITICAL ELEMENTS
-   ================================ */
 
-/* Force GPU layers para elementos que cambian frecuentemente */
+
+
 .result-panel,
 .jsonpath-sidebar,
 .jsonpath-results,
 .result-content {
     will-change: transform;
     transform: translateZ(0);
-    /* Force GPU layer */
+
     backface-visibility: hidden;
 }
 
-/* ================================
-   PROGRESS INDICATOR STYLES
-   ================================ */
+
 
 .progress-container {
     position: relative;
@@ -844,9 +802,7 @@ body:has(.jsonpath-modal-backdrop) {
     text-align: center;
 }
 
-/* ================================
-   PERFORMANCE TOGGLE BUTTON
-   ================================ */
+
 
 .performance-controls {
     display: flex;
@@ -887,9 +843,7 @@ body:has(.jsonpath-modal-backdrop) {
     background: rgba(108, 92, 231, 0.3);
 }
 
-/* ================================
-   STRATEGY INDICATOR
-   ================================ */
+
 
 .strategy-indicator {
     display: flex;
@@ -931,9 +885,7 @@ body:has(.jsonpath-modal-backdrop) {
     color: #ef4444;
 }
 
-/* ================================
-   LOADING STATES OPTIMIZED
-   ================================ */
+
 
 .loading-overlay {
     position: absolute;
@@ -948,7 +900,7 @@ body:has(.jsonpath-modal-backdrop) {
     justify-content: center;
     z-index: 100;
     backdrop-filter: blur(2px);
-    /* Blur reducido */
+
 }
 
 .loading-spinner {
@@ -968,11 +920,9 @@ body:has(.jsonpath-modal-backdrop) {
     margin-bottom: 8px;
 }
 
-/* ================================
-   RESPONSIVE OPTIMIZATIONS
-   ================================ */
 
-/* Auto performance mode en móviles */
+
+
 @media (max-width: 768px) {
     .jsonpath-tool-container {
         backdrop-filter: none !important;
@@ -984,7 +934,7 @@ body:has(.jsonpath-modal-backdrop) {
         background: rgba(26, 29, 58, 0.95) !important;
     }
 
-    /* Simplificar estilos en móvil */
+
     * {
         box-shadow: none !important;
         animation: none !important;
@@ -992,7 +942,7 @@ body:has(.jsonpath-modal-backdrop) {
     }
 }
 
-/* Auto performance mode para reduced motion */
+
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -1011,37 +961,33 @@ body:has(.jsonpath-modal-backdrop) {
     }
 }
 
-/* ================================
-   MEMORY OPTIMIZATION HINTS
-   ================================ */
 
-/* Optimizar scroll performance */
+
+
 .result-content {
     contain: layout style;
     overflow-anchor: none;
 }
 
-/* Optimizar rendering */
+
 .result-panel {
     contain: layout;
     isolation: isolate;
 }
 
 
-/* 🚀 AGREGAR al final del archivo src/components/JSONPathTool.css */
 
-/* ================================
-   ESTILOS FALTANTES PARA FASTJSONVIEWER
-   ================================ */
 
-/* Estado activo para botones de modo */
+
+
+
 .copy-btn.active {
     background: rgba(108, 92, 231, 0.3) !important;
     border-color: #6c5ce7 !important;
     color: #6c5ce7 !important;
 }
 
-/* Estilos específicos para el pre del JSON */
+
 .result-content pre {
     margin: 0;
     padding: 12px;
@@ -1057,7 +1003,7 @@ body:has(.jsonpath-modal-backdrop) {
     border-radius: 6px;
 }
 
-/* Scrollbar para el contenido JSON */
+
 .result-content pre::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -1077,13 +1023,13 @@ body:has(.jsonpath-modal-backdrop) {
     background: rgba(108, 92, 231, 0.7);
 }
 
-/* Flexbox mejorado para result-header */
+
 .result-header {
     flex-wrap: wrap;
     gap: 8px;
 }
 
-/* Indicadores de tamaño y modo */
+
 .size-badge {
     font-size: 11px;
     padding: 2px 6px;
@@ -1103,18 +1049,16 @@ body:has(.jsonpath-modal-backdrop) {
     min-width: auto;
 }
 
-/* Performance optimizations */
+
 .result-content {
     contain: layout style;
     overflow-anchor: none;
 }
 
 
-/* ================================
-   COLORES PARA FASTJSONVIEWER
-   ================================ */
 
-   .result-content pre .json-key {
+
+.result-content pre .json-key {
     color: #ff79c6 !important;
     font-weight: 600;
 }
@@ -1144,11 +1088,9 @@ body:has(.jsonpath-modal-backdrop) {
 }
 
 
-/* ================================
-   FIX DEFINITIVO: Scroll completo
-   ================================ */
 
-   .result-panel {
+
+.result-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -1159,7 +1101,7 @@ body:has(.jsonpath-modal-backdrop) {
     border: 1px solid rgba(108, 92, 231, 0.2);
     backdrop-filter: blur(10px);
     overflow: hidden;
-    /* FORZAR altura específica */
+
     max-height: calc(50vh - 40px) !important;
 }
 
@@ -1168,7 +1110,7 @@ body:has(.jsonpath-modal-backdrop) {
     background: rgba(26, 29, 58, 0.3);
     overflow: hidden;
     position: relative;
-    /* FORZAR que el contenido ocupe todo el espacio disponible */
+
     height: 100% !important;
 }
 
@@ -1180,11 +1122,348 @@ body:has(.jsonpath-modal-backdrop) {
     color: #e2e8f0 !important;
     background: transparent !important;
     overflow: auto !important;
-    /* QUITAR max-height fijo y usar altura del contenedor */
+
     height: 100% !important;
     max-height: none !important;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
     white-space: pre-wrap !important;
     word-break: break-word !important;
     box-sizing: border-box !important;
+}
+
+
+
+
+
+
+.sidebar-content {
+    padding: 12px !important;
+    gap: 8px !important;
+}
+
+
+.form-group {
+    margin-bottom: 10px !important;
+    padding: 0 !important;
+}
+
+
+.form-label {
+    margin-bottom: 6px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+
+.form-input,
+.form-select {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    min-height: 38px !important;
+    margin-bottom: 0 !important;
+    line-height: 1.4 !important;
+    border-radius: 6px;
+    background: rgba(37, 42, 74, 0.5);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+    background: rgba(37, 42, 74, 0.7);
+}
+
+
+button {
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    min-height: 36px !important;
+    margin: 4px 0 !important;
+    line-height: 1.3 !important;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+
+.template-btn {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    margin: 2px !important;
+    min-height: 28px !important;
+    line-height: 1.2 !important;
+    border-radius: 4px;
+    background: rgba(108, 92, 231, 0.1);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    color: #a0a3bd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.template-btn:hover {
+    background: rgba(108, 92, 231, 0.2);
+    color: #6c5ce7;
+    border-color: rgba(108, 92, 231, 0.4);
+}
+
+
+textarea {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    min-height: 80px !important;
+    max-height: 120px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 0 !important;
+    resize: vertical !important;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+    border-radius: 6px;
+    background: rgba(37, 42, 74, 0.5);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    color: #e2e8f0;
+}
+
+
+.token-input-container {
+    position: relative !important;
+    width: 100% !important;
+}
+
+.dev-token-input,
+input[type="text"]:last-of-type {
+    font-family: 'Monaco', 'Menlo', monospace !important;
+    font-size: 11px !important;
+    padding: 10px 40px 10px 12px !important;
+    min-height: 38px !important;
+    letter-spacing: 0.5px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+
+.token-toggle {
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    color: #a0a3bd !important;
+    cursor: pointer !important;
+    padding: 6px !important;
+    transition: all 0.3s ease !important;
+    border-radius: 4px !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    z-index: 2 !important;
+}
+
+.token-toggle:hover {
+    color: white !important;
+    background: rgba(108, 92, 231, 0.2) !important;
+}
+
+
+.action-buttons {
+    gap: 8px !important;
+    margin-top: 8px !important;
+    margin-bottom: 6px !important;
+    flex-wrap: wrap;
+    display: flex !important;
+}
+
+
+.execute-btn,
+.clear-btn {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+    min-height: 34px !important;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.execute-btn {
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    border: none;
+    color: white;
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+}
+
+.execute-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+}
+
+.clear-btn {
+    background: rgba(37, 42, 74, 0.5);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    color: #a0a3bd;
+}
+
+.clear-btn:hover {
+    background: rgba(37, 42, 74, 0.7);
+    color: white;
+    border-color: #6c5ce7;
+}
+
+
+.preview-url-btn {
+    margin: 6px 0 !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    min-height: 34px !important;
+    border-radius: 6px;
+    background: rgba(37, 42, 74, 0.5);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    color: #a0a3bd;
+}
+
+.preview-url-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.preview-url-btn:not(:disabled):hover {
+    background: rgba(37, 42, 74, 0.7);
+    color: white;
+    border-color: #6c5ce7;
+}
+
+
+.fetch-btn {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    min-height: 40px !important;
+    margin: 6px 0 !important;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+    border: none;
+    color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+    transition: all 0.3s ease;
+}
+
+.fetch-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+}
+
+
+.sidebar-section {
+    margin-bottom: 8px !important;
+    padding-bottom: 0 !important;
+}
+
+.sidebar-section+.sidebar-section {
+    margin-top: 6px !important;
+    padding-top: 6px !important;
+    border-top: 1px solid rgba(108, 92, 231, 0.1);
+}
+
+
+.sidebar-section h3 {
+    font-size: 11px !important;
+    margin-bottom: 6px !important;
+    margin-top: 0 !important;
+    line-height: 1.2 !important;
+    padding: 0 !important;
+    color: #a0a3bd;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+
+.template-container,
+.endpoint-templates-container {
+    margin: 6px 0 !important;
+    padding: 6px !important;
+    max-height: 120px !important;
+    overflow-y: auto;
+    background: rgba(26, 29, 58, 0.3);
+    border-radius: 6px;
+    border: 1px solid rgba(108, 92, 231, 0.1);
+}
+
+
+.form-label .header-icon,
+.form-label span:first-child {
+    font-size: 14px !important;
+    margin-right: 4px !important;
+}
+
+
+.endpoint-path-input,
+.jsonpath-sidebar input[type="text"]:first-of-type {
+    font-family: 'Monaco', 'Menlo', monospace !important;
+    font-size: 12px !important;
+}
+
+
+.status-indicator {
+    font-size: 10px !important;
+    margin-left: 4px !important;
+    border-radius: 50%;
+    background: rgba(108, 92, 231, 0.1);
+    color: #6c5ce7;
+}
+
+
+@media (min-width: 1200px) {
+
+    .jsonpath-sidebar {
+        height: calc(100vh - 100px) !important;
+        max-height: calc(100vh - 100px) !important;
+        overflow-y: auto !important;
+    }
+
+
+    .sidebar-content {
+        height: 100% !important;
+        max-height: 100% !important;
+        padding: 10px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+    }
+
+
+    .action-buttons {
+        margin-top: 6px !important;
+        margin-bottom: 8px !important;
+        flex-shrink: 0 !important;
+    }
+}
+
+
+.jsonpath-sidebar::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.jsonpath-sidebar::-webkit-scrollbar-track {
+    background: rgba(26, 29, 58, 0.3);
+    border-radius: 3px;
+}
+
+.jsonpath-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(108, 92, 231, 0.5);
+    border-radius: 3px;
+}
+
+.jsonpath-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(108, 92, 231, 0.7);
 }

@@ -1,5 +1,3 @@
-// src/App.tsx - VERSIÓN FINAL LIMPIA
-
 import { useState, useEffect } from "react";
 import HolographicButton from "./components/HolographicButton";
 import FuturisticBackground from "./components/FuturisticBackground";
@@ -21,6 +19,7 @@ import './utils/test_backend.js';
 import JSONPathTool from './components/JSONPathTool';
 import ProductChunksModal from './components/ProductChunksModal';
 import "./App.css";
+import copilotIcon from './assets/copilot.png';
 
 
 interface MenuItem {
@@ -43,7 +42,7 @@ interface WorkspaceValidation {
 }
 
 function App() {
-  // 🔥 ESTADO DEL SPLASH SCREEN
+
   const [isAppLoading, setIsAppLoading] = useState(true);
 
   const [response, setResponse] = useState("");
@@ -52,7 +51,7 @@ function App() {
   const [workspacePath, setWorkspacePath] = useState<string>('');
   const [activeView, setActiveView] = useState<'main' | 'review-branches' | 'jsonpath'>('main');
 
-  // Estados de modales
+
   const [showPostItNotesModal, setShowPostItNotesModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showProductDataModal, setShowProductDataModal] = useState(false);
@@ -60,10 +59,9 @@ function App() {
   const [showCreateStructureModal, setShowCreateStructureModal] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showQChunksModal, setShowQChunksModal] = useState(false);
-  const [showCopilotModal, setShowCopilotModal] = useState(false);
   const [showProductChunksModal, setShowProductChunksModal] = useState(false);
 
-  // Estado de validación del workspace
+
   const [workspaceValidation, setWorkspaceValidation] = useState<WorkspaceValidation>({
     valid: false,
     has_microservices: false,
@@ -75,21 +73,7 @@ function App() {
   const { exchangeRates } = useExchangeRates();
 
   const menuItems: MenuItem[] = [
-    {
-      id: 'post-it-notes',
-      label: 'Post-it Notes',
-      desc: 'Digital sticky notes',
-      icon: '📝',
-      category: 'UTILITIES'
-    },
-    {
-      id: 'product-chunks',  // ← NUEVO ID
-      label: 'Product Chunks',
-      desc: 'Download JSON and Chunks Manipulation',
-      icon: '📊',
-      category: 'AZURE TOOLS'
-    },
-    // Git Operations
+
     {
       id: 'clone-master',
       label: 'Clone Repos (Master)',
@@ -108,7 +92,7 @@ function App() {
       requiresMicroservices: true
     },
 
-    // Azure Tools
+
     {
       id: 'azure-download',
       label: 'Download Files',
@@ -124,8 +108,15 @@ function App() {
       icon: '🔓',
       category: 'AZURE TOOLS'
     },
+    {
+      id: 'product-chunks',
+      label: 'Product Chunks',
+      desc: 'Download JSON and Chunks Manipulation',
+      icon: '📊',
+      category: 'AZURE TOOLS'
+    },
 
-    // Data Processing
+
     {
       id: 'duplicate-mdd',
       label: 'Duplicate MDD',
@@ -144,7 +135,14 @@ function App() {
       requiresMicroservices: true
     },
 
-    // Utilities
+
+    {
+      id: 'post-it-notes',
+      label: 'Post-it Notes',
+      desc: 'Digital sticky notes',
+      icon: '📝',
+      category: 'UTILITIES'
+    },
     {
       id: 'jsonpath',
       label: 'JsonPath Tool',
@@ -171,10 +169,10 @@ function App() {
 
   const categories = [...new Set(menuItems.map(item => item.category))];
 
-  // Verificar si hay workspace seleccionado
+
   const isWorkspaceSelected = workspacePath !== '';
 
-  // 🔥 HANDLER PARA CUANDO TERMINE EL SPLASH
+
   const handleSplashComplete = () => {
     console.log("✅ Splash screen completed!");
     setIsAppLoading(false);
@@ -182,7 +180,7 @@ function App() {
   };
 
 
-  // Función helper para tooltips dinámicos
+
   const getTooltipContent = (item: MenuItem, enabled: boolean) => {
     if (enabled) {
       return {
@@ -219,7 +217,7 @@ function App() {
     };
   };
 
-  // Validar workspace cuando cambie
+
   useEffect(() => {
     if (isWorkspaceSelected) {
       validateWorkspace();
@@ -248,16 +246,14 @@ function App() {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [activeView]);
 
-  // 3. Opcional: Agregar función helper para cerrar JSONPath
+
   const handleCloseJSONPath = () => {
     setActiveView('main');
     setSelectedItem('');
     setResponse('🔗 JSONPath Tool closed');
   };
 
-  // Validar workspace con el backend
-  // Función corregida para validar workspace en App.tsx
-  // Función mejorada que combina verificación local con backend
+
   const validateWorkspace = async () => {
     if (!workspacePath || workspacePath.trim() === '') {
       setResponse('❌ No workspace path to validate');
@@ -268,7 +264,7 @@ function App() {
       setResponse("🔄 Validating workspace...");
       console.log('Validating workspace:', workspacePath);
 
-      // PASO 1: Verificación local con Tauri (más confiable)
+
       try {
         const { invoke } = await import('@tauri-apps/api/core');
         const localValidation = await invoke('check_workspace_folders', {
@@ -277,7 +273,7 @@ function App() {
 
         console.log('Local validation result:', localValidation);
 
-        // Si encontramos microservicios localmente, usar esa información
+
         if (localValidation && localValidation.has_microservices) {
           setWorkspaceValidation({
             valid: true,
@@ -287,9 +283,9 @@ function App() {
           });
 
           setResponse(`✅ Workspace validated locally!\n📂 Path: ${workspacePath}\n🌿 Found repositories: ${localValidation.existing_repos.join(', ')}\n📁 Contents: ${localValidation.details.workspace_contents.join(', ')}`);
-          return; // Éxito con validación local
+          return;
         } else {
-          // Si no hay microservicios, mostrar información detallada
+
           const details = localValidation.details || {};
           setResponse(`📂 Workspace validated: ${workspacePath}\n⚠️ No microservices found\n\nDetails:\n• Content folder exists: ${details.content_folder_exists ? '✅' : '❌'}\n• Content is git repo: ${details.content_is_git_repo ? '✅' : '❌'}\n• Dimensions folder exists: ${details.dimensions_folder_exists ? '✅' : '❌'}\n• Dimensions is git repo: ${details.dimensions_is_git_repo ? '✅' : '❌'}\n• Workspace contents: ${details.workspace_contents?.join(', ') || 'empty'}\n\n💡 Use "Clone Master" to download microservices`);
 
@@ -299,14 +295,14 @@ function App() {
             existing_repos: [],
             workspace_path: workspacePath
           });
-          return; // Workspace válido pero sin microservicios
+          return;
         }
       } catch (tauriError) {
         console.warn('Local validation failed:', tauriError);
         setResponse("⚠️ Local validation failed, trying backend...");
       }
 
-      // PASO 2: Si Tauri falla, intentar con backend
+
       try {
         const res = await fetch("http://127.0.0.1:8000/validate-workspace", {
           method: "POST",
@@ -339,7 +335,7 @@ function App() {
       } catch (backendError) {
         console.warn('Backend validation failed:', backendError);
 
-        // PASO 3: Fallback - marcar como válido para permitir operaciones
+
         setWorkspaceValidation({
           valid: true,
           has_microservices: false,
@@ -353,7 +349,7 @@ function App() {
     } catch (error) {
       console.error('Workspace validation error:', error);
 
-      // En caso de error total, al menos permitir usar el workspace
+
       setWorkspaceValidation({
         valid: true,
         has_microservices: false,
@@ -366,12 +362,17 @@ function App() {
   };
 
   const testAPI = async () => {
+    setLoading(true);
+    setResponse("🔗 Testing Neural Link connection...\n⏳ Initializing backend verification...");
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/");
-      const data = await res.json();
-      setResponse(`🚀 ${data.message}\n🎯 Backend is running correctly!`);
+      const { invoke } = await import('@tauri-apps/api/core');
+      const result = await invoke('test_backend_connection') as string;
+      setResponse(result);
     } catch (error) {
-      setResponse("❌ Error connecting to API\n💡 Start backend with: cd backend && python main.py");
+      setResponse(`❌ Neural Link connection failed\n\n🔍 Diagnostics:\n• Backend may not be running\n• Port 8000 may be blocked\n• Network connectivity issue\n\n💡 Solutions:\n1. Check if backend process is running\n2. Restart with: ./START-FINAL.bat\n3. Manual start: ./kaptools-backend.exe\n\n🛠️ Debug info: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -381,7 +382,7 @@ function App() {
 
       const { invoke } = await import('@tauri-apps/api/core');
 
-      // Usar solo RFD (Rust File Dialog) - más confiable y simple
+
       const selectedPath = await invoke('select_folder_rfd') as string | null;
 
       if (selectedPath && selectedPath.trim() !== '') {
@@ -389,7 +390,7 @@ function App() {
         setResponse(`📁 Workspace folder selected:\n📁 ${selectedPath}\n🔄 Validating...`);
         console.log('Selected workspace:', selectedPath);
 
-        // Validar el workspace después de seleccionarlo
+
         await validateWorkspace();
       } else {
         setResponse("❌ No folder selected - Operation cancelled");
@@ -458,7 +459,7 @@ function App() {
     }
   };
 
-  // Verificar si item está habilitado
+
   const isMenuItemEnabled = (item: MenuItem): boolean => {
     if (item.requiresWorkspace && !isWorkspaceSelected) {
       return false;
@@ -471,7 +472,7 @@ function App() {
     return true;
   };
 
-  // Obtener mensaje de estado del item
+
   const getMenuItemStatusMessage = (item: MenuItem): string => {
     if (item.requiresWorkspace && !isWorkspaceSelected) {
       return "❌ Requires workspace selection";
@@ -484,7 +485,7 @@ function App() {
     return "✅ Ready";
   };
 
-  // Handlers para cerrar modales
+
   const handleCloseReviewBranches = () => {
     setActiveView('main');
     setSelectedItem('');
@@ -515,12 +516,12 @@ function App() {
     setResponse('📝 Post-it Notes closed');
   };
 
-  // Handler principal del menú
+
   const handleMenuItemClick = async (itemId: string) => {
     const item = menuItems.find(item => item.id === itemId);
     if (!item) return;
 
-    // Verificar si el item está habilitado
+
     if (!isMenuItemEnabled(item)) {
       const statusMsg = getMenuItemStatusMessage(item);
       setResponse(`🚫 Cannot execute: ${item.label}\n${statusMsg}`);
@@ -532,7 +533,7 @@ function App() {
       setShowPostItNotesModal(true);
       setResponse(`📝 Opening Post-it Notes...\n🎨 Digital sticky notes ready for organizing your ideas`);
     }
-    // Handle Git operations
+
     else if (itemId === 'clone-master') {
       await cloneMicroservices('master');
     } else if (itemId === 'review-branches') {
@@ -545,7 +546,7 @@ function App() {
       setResponse(`📊 Opening Product Chunks Processor...\n🔧 Ready to download JSON and generate chunks report`);
     }
 
-    // Handle Azure Tools
+
     else if (itemId === 'product-data') {
       setShowProductDataModal(true);
       setResponse(`📦 Opening Product Data Inspector...\n📂 Ready to analyze product metadata`);
@@ -554,7 +555,7 @@ function App() {
       setResponse(`☁️ Opening Azure Download Center...\n📂 Target: ${workspacePath}`);
     }
 
-    // Handle Data Processing
+
     else if (itemId === 'duplicate-mdd') {
       setShowDuplicateMDDModal(true);
       setResponse(`📋 Opening MDD Duplicator...\n📂 Workspace: ${workspacePath}\n🔄 Ready to duplicate and combine files`);
@@ -566,13 +567,13 @@ function App() {
       setResponse(`⚙️ Opening ODIN Chunks Processor...\n📂 Workspace: ${workspacePath}\n🔧 Ready to process .odin files and generate Template_Chunks structure`);
     }
 
-    // Handler Shortcuts:
+
     else if (itemId === 'shortcuts') {
       setShowShortcutsModal(true);
       setResponse(`🌐 Opening Command Shortcuts Portal...\n⚡ Accessing divine portal matrix`);
     }
 
-    // Handle Utilities
+
     else if (itemId === 'jsonpath') {
       setActiveView('jsonpath');
       setResponse(`🔗 Opening JSONPath Tool...\n🎯 Advanced API querying ready\n⚡ Quantum JSON analysis activated`);
@@ -593,7 +594,7 @@ function App() {
       );
     }
 
-    // ✅ AGREGAR ESTO:
+
     if (activeView === 'jsonpath') {
       return (
         <JSONPathTool onClose={handleCloseJSONPath} />
@@ -826,12 +827,12 @@ function App() {
     );
   };
 
-  // 🔥 MOSTRAR SPLASH SCREEN SI ESTÁ CARGANDO
+
   if (isAppLoading) {
     return <SplashScreen onLoadingComplete={handleSplashComplete} />;
   }
 
-  // 🔥 MOSTRAR APP PRINCIPAL CUANDO HAYA TERMINADO EL SPLASH
+
   return (
     <div className={`nexus-app ${activeView === 'review-branches' || activeView === 'jsonpath' ? 'review-branches-mode' : ''}`}>
       <FuturisticBackground />
@@ -856,7 +857,7 @@ function App() {
 
 
 
-      {/* 🤖 COPILOT 365 FLOATING BUTTON */}
+
       <div className="copilot-floating-button">
         <SmartTooltipWrapper
           content={{
@@ -881,10 +882,35 @@ function App() {
             }}
           >
             <img
-              src="https://img.icons8.com/fluency/48/microsoft-copilot.png"
-              alt="Copilot"
+              src={copilotIcon}
+              alt="Microsoft Copilot"
               width="48"
               height="48"
+              style={{
+                borderRadius: '8px',
+                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+              }}
+              onError={() => {
+                // Si falla, usar diseño con texto
+                const button = document.querySelector('.copilot-button');
+                if (button) {
+                  button.innerHTML = `
+              <div style="
+                width: 48px; 
+                height: 48px; 
+                background: linear-gradient(135deg, #0078D4, #00BCF2); 
+                border-radius: 12px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                color: white; 
+                font-size: 14px; 
+                font-weight: bold;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+              ">Co</div>
+            `;
+                }
+              }}
             />
           </button>
         </SmartTooltipWrapper>
@@ -919,7 +945,7 @@ function App() {
         </div>
       </footer>
 
-      {/* Todos los modales */}
+
       <DownloadFiles
         isOpen={showDownloadModal}
         onClose={handleCloseDownloadModal}
@@ -964,7 +990,7 @@ function App() {
         workspacePath={workspacePath}
       />
 
-      {/* Product Chunks Modal */}
+
       {showProductChunksModal && (
         <ProductChunksModal
           isOpen={showProductChunksModal}

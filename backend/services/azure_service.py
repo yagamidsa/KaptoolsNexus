@@ -14,7 +14,7 @@ class AzureService:
         self.azure_transfer_exe = self.config.get('DEFAULT', 'azure_transfer', fallback='AzureFileTransfer\\AzureFileTransfer.exe')
     
     def _load_config(self) -> configparser.ConfigParser:
-        """Load configuration from config.ini"""
+        
         config = configparser.ConfigParser()
         config_path = Path(__file__).parent.parent / 'config' / 'config.ini'
         if config_path.exists():
@@ -28,20 +28,9 @@ class AzureService:
         server: str, 
         workspace_path: str
     ) -> Dict[str, any]:
-        """
-        Download Azure files from specified server
         
-        Args:
-            project_folder: KapID del proyecto
-            wave_id: WaveID del proyecto  
-            server: Servidor (ProdBlue, Prod, Uat, Dev, Sandbox3-13, Staging)
-            workspace_path: Ruta del workspace local
-            
-        Returns:
-            Dict con status y mensaje
-        """
         try:
-            # Validate inputs
+        
             if not all([project_folder, wave_id, server, workspace_path]):
                 return {
                     "success": False,
@@ -49,13 +38,13 @@ class AzureService:
                     "files_downloaded": []
                 }
             
-            # Create destination path
+        
             destination_path = Path(workspace_path) / project_folder
             if destination_path.exists():
                 shutil.rmtree(destination_path)
             destination_path.mkdir(parents=True, exist_ok=True)
             
-            # Define files to download
+        
             files_to_download = [
                 f"metadata-create\\{project_folder}\\{project_folder}_{wave_id}_Metadata.json",
                 f"metadata-create\\{project_folder}\\combined_portal_information.json",
@@ -68,28 +57,28 @@ class AzureService:
                 f"beast-interface\\download\\{project_folder}_{wave_id}.zip"
             ]
             
-            # Build Azure transfer commands
+        
             azure_transfer_path = Path(self.base_path) / server / self.azure_transfer_exe
             commands = []
             
             for file_path in files_to_download:
                 cmd = [
                     str(azure_transfer_path),
-                    "d",  # download
-                    "-f",  # force
-                    "-s", file_path,  # source
-                    "-d", str(destination_path),  # destination
-                    "-sf", "NA"  # source filter
+                    "d",  
+                    "-f",  
+                    "-s", file_path,  
+                    "-d", str(destination_path),  
+                    "-sf", "NA"  
                 ]
                 commands.append(cmd)
             
-            # Execute downloads
+            
             downloaded_files = []
             failed_files = []
             
             for i, cmd in enumerate(commands):
                 try:
-                    # Run command
+                    
                     result = await asyncio.create_subprocess_exec(
                         *cmd,
                         stdout=asyncio.subprocess.PIPE,
@@ -112,10 +101,10 @@ class AzureService:
                         "error": str(e)
                     })
             
-            # Wait a bit for file system to sync
+            
             await asyncio.sleep(2)
             
-            # Check final results
+            
             actual_files = list(destination_path.rglob("*"))
             actual_file_count = len([f for f in actual_files if f.is_file()])
             
@@ -146,7 +135,7 @@ class AzureService:
             }
     
     def get_available_servers(self) -> List[str]:
-        """Get list of available servers"""
+        
         return [
             "ProdBlue",
             "Prod", 
@@ -167,7 +156,7 @@ class AzureService:
         ]
     
     def validate_azure_config(self) -> Dict[str, any]:
-        """Validate Azure configuration"""
+        
         issues = []
         
         if not self.base_path:

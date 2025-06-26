@@ -131,16 +131,16 @@ const NeonDock: React.FC = () => {
         }
     ];
 
-    // 🔥 Función para calcular posición del tooltip
+    
     const calculateTooltipPosition = (element: HTMLElement) => {
         const rect = element.getBoundingClientRect();
-        const tooltipX = rect.right + 20; // 20px a la derecha del elemento
-        const tooltipY = rect.top + (rect.height / 2); // Centrado verticalmente
+        const tooltipX = rect.right + 20; 
+        const tooltipY = rect.top + (rect.height / 2); 
 
         setTooltipPosition({ x: tooltipX, y: tooltipY });
     };
 
-    // 🔥 Handlers mejorados para el hover
+    
     const handleMouseEnter = (appId: string, event: React.MouseEvent<HTMLDivElement>) => {
         const element = event.currentTarget;
         calculateTooltipPosition(element);
@@ -245,7 +245,7 @@ const NeonDock: React.FC = () => {
 
     const handleAppClick = (app: DockApp) => {
         app.action();
-        // Auto-colapsar después de hacer clic en pantallas pequeñas
+        
         if (window.innerWidth < 1200) {
             setIsExpanded(false);
         }
@@ -270,7 +270,7 @@ const NeonDock: React.FC = () => {
         setIsExpanded(!isExpanded);
     };
 
-    // 🔥 Tooltip global usando createPortal
+    
     const TooltipPortal: React.FC<{ app: DockApp }> = ({ app }) => {
         if (!hoveredApp || hoveredApp !== app.id) return null;
 
@@ -324,7 +324,7 @@ const NeonDock: React.FC = () => {
                 >
                     {getAppDescription(app.id)}
                 </div>
-                {/* Flecha del tooltip */}
+                
                 <div
                     style={{
                         position: 'absolute',
@@ -343,7 +343,7 @@ const NeonDock: React.FC = () => {
         );
     };
 
-    // Agregar estilos para la animación del tooltip
+    
     useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `
@@ -367,7 +367,7 @@ const NeonDock: React.FC = () => {
 
     return (
         <>
-            {/* Botón de toggle - siempre visible */}
+            
             <button
                 className={`dock-toggle ${isExpanded ? 'expanded' : ''}`}
                 onClick={toggleDock}
@@ -381,7 +381,7 @@ const NeonDock: React.FC = () => {
                 )}
             </button>
 
-            {/* Overlay para cerrar al hacer clic fuera */}
+            
             {isExpanded && (
                 <div
                     className="dock-overlay"
@@ -389,7 +389,7 @@ const NeonDock: React.FC = () => {
                 />
             )}
 
-            {/* Dock principal */}
+            
             <div
                 ref={dockRef}
                 className={`neon-dock ${isExpanded ? 'expanded' : 'collapsed'}`}
@@ -421,10 +421,10 @@ const NeonDock: React.FC = () => {
                                     }}
                                 />
 
-                                {/* Efecto de glow al hover */}
+                                
                                 <div className="app-glow"></div>
 
-                                {/* Partículas de activación */}
+                                
                                 <div className="app-particles">
                                     {[...Array(6)].map((_, i) => (
                                         <div key={i} className={`particle particle-${i + 1}`}></div>
@@ -443,7 +443,7 @@ const NeonDock: React.FC = () => {
                 </div>
             </div>
 
-            {/* 🔥 Tooltips renderizados globalmente */}
+            
             {dockApps.map((app) => (
                 <TooltipPortal key={`tooltip-${app.id}`} app={app} />
             ))}

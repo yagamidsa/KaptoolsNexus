@@ -1,4 +1,3 @@
-// src/components/QChunksProcessor.tsx - CORREGIDO PARA USAR BACKEND
 import React, { useState, useRef } from 'react';
 import './Modal.css';
 
@@ -35,7 +34,7 @@ interface BackendResponse {
     message: string;
     original_filename: string;
     processed_content: string;
-    encoding_info?: EncodingInfo;  // 🔥 Puede ser undefined
+    encoding_info?: EncodingInfo;
     stats: ProcessingStats;
     processing_results: ProcessingResult[];
 }
@@ -45,6 +44,7 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
     const [processing, setProcessing] = useState(false);
     const [result, setResult] = useState<BackendResponse | null>(null);
     const [error, setError] = useState('');
+    const [processingProgress, setProcessingProgress] = useState(0);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,9 +79,17 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
         setProcessing(true);
         setError('');
         setResult(null);
+        setProcessingProgress(0);
 
         try {
-            // 🔥 USAR EL ENDPOINT CORRECTO DEL BACKEND
+
+            const progressInterval = setInterval(() => {
+                setProcessingProgress(prev => {
+                    if (prev >= 90) return prev;
+                    return prev + Math.random() * 15;
+                });
+            }, 200);
+
             const formData = new FormData();
             formData.append('odin_file', selectedFile);
             formData.append('workspace_path', workspacePath);
@@ -96,6 +104,8 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
                 body: formData
             });
 
+            clearInterval(progressInterval);
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Backend error (${response.status}): ${errorText}`);
@@ -104,8 +114,14 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
             const data: BackendResponse = await response.json();
 
             if (data.success) {
-                setResult(data);
-                console.log('✅ Processing successful:', data.message);
+                
+                setProcessingProgress(100);
+
+                
+                setTimeout(() => {
+                    setResult(data);
+                    console.log('✅ Processing successful:', data.message);
+                }, 500);
             } else {
                 throw new Error(data.message || 'Processing failed');
             }
@@ -116,30 +132,31 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
             setError(errorMessage);
         } finally {
             setProcessing(false);
+            setProcessingProgress(0); 
         }
     };
 
     const downloadProcessedFile = () => {
         if (!result || !result.processed_content || !selectedFile) return;
 
-        // 🔥 VALIDACIÓN SEGURA DE encoding_info
+        
         let blob;
         let filename = selectedFile.name.replace('.odin', '_processed.odin');
+
         
-        // Verificar si encoding_info existe y tiene la propiedad output_encoding
-        const hasValidEncodingInfo = result.encoding_info && 
-                                   result.encoding_info.output_encoding !== undefined;
-        
-        const isUtf16Output = hasValidEncodingInfo && 
-                            result.encoding_info!.output_encoding === "UTF-16 LE with BOM";
-        
+        const hasValidEncodingInfo = result.encoding_info &&
+            result.encoding_info.output_encoding !== undefined;
+
+        const isUtf16Output = hasValidEncodingInfo &&
+            result.encoding_info!.output_encoding === "UTF-16 LE with BOM";
+
         if (isUtf16Output) {
-            // Convertir a UTF-16 LE con BOM
+            
             const utf16Content = new TextEncoder().encode('\ufeff' + result.processed_content);
             blob = new Blob([utf16Content], { type: 'text/plain;charset=utf-16le' });
             console.log('📄 Saving as UTF-16 LE with BOM');
         } else {
-            // Guardar como UTF-8 (default)
+            
             blob = new Blob([result.processed_content], { type: 'text/plain;charset=utf-8' });
             console.log('📄 Saving as UTF-8');
         }
@@ -153,11 +170,11 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        // 🔥 ACCESO SEGURO A encoding_info
-        const encodingInfo = hasValidEncodingInfo ? 
-                           result.encoding_info!.output_encoding : 
-                           'UTF-8';
         
+        const encodingInfo = hasValidEncodingInfo ?
+            result.encoding_info!.output_encoding :
+            'UTF-8';
+
         console.log('Downloaded: ' + filename + ' (' + encodingInfo + ')');
     };
 
@@ -231,22 +248,56 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
                     </div>
 
                     {/* Process Button */}
-                    <button
-                        className={`process-button ${!selectedFile || processing ? 'disabled' : ''}`}
-                        onClick={processFile}
-                        disabled={!selectedFile || processing}
-                    >
-                        {processing ? (
-                            <>
-                                <span className="spinner"></span>
-                                Processing via Backend...
-                            </>
-                        ) : (
-                            <>
-                                ⚡ Process ODIN File (Backend)
-                            </>
-                        )}
-                    </button>
+                    {!processing ? (
+                        <button
+                            className={`process-button ${!selectedFile ? 'disabled' : ''}`}
+                            onClick={processFile}
+                            disabled={!selectedFile}
+                        >
+                            ⚡ Process ODIN File (Backend)
+                        </button>
+                    ) : (
+                        
+                        <div className="circular-progress-container processing">
+                            
+                            <svg className="progress-gradient-defs" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style={{ stopColor: '#6c5ce7', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#ff6b9d', stopOpacity: 1 }} />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+
+                            
+                            <div style={{ position: 'relative' }}>
+                                <svg className="circular-progress-svg" xmlns="http://www.w3.org/2000/svg">
+                                    <circle className="progress-circle-bg" cx="60" cy="60" r="50" />
+                                    <circle className="progress-circle-inner" cx="60" cy="60" r="40" />
+                                    <circle
+                                        className="progress-circle-fill"
+                                        cx="60"
+                                        cy="60"
+                                        r="50"
+                                        style={{
+                                            strokeDashoffset: `calc(314 - (314 * ${processingProgress}) / 100)`
+                                        }}
+                                    />
+                                </svg>
+
+                                
+                                <div className="progress-text-overlay">
+                                    <div className="progress-percentage">{Math.round(processingProgress)}%</div>
+                                    <div className="progress-label">Processing</div>
+                                </div>
+                            </div>
+
+                            
+                            <div className="progress-info-text">
+                                Processing ODIN file via backend...
+                            </div>
+                        </div>
+                    )}
 
                     {/* Error Message */}
                     {error && (
@@ -261,11 +312,10 @@ const QChunksProcessor: React.FC<QChunksProcessorProps> = ({ isOpen, onClose, wo
                         <div className="results-section">
                             {/* Success Message */}
                             <div className="success-message">
-                                <span className="success-icon">✅</span>
+
                                 {result.message}
                             </div>
 
-                            {/* 🔥 MOSTRAR INFORMACIÓN DE ENCODING SI ESTÁ DISPONIBLE */}
                             {result.encoding_info && (
                                 <div className="encoding-info">
                                     <h4>📝 Encoding Information</h4>

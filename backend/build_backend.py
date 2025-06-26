@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-"""
-Script simple para construir el backend Python en un ejecutable
-"""
 import os
 import sys
 import shutil
@@ -11,30 +7,30 @@ from pathlib import Path
 def main():
     print("🚀 Construyendo backend KapTools Nexus...")
     
-    # Verificar que estamos en la carpeta correcta
+
     if not os.path.exists('main.py'):
         print("❌ Error: No se encuentra main.py")
         print("   Ejecuta este script desde la carpeta backend/")
         return False
     
-    # Instalar PyInstaller si no está disponible
+
     try:
         import PyInstaller
     except ImportError:
         print("📦 Instalando PyInstaller...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
     
-    # Limpiar builds anteriores
+
     for dir_name in ['dist', 'build', '__pycache__']:
         if os.path.exists(dir_name):
             print(f"🧹 Limpiando {dir_name}/")
             shutil.rmtree(dir_name)
     
-    # Crear directorio de binarios
+
     binaries_dir = Path("../src-tauri/binaries")
     binaries_dir.mkdir(parents=True, exist_ok=True)
     
-    # Comando PyInstaller básico
+
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "main.py",
@@ -46,7 +42,7 @@ def main():
         "--specpath=build",
         "--noconfirm",
         
-        # Módulos esenciales
+    
         "--hidden-import=uvicorn",
         "--hidden-import=fastapi",
         "--hidden-import=git",
@@ -54,7 +50,7 @@ def main():
         "--hidden-import=configparser",
     ]
     
-    # Solo incluir services si existe y tiene contenido
+
     if os.path.exists('services') and os.listdir('services'):
         cmd.append("--add-data=services;services")
         print("📁 Incluyendo carpeta services/")
@@ -66,7 +62,7 @@ def main():
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         print("✅ PyInstaller completado")
         
-        # Verificar que se creó el ejecutable
+    
         exe_path = Path("../src-tauri/binaries/kaptools-backend.exe")
         if exe_path.exists():
             size_mb = exe_path.stat().st_size / (1024 * 1024)

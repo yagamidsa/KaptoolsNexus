@@ -48,7 +48,6 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
     const [exclusionsText, setExclusionsText] = useState('');
     const [loadingExclusions, setLoadingExclusions] = useState(false);
 
-    // Cargar exclusiones cuando se abre el modal
     useEffect(() => {
         if (isOpen && !exclusions.length) {
             loadExclusions();
@@ -99,7 +98,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
         }
     };
 
-    
+
     const handleSubmit = async () => {
         if (!token.trim() || !productName.trim()) {
             setError('Please fill in all fields');
@@ -169,7 +168,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
     return (
         <div className="product-chunks-modal">
             <div className="product-chunks-modal-container">
-                {/* Header */}
+
                 <div className="product-chunks-header">
                     <div className="product-chunks-header-content">
                         <div className="product-chunks-icon">
@@ -188,12 +187,12 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                     </button>
                 </div>
 
-                {/* Content */}
+
                 <div className="product-chunks-content">
                     {!result ? (
-                        /* Input Form */
+
                         <div className="form-container">
-                            {/* Botón para mostrar/ocultar exclusiones */}
+
                             <div className="exclusions-toggle">
                                 <button
                                     onClick={() => setShowExclusions(!showExclusions)}
@@ -206,7 +205,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                 </button>
                             </div>
 
-                            {/* Panel de exclusiones */}
+
                             {showExclusions && (
                                 <div className="exclusions-panel">
                                     <h4 className="exclusions-title">
@@ -216,7 +215,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                     <p className="exclusions-description">
                                         Variables in this list will NOT be processed (dummy, test, control variables, etc.)
                                     </p>
-                                    
+
                                     <div className="exclusions-textarea-container">
                                         <textarea
                                             value={exclusionsText}
@@ -312,9 +311,9 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                             </button>
                         </div>
                     ) : (
-                        /* Results Display */
+
                         <div className="results-container">
-                            {/* Success Message */}
+
                             <div className="success-message">
                                 <div>
                                     <h3 className="success-title">Processing Complete!</h3>
@@ -322,7 +321,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                 </div>
                             </div>
 
-                            {/* Summary Stats */}
+
                             <div className="stats-grid">
                                 <div className="stat-card">
                                     <h4 className="stat-label">Variables Found</h4>
@@ -338,7 +337,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                 </div>
                             </div>
 
-                            {/* Chunks by Type */}
+
                             <div className="chunks-breakdown">
                                 <h4 className="breakdown-title">Chunks by Question Type</h4>
                                 <div className="breakdown-list">
@@ -358,7 +357,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                 </div>
                             </div>
 
-                            {/* Report Preview */}
+
                             <div className="report-preview">
                                 <h4 className="report-title">
                                     <span>📄</span>
@@ -372,7 +371,7 @@ const ProductChunksProcessor: React.FC<ProductChunksProcessorProps> = ({
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
+
                             <div className="action-buttons">
                                 <button
                                     onClick={handleReset}

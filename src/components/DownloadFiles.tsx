@@ -1,4 +1,3 @@
-// src/components/DownloadFiles.tsx
 import { useState } from 'react';
 import './DownloadFiles.css';
 
@@ -78,7 +77,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
     };
 
     const handleDownload = async () => {
-        // 🔥 VALIDACIÓN
+
         if (!validateFields()) {
             return;
         }
@@ -90,10 +89,10 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
         setCurrentStep('🔄 Initializing Azure connection...');
 
         try {
-            // Simular progreso realista
+
             await simulateRealProgress();
 
-            // Llamada real al backend
+
             const response = await fetch('http://127.0.0.1:8000/azure/download-files', {
                 method: 'POST',
                 headers: {
@@ -115,7 +114,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                 setDownloadResult(result);
                 setDownloadComplete(true);
                 setLoading(false);
-                // NO cerramos automáticamente, el usuario debe cerrar
+
             } else {
                 throw new Error(result.message || 'Download failed');
             }
@@ -145,7 +144,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
     };
 
     const handleCloseModal = () => {
-        // Reset todo cuando se cierre
+
         setShowProgress(false);
         setDownloadComplete(false);
         setProgress(0);
@@ -169,11 +168,11 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
             onClick={handleBackdropClick}
         >
             <div className="download-modal">
-                {/* Header */}
+
                 <div className="download-df-modal-header">
                     <div className="df-header-content">
                         <div className="df-header-icon">
-                            {/* Azure Cloud SVG Icon */}
+
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                                 <path
                                     d="M12 2L13.09 8.26L19 7L18.74 13.09L21 14L15.25 16.17L13.09 22L12 15.74L10.91 22L8.75 16.17L3 14L5.26 13.09L5 7L10.91 8.26L12 2Z"
@@ -199,7 +198,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                         </div>
                     </div>
                     <button className="df-close-button" onClick={onClose}>
-                        {/* Close X SVG */}
+
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path
                                 d="M18 6L6 18M6 6L18 18"
@@ -211,7 +210,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                     </button>
                 </div>
 
-                {/* 🔥 PROGRESS BAR PROFESIONAL */}
+
                 {showProgress && (
                     <div className="df-progress-overlay">
                         <div className="progress-modal">
@@ -229,12 +228,12 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 </div>
                                 <div className="df-progress-title">
                                     <h3>Downloading Azure Files</h3>
-                                    <p>Project: {formData.kapId} • Wave: {formData.waveId} • Server: {formData.server}</p>
+                                    <p>Project: {formData.kapId} • Server: {formData.server}</p>
                                 </div>
                             </div>
 
                             <div className="progress-content">
-                                {/* Progress Bar */}
+
                                 <div className="progress-bar-container">
                                     <div className="progress-bar-track">
                                         <div
@@ -245,12 +244,12 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                     <div className="progress-percentage">{progress}%</div>
                                 </div>
 
-                                {/* Current Step */}
+
                                 <div className="progress-step">
                                     {currentStep}
                                 </div>
 
-                                {/* Success Message */}
+
                                 {downloadComplete && downloadResult?.success && (
                                     <div className="df-success-message">
                                         <div className="df-success-icon">✅</div>
@@ -266,7 +265,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                     </div>
                                 )}
 
-                                {/* Error Message */}
+
                                 {downloadComplete && !downloadResult?.success && (
                                     <div className="df-error-message">
                                         <div className="df-error-icon">❌</div>
@@ -278,7 +277,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                                 )}
                             </div>
 
-                            {/* Actions */}
+
                             <div className="progress-actions">
                                 {downloadComplete ? (
                                     <button
@@ -301,13 +300,13 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                     </div>
                 )}
 
-                {/* Form Content - Se oculta durante descarga */}
+
                 <div className={`download-modal-content ${showProgress ? 'content-hidden' : ''}`}>
-                    {/* Server Selection */}
+
                     <div className="form-group">
                         <label className="form-label">
                             <span className="label-icon">
-                                {/* Server SVG Icon */}
+
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <rect x="2" y="3" width="20" height="4" rx="1" fill="currentColor" opacity="0.8" />
                                     <rect x="2" y="10" width="20" height="4" rx="1" fill="currentColor" opacity="0.6" />
@@ -333,11 +332,11 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                         )}
                     </div>
 
-                    {/* KapID Input */}
+
                     <div className={`form-group ${validationErrors.kapId ? 'error' : ''}`}>
                         <label className="form-label">
                             <span className="label-icon">
-                                {/* ID Card SVG Icon */}
+
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
                                     <path d="M7 10h4M7 14h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -359,11 +358,11 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                         )}
                     </div>
 
-                    {/* WaveID Input */}
+
                     <div className={`form-group ${validationErrors.waveId ? 'error' : ''}`}>
                         <label className="form-label">
                             <span className="label-icon">
-                                {/* Wave SVG Icon */}
+
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path
                                         d="M2 12c0-2 1-3 2-3s2 1 2 3-1 3-2 3-2-1-2-3zm6 0c0-2 1-3 2-3s2 1 2 3-1 3-2 3-2-1-2-3zm6 0c0-2 1-3 2-3s2 1 2 3-1 3-2 3-2-1-2-3z"
@@ -389,11 +388,11 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                         )}
                     </div>
 
-                    {/* Token Input */}
+
                     <div className={`form-group ${validationErrors.token ? 'error' : ''}`}>
                         <label className="form-label">
                             <span className="label-icon">
-                                {/* Key SVG Icon */}
+
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path
                                         d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
@@ -431,7 +430,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                         )}
                     </div>
 
-                    {/* Workspace Info */}
+
                     <div className="workspace-info">
                         <div className="info-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -450,7 +449,7 @@ const DownloadFiles: React.FC<DownloadFilesProps> = ({ isOpen, onClose, workspac
                     </div>
                 </div>
 
-                {/* Action Buttons */}
+
                 <div className="download-modal-actions">
                     <button
                         className="df-modal-button df-secondary"

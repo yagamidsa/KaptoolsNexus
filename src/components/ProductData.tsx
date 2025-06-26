@@ -1,4 +1,3 @@
-// src/components/ProductData.tsx - VERSIÓN COMPLETA CON MANEJO MEJORADO DE ERRORES
 import { useState } from 'react';
 import './ProductData.css';
 
@@ -54,7 +53,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         'Sandbox9', 'Sandbox10', 'Sandbox11', 'Sandbox12', 'Sandbox13', 'Staging'
     ]);
 
-    // 🔥 Función para validar KapID
+
     const validateKapId = async (kapIdValue: string): Promise<boolean> => {
         if (!kapIdValue.trim()) return false;
 
@@ -77,7 +76,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // 🔥 Función mejorada para buscar datos del producto
+    
     const handleSearch = async () => {
         const trimmedKapId = kapId.trim();
 
@@ -99,7 +98,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
             return;
         }
 
-        // Validar KapID antes de continuar
+        
         const isValidKapId = await validateKapId(trimmedKapId);
         if (!isValidKapId) {
             setError('❌ Invalid KapID format');
@@ -156,7 +155,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // 🔥 Función para limpiar resultados
+    
     const clearResults = () => {
         setProductInfo(null);
         setError('');
@@ -164,7 +163,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         setKapId('');
     };
 
-    // 🔥 Función para cambiar servidor automáticamente
+    
     const tryDifferentServer = () => {
         const currentIndex = availableServers.indexOf(selectedServer);
         const nextIndex = (currentIndex + 1) % availableServers.length;
@@ -175,7 +174,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         setErrorDetails(null);
     };
 
-    // 🔥 Función para formatear fecha
+    
     const formatDate = (dateString: string): string => {
         if (!dateString) return 'N/A';
 
@@ -194,7 +193,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // 🔥 Función para determinar color del status
+    
     const getStatusColor = (status: string): string => {
         switch (status.toLowerCase()) {
             case 'active':
@@ -215,14 +214,14 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    // 🔥 Handle Enter key press
+    
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter' && !loading && kapId.trim()) {
             handleSearch();
         }
     };
 
-    // 🔥 Renderizar panel de error mejorado
+    
     const renderErrorPanel = () => {
         if (!error && !errorDetails) return null;
 
@@ -240,7 +239,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                         {error}
                     </div>
 
-                    {/* 🔥 Mostrar detalles específicos del error KAP */}
+    
                     {errorDetails?.error_details && (
                         <div className="kap-error-details">
                             <h5>🔥 KAP Server Error Information:</h5>
@@ -269,7 +268,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                         </div>
                     )}
 
-                    {/* 🔥 Mostrar sugerencias de solución */}
+                    
                     {errorDetails?.suggestion && (
                         <div className="error-suggestions">
                             <h5>💡 Suggested Solutions:</h5>
@@ -283,7 +282,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                         </div>
                     )}
 
-                    {/* 🔥 Acciones rápidas para errores específicos */}
+                    
                     {errorDetails?.error_type === 'server_error' && (
                         <div className="error-actions">
                             <h5>🛠️ Quick Actions:</h5>
@@ -305,7 +304,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                         </div>
                     )}
 
-                    {/* 🔥 Raw error para debugging */}
+                    
                     {errorDetails?.raw_error && (
                         <details className="raw-error-details">
                             <summary>🔧 Raw Error (for debugging)</summary>
@@ -322,7 +321,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
     return (
         <div className="product-data-overlay">
             <div className="product-data-modal">
-                {/* Header */}
+                
                 <div className="product-data-header">
                     <div className="pd-header-content">
                         <div className="pd-header-icon">
@@ -342,9 +341,9 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                     </button>
                 </div>
 
-                {/* Content */}
+                
                 <div className="product-data-content">
-                    {/* Configuration Panel */}
+                    
                     <div className="config-panel">
                         <div className="panel-section">
                             <h3>
@@ -427,7 +426,7 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                         </div>
                     </div>
 
-                    {/* Action Panel */}
+                    
                     <div className="action-panel">
                         <button
                             className="pd-action-button pd-primary"
@@ -463,10 +462,10 @@ const ProductData: React.FC<ProductDataProps> = ({ isOpen, onClose, workspacePat
                         )}
                     </div>
 
-                    {/* 🔥 Panel de error mejorado */}
+                    
                     {renderErrorPanel()}
 
-                    {/* Results Panel */}
+                    
                     {productInfo && (
                         <div className="results-panel">
                             <h3>

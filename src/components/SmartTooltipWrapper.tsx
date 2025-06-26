@@ -1,6 +1,3 @@
-// 🔥 SmartTooltipWrapper.tsx - ARREGLADO para Tauri (sin NodeJS.Timeout)
-// src/components/SmartTooltipWrapper.tsx
-
 import React, { useEffect, useRef, useState, cloneElement, ReactElement } from 'react';
 import ReactDOM from 'react-dom';
 import './style/SmartTooltip.css';
@@ -30,10 +27,10 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
     const [isVisible, setIsVisible] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0, placement: 'top' });
     const triggerRef = useRef<HTMLElement>(null);
-    // 🔥 ARREGLADO: usar number en lugar de NodeJS.Timeout para Tauri
+
     const timeoutRef = useRef<number>();
 
-    // 🔥 Calcular posición inteligente
+
     const calculatePosition = () => {
         if (!triggerRef.current || !enabled) return;
 
@@ -41,23 +38,23 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        // Espacios disponibles
+
         const spaceTop = rect.top;
         const spaceBottom = viewportHeight - rect.bottom;
         const spaceLeft = rect.left;
         const spaceRight = viewportWidth - rect.right;
 
-        // Tamaño estimado del tooltip
+
         const tooltipWidth = viewportWidth <= 768 ? 180 : 240;
-        const tooltipHeight = 60; // Estimación
+        const tooltipHeight = 60;
 
         let placement = 'top';
         let x = rect.left + rect.width / 2;
         let y = rect.top;
 
-        // Algoritmo de posicionamiento inteligente
+
         if (viewportWidth <= 1024) {
-            // Móvil/tablet: preferir arriba/abajo
+
             if (spaceTop > tooltipHeight + offset && spaceTop >= spaceBottom) {
                 placement = 'top';
                 y = rect.top - offset;
@@ -65,11 +62,11 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
                 placement = 'bottom';
                 y = rect.bottom + offset;
             } else {
-                // No hay espacio suficiente, no mostrar
+
                 return;
             }
         } else {
-            // Desktop: todas las direcciones
+
             const positions = [
                 { name: 'top', space: spaceTop, x, y: rect.top - offset },
                 { name: 'bottom', space: spaceBottom, x, y: rect.bottom + offset },
@@ -77,7 +74,7 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
                 { name: 'right', space: spaceRight, x: rect.right + offset, y: rect.top + rect.height / 2 }
             ];
 
-            // Encontrar la mejor posición
+
             const bestPosition = positions
                 .filter(pos => pos.space > (pos.name.includes('left') || pos.name.includes('right') ? tooltipWidth : tooltipHeight) + offset)
                 .sort((a, b) => b.space - a.space)[0];
@@ -87,11 +84,11 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
                 x = bestPosition.x;
                 y = bestPosition.y;
             } else {
-                return; // No hay espacio suficiente
+                return;
             }
         }
 
-        // Ajustar posición para evitar salirse del viewport
+
         if (placement === 'top' || placement === 'bottom') {
             const halfWidth = tooltipWidth / 2;
             if (x - halfWidth < 10) {
@@ -104,7 +101,7 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
         setPosition({ x, y, placement });
     };
 
-    // 🔥 Handlers
+
     const handleMouseEnter = () => {
         if (!enabled) return;
 
@@ -112,7 +109,7 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
             clearTimeout(timeoutRef.current);
         }
 
-        // 🔥 ARREGLADO: window.setTimeout devuelve number en el navegador
+
         timeoutRef.current = window.setTimeout(() => {
             calculatePosition();
             setIsVisible(true);
@@ -126,7 +123,7 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
         setIsVisible(false);
     };
 
-    // 🔥 Efectos
+
     useEffect(() => {
         const handleResize = () => {
             if (isVisible) {
@@ -157,7 +154,7 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
         };
     }, []);
 
-    // 🔥 Clonar el children con eventos
+
     const enhancedChild = cloneElement(children, {
         ref: triggerRef,
         onMouseEnter: (e: React.MouseEvent) => {
@@ -174,13 +171,13 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
         }
     });
 
-    // 🔥 Tooltip Component
+
     const TooltipComponent = () => {
         if (!isVisible || !enabled) return null;
 
         const getTooltipStyle = () => {
             const { x, y, placement } = position;
-            
+
             switch (placement) {
                 case 'top':
                     return {
@@ -238,7 +235,7 @@ export const SmartTooltipWrapper: React.FC<SmartTooltipWrapperProps> = ({
         );
     };
 
-    // 🔥 Renderizar tooltip en portal para evitar conflictos de z-index
+
     return (
         <>
             {enhancedChild}

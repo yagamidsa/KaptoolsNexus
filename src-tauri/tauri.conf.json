@@ -1,5 +1,4 @@
 {
-  "$schema": "../gen/schemas/desktop-schema.json",
   "productName": "KapTools Nexus",
   "version": "2.0.0",
   "identifier": "com.kaptools.nexus",
@@ -24,13 +23,19 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000 https://sandbox3-kap-product-template.azurewebsites.net"
-    }
+      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://sandbox3-kap-product-template.azurewebsites.net https://img.icons8.com 'unsafe-inline'; img-src 'self' data: https: http:; style-src 'self' 'unsafe-inline'"
+    },
+    "withGlobalTauri": false
   },
   "bundle": {
-    "resources": ["../backend/"],
+    "resources": [
+      "../backend/",
+      "../backend/config/config.ini",
+      "../backend/start_backend.bat",
+      "../backend/config/**/*"
+    ],
     "active": true,
-    "targets": "all",
+    "targets": ["msi"],
     "icon": [
       "icons/16x16.png",
       "icons/32x32.png",
@@ -43,6 +48,6 @@
     ]
   },
   "plugins": {
-  "fs": {}
-}
+    "fs": {}
+  }
 }

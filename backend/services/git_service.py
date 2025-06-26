@@ -1,4 +1,3 @@
-# backend/services/git_service.py - PARTE 1: IMPORTS, MODELOS Y MÉTODOS BÁSICOS
 import os
 import subprocess
 import asyncio
@@ -10,26 +9,23 @@ from datetime import datetime
 from pydantic import BaseModel
 import re
 
-# ================================
-# MODELOS PARA REVIEW BRANCHES
-# ================================
 
 class BranchInfo(BaseModel):
     name: str
-    display_name: str  # Sin 'origin/' prefix
+    display_name: str  
     author: str
     author_email: str
     commit_hash: str
     commit_message: str
     date: datetime
-    repository: str  # 'content' or 'dimensions'
+    repository: str  
     is_current: bool = False
     commits_ahead: int = 0
     commits_behind: int = 0
 
 class ComparisonFile(BaseModel):
     path: str
-    change_type: str  # 'added', 'deleted', 'modified'
+    change_type: str  
     additions: int
     deletions: int
     old_path: Optional[str] = None
@@ -62,37 +58,37 @@ class RepositoryStatus(BaseModel):
     last_commit_date: Optional[datetime] = None
     remote_url: Optional[str] = None
 
-# ================================
-# MODELOS PARA FILE DIFF VIEWER
-# ================================
+
+
+
 
 class DiffLine(BaseModel):
-    """Single line in a file diff"""
+
     line_number_old: Optional[int] = None
     line_number_new: Optional[int] = None
     content: str = ""
-    type: str = "context"  # 'added', 'deleted', 'context', 'header'
+    type: str = "context"  
 
 class FileDiff(BaseModel):
-    """File difference information"""
+
     path: str
     old_content: str = ""
     new_content: str = ""
     diff_lines: List[DiffLine] = []
     change_type: str = "modified"
 
-# ================================
-# SERVICIO GIT - INICIO DE CLASE
-# ================================
+
+
+
 
 class GitService:
     def __init__(self):
         self.config = self._load_config()
     
     def _load_config(self) -> configparser.ConfigParser:
-        """Load configuration from config.ini"""
+
         config = configparser.ConfigParser()
-        # Buscar config.ini en diferentes ubicaciones posibles
+        
         possible_paths = [
             Path(__file__).parent.parent / 'config' / 'config.ini',
             Path(__file__).parent / 'config.ini',
@@ -103,7 +99,7 @@ class GitService:
         
         for config_path in possible_paths:
             if config_path.exists():
-                config.read(config_path)
+                config.read(config_path, encoding='utf-8')
                 print(f"✅ Config loaded from: {config_path}")
                 break
         else:
@@ -111,14 +107,14 @@ class GitService:
         
         return config
     
-    # ================================
-    # MÉTODOS BÁSICOS DE GIT
-    # ================================
+    
+    
+    
     
     async def clone_microservices(self, project_path: str, branch: str = "develop") -> Dict[str, any]:
-        """Clone microservices to specified path"""
+
         try:
-            # Validate project path
+            
             if not project_path or project_path.strip() == "Path of your workspace":
                 return {
                     "success": False,
@@ -128,10 +124,10 @@ class GitService:
             project_path = project_path.strip()
             workspace = Path(project_path)
             
-            # Create workspace if it doesn't exist
+            
             workspace.mkdir(parents=True, exist_ok=True)
             
-            # Define repositories and their target directories
+            
             repos = [
                 {
                     "name": "outputs-dimensions-content",
@@ -148,7 +144,7 @@ class GitService:
             results = []
             
             for repo in repos:
-                # Check if repo already exists
+                
                 if repo["path"].exists():
                     results.append({
                         "repo": repo["name"],
@@ -157,7 +153,7 @@ class GitService:
                     })
                     continue
                 
-                # Get clone command from config
+                
                 clone_command = self.config.get('Git', repo["url_key"], fallback='')
                 if not clone_command:
                     results.append({
@@ -167,7 +163,7 @@ class GitService:
                     })
                     continue
                 
-                # Execute clone
+                
                 try:
                     process = await asyncio.create_subprocess_shell(
                         f'cd "{workspace}" && {clone_command}',
@@ -198,7 +194,7 @@ class GitService:
                         "message": f"Exception cloning {repo['name']}: {str(e)}"
                     })
             
-            # Determine overall success
+            
             successful_repos = [r for r in results if r["status"] in ["success", "skipped"]]
             total_success = len(successful_repos) == len(repos)
             
@@ -220,7 +216,7 @@ class GitService:
             }
     
     def validate_workspace(self, workspace_path: str) -> Dict[str, any]:
-        """Validate workspace for Git operations"""
+
         issues = []
         
         if not workspace_path or workspace_path.strip() == "Path of your workspace":
@@ -233,18 +229,18 @@ class GitService:
         
         workspace = Path(workspace_path.strip())
         
-        # Check if path exists
+        
         if not workspace.exists():
             try:
                 workspace.mkdir(parents=True, exist_ok=True)
             except Exception as e:
                 issues.append(f"Cannot create workspace directory: {str(e)}")
         
-        # Check if path is writable
+        
         if workspace.exists() and not os.access(workspace, os.W_OK):
             issues.append("Workspace directory is not writable")
         
-        # Check if Git is available
+        
         try:
             result = subprocess.run(['git', '--version'], capture_output=True, text=True)
             if result.returncode != 0:
@@ -252,7 +248,7 @@ class GitService:
         except FileNotFoundError:
             issues.append("Git is not installed")
         
-        # Check for existing repositories
+        
         existing_repos = []
         if workspace.exists():
             content_repo = workspace / "outputs-dimensions-content"
@@ -272,7 +268,7 @@ class GitService:
         }
     
     def validate_repositories_for_branches(self, project_path: str) -> Dict[str, any]:
-        """Valida que los repositorios necesarios existan para Review Branches"""
+
         try:
             if not project_path or not os.path.exists(project_path):
                 return {
@@ -287,7 +283,7 @@ class GitService:
             content_exists = os.path.exists(content_path) and os.path.exists(os.path.join(content_path, ".git"))
             dimensions_exists = os.path.exists(dimensions_path) and os.path.exists(os.path.join(dimensions_path, ".git"))
             
-            valid = content_exists or dimensions_exists  # Al menos uno debe existir
+            valid = content_exists or dimensions_exists  
             
             message = ""
             if not valid:
@@ -316,10 +312,10 @@ class GitService:
             }
 
     def validate_git_config(self) -> Dict[str, any]:
-        """Validate Git configuration"""
+
         issues = []
         
-        # Check required config keys
+        
         required_keys = [
             'git_clone_command_content',
             'git_clone_command_dimensions', 
@@ -332,7 +328,7 @@ class GitService:
             if not value:
                 issues.append(f"Missing Git configuration: {key}")
         
-        # Check Git availability
+        
         try:
             result = subprocess.run(['git', '--version'], capture_output=True, text=True)
             if result.returncode != 0:
@@ -348,7 +344,7 @@ class GitService:
         }
     
     def get_git_config(self) -> Dict[str, any]:
-        """Get Git configuration details"""
+
         git_config = {}
         
         if self.config.has_section('Git'):
@@ -361,17 +357,17 @@ class GitService:
         }
     
 
-# ================================
-    # MÉTODOS PARA REVIEW BRANCHES
-    # ================================
+
+    
+    
 
     def get_recent_branches(self, project_path: str, repo_name: str = "both", limit: int = 15) -> List[BranchInfo]:
-        """Obtiene las ramas más recientes de uno o ambos repositorios"""
+
         branches = []
 
         repos_to_check = []
 
-        # Mapeo correcto de nombres
+        
         if repo_name in ['content', 'both']:
             content_path = os.path.join(project_path, "outputs-dimensions-content")
             if os.path.exists(content_path) and os.path.exists(os.path.join(content_path, ".git")):
@@ -386,13 +382,13 @@ class GitService:
             try:
                 repo = git.Repo(repo_path)
 
-                # Fetch remote branches
+                
                 try:
                     repo.remotes.origin.fetch()
                 except Exception as e:
                     print(f"Warning: Could not fetch from origin for {repo_type}: {e}")
 
-                # Obtener ramas remotas excluyendo HEAD y algunas especiales
+                
                 exclude_patterns = ['HEAD', 'develop', 'release', 'main', 'master']
                 remote_refs = []
 
@@ -401,20 +397,20 @@ class GitService:
                         branch_name = ref.name
                         display_name = branch_name.replace('origin/', '')
 
-                        # Excluir patrones específicos
+                        
                         if not any(pattern.lower() in display_name.lower() for pattern in exclude_patterns):
                             remote_refs.append(ref)
                 except Exception as e:
                     print(f"Error getting remote refs for {repo_type}: {e}")
                     continue
                 
-                # Ordenar por fecha de commit (más recientes primero)
+                
                 try:
                     remote_refs.sort(key=lambda x: x.commit.committed_datetime, reverse=True)
                 except Exception as e:
                     print(f"Warning: Could not sort branches for {repo_type}: {e}")
 
-                # Obtener la rama actual
+                
                 current_branch = None
                 try:
                     current_branch = repo.active_branch.name
@@ -424,12 +420,12 @@ class GitService:
                     except:
                         current_branch = None
 
-                # Tomar solo las primeras 'limit' ramas
+                
                 for ref in remote_refs[:limit]:
                     try:
                         display_name = ref.name.replace('origin/', '')
 
-                        # Calcular commits ahead/behind de master
+                        
                         commits_ahead = 0
                         commits_behind = 0
 
@@ -441,7 +437,7 @@ class GitService:
                         except Exception as e:
                             print(f"Warning: Could not calculate ahead/behind for {display_name}: {e}")
 
-                        # Mensaje de commit
+                        
                         commit_message = ""
                         try:
                             commit_message = ref.commit.message.strip()
@@ -452,7 +448,7 @@ class GitService:
                         except:
                             commit_message = "Error reading commit message"
 
-                        # Información del autor
+                        
                         author_name = "Unknown"
                         author_email = "unknown@unknown.com"
                         try:
@@ -484,7 +480,7 @@ class GitService:
                 print(f"Error processing {repo_type} repository: {e}")
                 continue
             
-        # Ordenar todas las ramas por fecha
+        
         try:
             branches.sort(key=lambda x: x.date, reverse=True)
         except Exception as e:
@@ -493,9 +489,9 @@ class GitService:
         return branches
 
     def checkout_branch(self, project_path: str, repo_name: str, branch_name: str) -> CheckoutResult:
-        """Hace checkout a una rama específica con mapeo correcto"""
+
         try:
-            # Mapeo correcto de nombres de repositorio
+            
             repo_folder_map = {
                 'content': 'outputs-dimensions-content',
                 'dimensions': 'outputs-dimensions'
@@ -530,7 +526,7 @@ class GitService:
 
             repo = git.Repo(repo_path)
 
-            # Obtener rama actual antes del checkout
+            
             previous_branch = "unknown"
             try:
                 previous_branch = repo.active_branch.name
@@ -540,16 +536,16 @@ class GitService:
                 except:
                     previous_branch = "detached"
 
-            # Fetch para obtener las referencias más recientes
+            
             try:
                 repo.remotes.origin.fetch()
             except Exception as e:
                 print(f"Warning: Could not fetch from origin: {e}")
 
-            # Limpiar el nombre de la rama
+            
             clean_branch_name = branch_name.replace('origin/', '')
 
-            # Verificar si hay cambios sin commitear
+            
             try:
                 if repo.is_dirty(untracked_files=True):
                     return CheckoutResult(
@@ -562,17 +558,17 @@ class GitService:
             except Exception as e:
                 print(f"Warning: Could not check if repo is dirty: {e}")
 
-            # Realizar checkout
+            
             try:
-                # Verificar si la rama local ya existe
+                
                 local_branches = [b.name for b in repo.heads]
 
                 if clean_branch_name in local_branches:
-                    # Rama local existe, hacer checkout
+                    
                     repo.heads[clean_branch_name].checkout()
                     print(f"Checked out to existing local branch: {clean_branch_name}")
                 else:
-                    # Crear rama local desde la remota
+                    
                     try:
                         remote_ref = repo.remotes.origin.refs[clean_branch_name]
                         local_branch = repo.create_head(clean_branch_name, remote_ref)
@@ -596,7 +592,7 @@ class GitService:
                     previous_branch=previous_branch
                 )
 
-            # Verificar el checkout
+            
             current_branch = previous_branch
             try:
                 current_branch = repo.active_branch.name
@@ -625,9 +621,9 @@ class GitService:
             )
 
     def compare_branch_with_master(self, project_path: str, repo_name: str, branch_name: str) -> BranchComparison:
-        """Compara una rama con master usando mapeo correcto"""
+
         try:
-            # Usar el mapeo correcto
+            
             repo_folder_map = {
                 'content': 'outputs-dimensions-content',
                 'dimensions': 'outputs-dimensions'
@@ -644,31 +640,31 @@ class GitService:
 
             repo = git.Repo(repo_path)
 
-            # Obtener referencias
+            
             try:
-                # Intentar obtener master desde remoto primero
+                
                 try:
                     master_ref = repo.remotes.origin.refs.master
                 except:
-                    # Si no hay remoto master, usar local
+                    
                     master_ref = repo.heads.master
             except Exception as e:
                 raise Exception(f"Could not find master branch: {str(e)}")
 
-            # Obtener la rama a comparar
+            
             clean_branch_name = branch_name.replace('origin/', '')
 
             try:
-                # Intentar remoto primero
+                
                 try:
                     branch_ref = repo.remotes.origin.refs[clean_branch_name]
                 except:
-                    # Si no hay remoto, usar local
+                    
                     branch_ref = repo.heads[clean_branch_name]
             except Exception as e:
                 raise Exception(f"Could not find branch '{clean_branch_name}': {str(e)}")
 
-            # Obtener diferencias
+            
             try:
                 diffs = master_ref.commit.diff(branch_ref.commit, create_patch=True)
             except Exception as e:
@@ -680,7 +676,7 @@ class GitService:
 
             for diff in diffs:
                 try:
-                    # Determinar tipo de cambio
+                    
                     if diff.new_file:
                         change_type = "added"
                     elif diff.deleted_file:
@@ -690,13 +686,13 @@ class GitService:
                     else:
                         change_type = "modified"
 
-                    # Contar líneas
+                    
                     additions = 0
                     deletions = 0
 
                     if diff.diff:
                         try:
-                            # Intentar diferentes encodings
+                            
                             diff_text = ""
                             try:
                                 diff_text = diff.diff.decode('utf-8')
@@ -715,7 +711,7 @@ class GitService:
                                         deletions += 1
                         except Exception as e:
                             print(f"Warning: Could not process diff for {diff.a_path or diff.b_path}: {e}")
-                            # Usar estimaciones básicas
+                            
                             if change_type == "added":
                                 additions = 1
                             elif change_type == "deleted":
@@ -741,7 +737,7 @@ class GitService:
                     print(f"Error processing diff item: {e}")
                     continue
                 
-            # Crear resumen
+            
             summary = f"{len(files)} files changed"
             if total_additions > 0:
                 summary += f", {total_additions} insertions(+)"
@@ -763,7 +759,6 @@ class GitService:
             raise Exception(f"Failed to compare branches: {str(e)}")
 
     def fetch_all_remote_branches(self, project_path: str) -> Dict[str, any]:
-        """Hace fetch de todas las ramas remotas de ambos repositorios"""
         try:
             validation = self.validate_repositories_for_branches(project_path)
             if not validation["valid"]:
@@ -788,7 +783,7 @@ class GitService:
                         repo_path = os.path.join(project_path, repo_folder)
                         repo = git.Repo(repo_path)
                         
-                        # Hacer fetch
+                        
                         repo.remotes.origin.fetch()
                         fetched_repos.append(repo_folder)
                         print(f"Successfully fetched {repo_folder}")
@@ -821,7 +816,7 @@ class GitService:
             }
 
     def get_repository_status(self, project_path: str) -> Dict[str, RepositoryStatus]:
-        """Obtiene el estado actual de ambos repositorios"""
+        
         status = {}
         
         repos = {
@@ -849,7 +844,7 @@ class GitService:
                 
                 repo = git.Repo(repo_path)
                 
-                # Obtener rama actual
+                
                 current_branch = None
                 try:
                     current_branch = repo.active_branch.name
@@ -859,7 +854,7 @@ class GitService:
                     except:
                         current_branch = None
                 
-                # Verificar estado
+                
                 is_dirty = False
                 has_untracked = False
                 try:
@@ -868,7 +863,7 @@ class GitService:
                 except:
                     pass
                 
-                # Último commit
+                
                 last_commit_hash = None
                 last_commit_date = None
                 try:
@@ -878,7 +873,7 @@ class GitService:
                 except:
                     pass
                 
-                # URL remota
+                
                 remote_url = None
                 try:
                     remote_url = repo.remotes.origin.url
@@ -907,16 +902,13 @@ class GitService:
         
         return status
 
-    # ================================
-    # MÉTODOS PARA FILE DIFF VIEWER
-    # ================================
+    
+    
+    
     
     def get_file_diff(self, project_path: str, repo_name: str, branch_name: str, file_path: str) -> FileDiff:
-        """
-        Obtiene las diferencias detalladas de un archivo específico entre una rama y master
-        """
         try:
-            # Mapeo correcto de repositorios
+            
             repo_folder_map = {
                 'content': 'outputs-dimensions-content',
                 'dimensions': 'outputs-dimensions'
@@ -933,7 +925,7 @@ class GitService:
             
             repo = git.Repo(repo_path)
             
-            # Obtener referencias
+            
             try:
                 master_ref = repo.remotes.origin.refs.master
             except:
@@ -946,11 +938,11 @@ class GitService:
             except:
                 branch_ref = repo.heads[clean_branch_name]
             
-            # Obtener el diff específico del archivo
+            
             diffs = master_ref.commit.diff(branch_ref.commit, paths=[file_path], create_patch=True)
             
             if not diffs:
-                # El archivo no tiene cambios o no existe en una de las ramas
+                
                 return FileDiff(
                     path=file_path,
                     old_content="",
@@ -961,7 +953,7 @@ class GitService:
             
             diff = diffs[0]
             
-            # Determinar tipo de cambio
+            
             if diff.new_file:
                 change_type = "added"
                 old_content = ""
@@ -985,7 +977,7 @@ class GitService:
                     old_content = "[Binary file or encoding error]"
                     new_content = "[Binary file or encoding error]"
             
-            # Procesar el diff línea por línea
+            
             diff_lines = []
             
             if diff.diff:
@@ -998,7 +990,7 @@ class GitService:
                     
                     for line in lines:
                         if line.startswith('@@'):
-                            # Header de ubicación del chunk
+                            
                             match = re.match(r'@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@', line)
                             if match:
                                 old_line_num = int(match.group(1))
@@ -1011,7 +1003,7 @@ class GitService:
                                 type="header"
                             ))
                         elif line.startswith('---') or line.startswith('+++'):
-                            # Headers de archivo
+                            
                             diff_lines.append(DiffLine(
                                 line_number_old=None,
                                 line_number_new=None,
@@ -1019,38 +1011,38 @@ class GitService:
                                 type="header"
                             ))
                         elif line.startswith('-'):
-                            # Línea eliminada
+                            
                             diff_lines.append(DiffLine(
                                 line_number_old=old_line_num,
                                 line_number_new=None,
-                                content=line[1:],  # Remover el prefijo '-'
+                                content=line[1:],  
                                 type="deleted"
                             ))
                             old_line_num += 1
                         elif line.startswith('+'):
-                            # Línea añadida
+                            
                             diff_lines.append(DiffLine(
                                 line_number_old=None,
                                 line_number_new=new_line_num,
-                                content=line[1:],  # Remover el prefijo '+'
+                                content=line[1:],  
                                 type="added"
                             ))
                             new_line_num += 1
                         elif line.startswith(' '):
-                            # Línea sin cambios (contexto)
+                            
                             diff_lines.append(DiffLine(
                                 line_number_old=old_line_num,
                                 line_number_new=new_line_num,
-                                content=line[1:],  # Remover el prefijo ' '
+                                content=line[1:],  
                                 type="context"
                             ))
                             old_line_num += 1
                             new_line_num += 1
                         elif line.strip() == '':
-                            # Línea vacía
+                            
                             continue
                         else:
-                            # Otras líneas (como metadatos)
+                            
                             diff_lines.append(DiffLine(
                                 line_number_old=None,
                                 line_number_new=None,
@@ -1060,7 +1052,7 @@ class GitService:
                             
                 except Exception as e:
                     print(f"Error processing diff: {e}")
-                    # Fallback básico
+                    
                     diff_lines = [DiffLine(
                         line_number_old=None,
                         line_number_new=None,
@@ -1080,7 +1072,7 @@ class GitService:
             raise Exception(f"Failed to get file diff: {str(e)}")
 
     def get_multiple_file_diffs(self, project_path: str, repo_name: str, branch_name: str, file_paths: List[str]) -> List[FileDiff]:
-        """Obtiene las diferencias de múltiples archivos de forma eficiente"""
+   
         results = []
         
         for file_path in file_paths:
@@ -1088,7 +1080,7 @@ class GitService:
                 file_diff = self.get_file_diff(project_path, repo_name, branch_name, file_path)
                 results.append(file_diff)
             except Exception as e:
-                # En caso de error, crear un FileDiff con error
+                
                 error_diff = FileDiff(
                     path=file_path,
                     old_content="",
@@ -1106,7 +1098,6 @@ class GitService:
         return results
 
     def get_file_content_at_commit(self, project_path: str, repo_name: str, commit_sha: str, file_path: str) -> str:
-        """Obtiene el contenido de un archivo en un commit específico"""
         try:
             repo_folder_map = {
                 'content': 'outputs-dimensions-content',
@@ -1126,7 +1117,6 @@ class GitService:
             return f"Error reading file: {str(e)}"
 
     def get_branch_file_tree(self, project_path: str, repo_name: str, branch_name: str) -> Dict[str, any]:
-        """Obtiene el árbol de archivos de una rama específica"""
         try:
             repo_folder_map = {
                 'content': 'outputs-dimensions-content',
@@ -1144,7 +1134,7 @@ class GitService:
             except:
                 branch_ref = repo.heads[clean_branch_name]
             
-            # Obtener el árbol de archivos
+            
             tree = branch_ref.commit.tree
             
             def build_tree_structure(tree_obj, path=""):
@@ -1153,14 +1143,14 @@ class GitService:
                 for item in tree_obj:
                     item_path = os.path.join(path, item.name) if path else item.name
                     
-                    if item.type == 'tree':  # Directorio
+                    if item.type == 'tree':  
                         items.append({
                             "name": item.name,
                             "path": item_path,
                             "type": "directory",
                             "children": build_tree_structure(item, item_path)
                         })
-                    else:  # Archivo
+                    else:  
                         items.append({
                             "name": item.name,
                             "path": item_path,
@@ -1181,22 +1171,18 @@ class GitService:
             raise Exception(f"Failed to get file tree: {str(e)}")
 
     def get_detailed_comparison(self, project_path: str, repo_name: str, branch_name: str) -> Dict[str, any]:
-        """
-        Obtiene una comparación detallada completa entre una rama y master
-        Incluye: resumen, archivos cambiados, y diffs detallados
-        """
         try:
-            # Obtener comparación básica
+            
             comparison = self.compare_branch_with_master(project_path, repo_name, branch_name)
             
-            # Obtener diffs detallados para archivos pequeños (< 50 cambios)
+            
             detailed_files = []
             summary_files = []
             
             for file_info in comparison.files:
                 total_changes = file_info.additions + file_info.deletions
                 
-                # Solo obtener diff detallado para archivos con pocos cambios
+                
                 if total_changes < 50 and file_info.change_type != "binary":
                     try:
                         file_diff = self.get_file_diff(project_path, repo_name, branch_name, file_info.path)
@@ -1211,8 +1197,8 @@ class GitService:
             
             return {
                 "comparison": comparison,
-                "detailed_files": detailed_files,  # Archivos con diff completo
-                "summary_files": summary_files,    # Archivos solo con resumen
+                "detailed_files": detailed_files,  
+                "summary_files": summary_files,    
                 "has_large_files": len(summary_files) > 0,
                 "total_detailed": len(detailed_files),
                 "total_summary": len(summary_files)

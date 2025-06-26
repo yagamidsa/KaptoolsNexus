@@ -1,8 +1,3 @@
-/* ReviewBranches.css - Actualizado con paleta de colores de la app principal */
-
-/* ================================
-   🎨 VARIABLES DE COLOR CONSISTENTES
-   ================================ */
 :root {
     --primary-purple: #6c5ce7;
     --primary-pink: #ff6b9d;
@@ -21,15 +16,6 @@
     --shadow-glow: 0 0 20px rgba(108, 92, 231, 0.3);
 }
 
-
-/* ================================
-   🌙 DRACULA CIRCULAR PROGRESS - COMPLETO
-   Agregar al final de ReviewBranches.css
-   ================================ */
-
-/* ================================
-   🎯 MEJORA DEL CONTENEDOR PRINCIPAL
-   ================================ */
 .rb-loading-spinner {
     display: flex;
     flex-direction: column;
@@ -39,7 +25,6 @@
     width: 100%;
     height: 100%;
     min-height: 300px;
-    /* Altura mínima para centrado */
     position: relative;
 }
 
@@ -51,22 +36,19 @@
     align-items: center;
     justify-content: center;
     order: 2;
-    /* Spinner va después del texto */
+
 }
 
-/* Texto va primero */
+
 .loading-text {
     order: 1;
 }
 
 .loading-subtext {
     order: 3;
-    /* Va después del spinner */
 }
 
-/* ================================
-   ⭕ SPINNER PRINCIPAL - DRACULA STYLE
-   ================================ */
+
 .spinner-ring {
     width: 60px;
     height: 60px;
@@ -79,9 +61,7 @@
     filter: drop-shadow(0 0 15px rgba(189, 147, 249, 0.4));
 }
 
-/* ================================
-   🌟 CÍRCULO INTERIOR CONTRA-ROTATORIO
-   ================================ */
+
 .spinner-ring::before {
     content: '';
     position: absolute;
@@ -96,9 +76,7 @@
     animation: draculaSpin 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) infinite reverse;
 }
 
-/* ================================
-   💫 EFECTO DE PULSO DE FONDO
-   ================================ */
+
 .spinner-ring::after {
     content: '';
     position: absolute;
@@ -115,9 +93,7 @@
     z-index: -1;
 }
 
-/* ================================
-   🎨 ANIMACIONES PRINCIPALES
-   ================================ */
+
 @keyframes draculaSpin {
     0% {
         transform: rotate(0deg);
@@ -142,9 +118,7 @@
     }
 }
 
-/* ================================
-   ✨ PARTÍCULAS FLOTANTES ALREDEDOR
-   ================================ */
+
 .loading-spinner-container::before,
 .loading-spinner-container::after {
     content: '';
@@ -186,9 +160,7 @@
     }
 }
 
-/* ================================
-   🌈 MEJORA DEL TEXTO DE CARGA - ORDEN CORRECTO
-   ================================ */
+
 .loading-text {
     font-size: 16px;
     font-weight: 600;
@@ -205,7 +177,6 @@
     text-align: center;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     order: 1;
-    /* Texto principal arriba */
     margin-bottom: 8px;
 }
 
@@ -214,12 +185,11 @@
     color: var(--dracula-comment);
     text-align: center;
     margin-top: 16px;
-    /* Más espacio arriba del subtext */
     opacity: 0.8;
     animation: subtextPulse 2s ease-in-out infinite alternate;
     font-style: italic;
     order: 3;
-    /* Subtext abajo del spinner */
+
 }
 
 @keyframes textShimmer {
@@ -246,9 +216,7 @@
     }
 }
 
-/* ================================
-   🌟 BRILLO AMBIENTAL DEL CONTENEDOR - CENTRADO
-   ================================ */
+
 .rb-loading-spinner::before {
     content: '';
     position: absolute;
@@ -279,25 +247,18 @@
     }
 }
 
-/* ================================
-   🎯 EFECTOS HOVER INTERACTIVOS
-   ================================ */
+
 .rb-loading-spinner:hover .spinner-ring {
     transform: scale(1.05);
     filter: drop-shadow(0 0 25px rgba(189, 147, 249, 0.6));
     animation-duration: 0.8s;
-    /* Más rápido en hover */
 }
 
 .rb-loading-spinner:hover .loading-text {
     animation-duration: 2s;
-    /* Acelerar shimmer en hover */
     transform: scale(1.02);
 }
 
-/* ================================
-   📱 RESPONSIVE DESIGN - LAYOUT CENTRADO
-   ================================ */
 @media (max-width: 768px) {
     .rb-loading-spinner {
         gap: 16px;
@@ -384,9 +345,6 @@
     }
 }
 
-/* ================================
-   🚀 ANIMACIÓN DE ENTRADA SUAVE
-   ================================ */
 .rb-loading-spinner {
     animation: loadingEnter 0.6s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
     position: relative;
@@ -406,11 +364,7 @@
     }
 }
 
-/* ================================
-   ⚡ EFECTOS ESPECIALES ADICIONALES
-   ================================ */
 
-/* Efecto de destello ocasional */
 .spinner-ring {
     position: relative;
     overflow: visible;
@@ -420,12 +374,12 @@
     box-shadow: 0 0 10px rgba(139, 233, 253, 0.4);
 }
 
-/* Micro-animación de latido en el centro */
+
 .loading-spinner-container::after {
     animation-delay: 0.5s;
 }
 
-/* Sombra dinámica que cambia de color */
+
 .spinner-ring {
     animation:
         draculaSpin 1.2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite,
@@ -450,11 +404,7 @@
     }
 }
 
-/* ================================
-   🌟 VARIANTES ADICIONALES (OPCIONAL)
-   ================================ */
 
-/* Para usar en otros lugares - spinner pequeño */
 .spinner-ring.rb-small {
     width: 30px;
     height: 30px;
@@ -465,7 +415,7 @@
     border-width: 1px;
 }
 
-/* Para usar en otros lugares - spinner grande */
+
 .spinner-ring.rb-large {
     width: 80px;
     height: 80px;
@@ -481,9 +431,7 @@
     height: 100px;
 }
 
-/* ================================
-   🎨 MODO DISCO (OPCIONAL - SÚPER COOL)
-   ================================ */
+
 .spinner-ring.disco {
     animation:
         draculaSpin 1s linear infinite,
@@ -517,9 +465,7 @@
     }
 }
 
-/* ================================
-   🔥 PERFORMANCE OPTIMIZATIONS
-   ================================ */
+
 .spinner-ring,
 .spinner-ring::before,
 .spinner-ring::after {
@@ -532,54 +478,37 @@
     will-change: transform, opacity;
 }
 
-/* ================================
-   📋 HEADER SECTION - ICONO CIRCULAR
-   ================================ */
+
 .rb-header-icon {
-    /* Cambiar de rectangular a circular */
     width: 60px;
-    /* Ancho fijo */
     height: 60px;
-    /* Alto igual al ancho */
     border-radius: 50%;
-    /* 50% para hacer círculo perfecto */
     background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink));
     padding: 0;
-    /* Sin padding para centrar mejor */
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    /* Icono más grande */
     box-shadow: var(--shadow-glow);
     animation: iconPulse 3s ease infinite alternate;
     flex-shrink: 0;
 }
 
-/* Asegurar que el icono esté perfectamente centrado */
+
 .rb-header-icon::before {
     content: none;
-    /* Remover cualquier pseudo-elemento */
 }
 
-/* ================================
-   🔘 BOTONES DE ACCIÓN CIRCULARES
-   ================================ */
 
-/* Refresh Button - Circular */
 .refresh-button {
     background: linear-gradient(135deg, rgba(0, 255, 135, 0.15) 0%, rgba(0, 255, 135, 0.25) 100%);
     border: 1px solid rgba(0, 255, 135, 0.4);
     color: var(--success-green);
     width: 48px;
-    /* Ancho fijo */
     height: 48px;
-    /* Alto igual al ancho */
     border-radius: 50%;
-    /* Círculo perfecto */
     padding: 0;
-    /* Sin padding */
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(0, 255, 135, 0.2);
     display: flex;
@@ -595,31 +524,25 @@
     background: linear-gradient(135deg, rgba(0, 255, 135, 0.25) 0%, rgba(0, 255, 135, 0.35) 100%);
     border-color: rgba(0, 255, 135, 0.6);
     transform: translateY(-2px) scale(1.05);
-    /* Efecto de hover más pronunciado */
     box-shadow: 0 6px 20px rgba(0, 255, 135, 0.3);
 }
 
 .refresh-icon {
     transition: transform 0.3s ease;
     font-size: 22px;
-    /* Icono más grande */
     filter: drop-shadow(0 0 4px rgba(0, 255, 135, 0.5));
     color: var(--success-green);
 }
 
-/* Close Button - Circular */
+
 .rb-close-button {
     background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(255, 107, 157, 0.25) 100%);
     border: 1px solid rgba(255, 107, 157, 0.4);
     color: var(--primary-pink);
     width: 48px;
-    /* Ancho fijo */
     height: 48px;
-    /* Alto igual al ancho */
     border-radius: 50%;
-    /* Círculo perfecto */
     padding: 0;
-    /* Sin padding */
     font-weight: 700;
     box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
     position: relative;
@@ -629,14 +552,12 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 20px;
-    /* Tamaño del X */
 }
 
 .rb-close-button:hover:not(:disabled) {
     background: linear-gradient(135deg, rgba(255, 107, 157, 0.25) 0%, rgba(255, 107, 157, 0.4) 100%);
     border-color: rgba(255, 107, 157, 0.6);
     transform: translateY(-2px) scale(1.05);
-    /* Efecto de hover más pronunciado */
     box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
 }
 
@@ -647,11 +568,7 @@
     color: var(--primary-pink);
 }
 
-/* ================================
-   📱 RESPONSIVE - ICONOS CIRCULARES
-   ================================ */
 
-/* Tablet */
 @media (max-width: 1200px) {
     .rb-header-icon {
         width: 56px;
@@ -674,7 +591,6 @@
     }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
     .rb-header-icon {
         width: 52px;
@@ -697,7 +613,7 @@
     }
 }
 
-/* Small Mobile */
+
 @media (max-width: 480px) {
     .rb-header-icon {
         width: 48px;
@@ -720,11 +636,7 @@
     }
 }
 
-/* ================================
-   ✨ EFECTOS ADICIONALES PARA CÍRCULOS
-   ================================ */
 
-/* Efecto de pulso mejorado para el header icon */
 @keyframes iconPulse {
     from {
         box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
@@ -737,7 +649,7 @@
     }
 }
 
-/* Efecto de rotación suave para refresh cuando está spinning */
+
 .refresh-icon.spinning {
     animation: smoothSpin 1.2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
 }
@@ -757,7 +669,7 @@
     }
 }
 
-/* Efecto de brillo circular en hover */
+
 .refresh-button::before,
 .rb-close-button::before {
     content: '';
@@ -784,14 +696,14 @@
     height: 100%;
 }
 
-/* Asegurar que el contenido esté por encima del efecto */
+
 .refresh-icon,
 .rb-close-button::after {
     position: relative;
     z-index: 1;
 }
 
-/* Corregir el X del close button para que esté por encima */
+
 .rb-close-button::after {
     content: "✕";
     font-size: 20px;
@@ -804,17 +716,13 @@
     z-index: 2;
 }
 
-/* Ocultar el ::before del close button ya que usamos ::after */
+
 .rb-close-button::before {
     display: none;
 }
 
 
-/* ================================
-   🔗 ESTILOS PARA BRANCH CLICKEABLE A DEVOPS
-   ================================ */
 
-/* Branch name clickeable */
 .branch-name.clickable-branch {
     font-size: 14px;
     font-weight: 600;
@@ -854,7 +762,7 @@
     box-shadow: 0 4px 12px rgba(0, 255, 135, 0.3);
 }
 
-/* Icono de enlace */
+
 .devops-link-icon {
     font-size: 12px;
     opacity: 0;
@@ -873,13 +781,13 @@
     filter: drop-shadow(0 0 4px rgba(0, 255, 135, 0.3));
 }
 
-/* Efecto de loading cuando se hace click */
+
 .branch-name.clickable-branch:active {
     transform: scale(0.98);
     box-shadow: 0 2px 6px rgba(108, 92, 231, 0.3);
 }
 
-/* Tooltip mejorado */
+
 .branch-name.clickable-branch::before {
     content: 'Click to open in Azure DevOps';
     position: absolute;
@@ -926,9 +834,7 @@
     visibility: visible;
 }
 
-/* ================================
-   📱 RESPONSIVE DESIGN
-   ================================ */
+
 
 @media (max-width: 1200px) {
     .branch-name.clickable-branch {
@@ -958,7 +864,7 @@
         font-size: 10px;
     }
 
-    /* En mobile, simplificar el tooltip */
+
     .branch-name.clickable-branch::before {
         content: 'Open in DevOps';
         font-size: 9px;
@@ -977,18 +883,14 @@
         font-size: 9px;
     }
 
-    /* En móviles muy pequeños, ocultar tooltip */
+
     .branch-name.clickable-branch::before,
     .branch-name.clickable-branch::after {
         display: none;
     }
 }
 
-/* ================================
-   🎨 EFECTOS ADICIONALES
-   ================================ */
 
-/* Efecto de brillo en hover */
 .branch-name.clickable-branch:hover {
     box-shadow:
         0 4px 12px rgba(108, 92, 231, 0.2),
@@ -1003,7 +905,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Animación de aparición */
+
 .branch-name.clickable-branch {
     animation: branchFadeIn 0.3s ease-out;
 }
@@ -1020,7 +922,7 @@
     }
 }
 
-/* Efecto de pulso para indicar clickeable */
+
 .branch-name.clickable-branch::before {
     animation: pulseHint 2s ease-in-out infinite;
 }
@@ -1037,11 +939,7 @@
     }
 }
 
-/* ================================
-   🔗 INDICADOR DE ENLACE EXTERNO
-   ================================ */
 
-/* Mostrar icono de enlace externo en esquina */
 .branch-name.clickable-branch {
     position: relative;
 }
@@ -1069,11 +967,7 @@
     border-color: var(--success-green);
 }
 
-/* ================================
-   🎯 ESTADOS ESPECIALES
-   ================================ */
 
-/* Estado de carga */
 .branch-name.clickable-branch.rb-loading {
     pointer-events: none;
     opacity: 0.7;
@@ -1092,7 +986,7 @@
     }
 }
 
-/* Estado de error */
+
 .branch-name.clickable-branch.rb-error {
     color: var(--error-red);
     background: rgba(239, 68, 68, 0.1);
@@ -1104,7 +998,7 @@
     border-color: rgba(239, 68, 68, 0.5);
 }
 
-/* Estado de éxito */
+
 .branch-name.clickable-branch.rb-success {
     animation: successFlash 0.5s ease-out;
 }
@@ -1122,13 +1016,8 @@
 }
 
 
-/* ================================
-   🧛‍♂️ DRACULA THEME PARA REVIEW BRANCHES
-   ================================ */
 
-/* 🎨 DRACULA COLOR PALETTE */
 :root {
-    /* Dracula Core Colors */
     --dracula-background: #282a36;
     --dracula-current-line: #44475a;
     --dracula-foreground: #f8f8f2;
@@ -1141,13 +1030,13 @@
     --dracula-red: #ff5555;
     --dracula-yellow: #f1fa8c;
 
-    /* Dracula Semantic Colors */
+
     --dracula-selection: #44475a;
     --dracula-subtle: #424450;
     --dracula-surface: #343746;
     --dracula-overlay: rgba(68, 71, 90, 0.8);
 
-    /* Updated Theme Variables */
+
     --primary-purple: var(--dracula-purple);
     --primary-pink: var(--dracula-pink);
     --success-green: var(--dracula-green);
@@ -1166,9 +1055,6 @@
     --shadow-glow: 0 0 20px rgba(189, 147, 249, 0.3);
 }
 
-/* ================================
-   🏗️ CONTENEDOR PRINCIPAL - DRACULA
-   ================================ */
 .review-branches-container {
     background: linear-gradient(135deg, var(--dracula-background) 0%, var(--dracula-current-line) 100%);
     border: 1px solid var(--dracula-purple);
@@ -1185,7 +1071,7 @@
     position: relative;
 }
 
-/* Efecto de brillo superior estilo Dracula */
+
 .review-branches-container::before {
     content: '';
     position: absolute;
@@ -1215,9 +1101,7 @@
     }
 }
 
-/* ================================
-   📋 HEADER SECTION - DRACULA STYLE
-   ================================ */
+
 .branches-header {
     display: flex;
     justify-content: space-between;
@@ -1293,9 +1177,7 @@
     font-style: italic;
 }
 
-/* ================================
-   🔘 BOTONES - DRACULA STYLE
-   ================================ */
+
 .refresh-button {
     background: linear-gradient(135deg,
             rgba(80, 250, 123, 0.15) 0%,
@@ -1356,9 +1238,7 @@
     box-shadow: 0 6px 20px rgba(255, 85, 85, 0.4);
 }
 
-/* ================================
-   🎛️ CONTROLES - DRACULA THEME
-   ================================ */
+
 .branches-controls {
     display: flex;
     justify-content: space-between;
@@ -1436,9 +1316,7 @@
     filter: drop-shadow(0 0 4px rgba(139, 233, 253, 0.4));
 }
 
-/* ================================
-   📊 MENSAJES DE ESTADO - DRACULA
-   ================================ */
+
 .status-message {
     display: flex;
     align-items: center;
@@ -1465,9 +1343,7 @@
     box-shadow: 0 4px 12px rgba(80, 250, 123, 0.2);
 }
 
-/* ================================
-   📋 TABLA - DRACULA STYLE
-   ================================ */
+
 .branches-table-container {
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.6) 0%,
@@ -1532,9 +1408,7 @@
     width: 3px;
 }
 
-/* ================================
-   🌿 BRANCH INFO - DRACULA COLORS
-   ================================ */
+
 .branch-name.clickable-branch {
     font-size: 14px;
     font-weight: 600;
@@ -1604,9 +1478,7 @@
     border-color: rgba(189, 147, 249, 0.4);
 }
 
-/* ================================
-   🎨 COMMIT INFO - DRACULA COLORS
-   ================================ */
+
 .commit-hash {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 12px;
@@ -1626,58 +1498,7 @@
     filter: drop-shadow(0 0 4px rgba(255, 121, 198, 0.4));
 }
 
-/* ================================
-   🔘 BOTONES DE ACCIÓN - DRACULA
-   ================================ */
-.table-rb-action-button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: 1px solid;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-}
 
-.checkout-button {
-    background: rgba(80, 250, 123, 0.15);
-    border-color: rgba(80, 250, 123, 0.4);
-    color: var(--dracula-green);
-    padding: 8px 20px;
-    border-radius: 12px;
-}
-
-.checkout-button:hover:not(:disabled) {
-    background: rgba(80, 250, 123, 0.25);
-    border-color: rgba(80, 250, 123, 0.6);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(80, 250, 123, 0.3);
-}
-
-.compare-button {
-    background: rgba(255, 121, 198, 0.15);
-    border-color: rgba(255, 121, 198, 0.4);
-    color: var(--dracula-pink);
-    padding: 8px 20px;
-    border-radius: 12px;
-}
-
-.compare-button:hover:not(:disabled) {
-    background: rgba(255, 121, 198, 0.25);
-    border-color: rgba(255, 121, 198, 0.6);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 121, 198, 0.3);
-}
-
-/* ================================
-   📱 RESPONSIVE - DRACULA THEME
-   ================================ */
 @media (max-width: 768px) {
     .review-branches-container {
         background: var(--dracula-background);
@@ -1697,11 +1518,7 @@
     }
 }
 
-/* ================================
-   🌟 EFECTOS ESPECIALES DRACULA
-   ================================ */
 
-/* Scrollbar Dracula */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -1719,7 +1536,7 @@
     background: linear-gradient(180deg, var(--dracula-pink), var(--dracula-cyan));
 }
 
-/* Glow effects */
+
 .review-branches-container {
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.4),
@@ -1727,7 +1544,7 @@
         0 0 40px rgba(189, 147, 249, 0.05);
 }
 
-/* Loading spinner Dracula */
+
 .spinner-ring {
     border: 3px solid var(--dracula-current-line);
     border-top: 3px solid var(--dracula-purple);
@@ -1754,39 +1571,30 @@
 
 
 
-/* ================================
-   📋 ULTRA COMPACTO - VER MÁS BRANCHES
-   ================================ */
 
-/* ================================
-   🏗️ HEADER SECTION - ULTRA COMPACTO
-   ================================ */
 .branches-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
-    /* MUY poco espacio */
+
     padding: 12px 20px;
-    /* Padding mínimo */
+
     border-bottom: 1px solid var(--dracula-current-line);
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.4) 0%,
             rgba(52, 55, 70, 0.6) 100%);
     border-radius: 8px;
-    /* Menos redondeado */
+
     position: relative;
     box-shadow:
         0 2px 6px rgba(0, 0, 0, 0.2),
         inset 0 1px 0 rgba(248, 248, 242, 0.05);
 }
 
-/* ================================
-   🎯 ICONO DEL HEADER - MUY PEQUEÑO
-   ================================ */
 .rb-header-icon {
     width: 36px;
-    /* MUY pequeño */
+
     height: 36px;
     border-radius: 50%;
     background: linear-gradient(45deg, var(--dracula-purple), var(--dracula-pink));
@@ -1796,7 +1604,7 @@
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    /* Icono muy pequeño */
+
     box-shadow:
         0 0 10px rgba(189, 147, 249, 0.3),
         0 0 20px rgba(255, 121, 198, 0.2);
@@ -1804,16 +1612,14 @@
     flex-shrink: 0;
 }
 
-/* ================================
-   📝 TÍTULO Y SUBTÍTULO - MUY COMPACTOS
-   ================================ */
+
 .rb-header-title {
     font-size: 1.4rem;
-    /* Título muy pequeño */
+
     font-weight: 600;
-    /* Menos peso */
+
     margin-bottom: 2px;
-    /* Margen mínimo */
+
     background: linear-gradient(135deg,
             var(--dracula-foreground) 0%,
             var(--dracula-purple) 30%,
@@ -1826,59 +1632,55 @@
     animation: draculaTitleFlow 4s ease infinite;
     position: relative;
     line-height: 1.1;
-    /* Línea compacta */
+
 }
 
 .header-subtitle {
     color: var(--dracula-purple);
     font-size: 11px;
-    /* Subtítulo muy pequeño */
+
     margin: 0;
     opacity: 0.7;
     font-style: italic;
     line-height: 1;
 }
 
-/* ================================
-   🔘 BOTONES DIMINUTOS
-   ================================ */
+
 .header-actions {
     display: flex;
     gap: 6px;
-    /* Espacio mínimo */
+
     position: absolute;
     top: 8px;
-    /* Más pegados arriba */
+
     right: 12px;
-    /* Más pegados a la derecha */
+
 }
 
 .refresh-button,
 .rb-close-button {
     width: 24px;
-    /* DIMINUTOS */
+
     height: 24px;
     border-radius: 50%;
     padding: 0;
     font-size: 10px;
-    /* Iconos diminutos */
+
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
 }
 
-/* ================================
-   🎛️ CONTROLES - MUY COMPACTOS
-   ================================ */
+
 .branches-controls {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
     gap: 16px;
-    /* Menos espacio */
+
     margin-bottom: 10px;
-    /* Margen mínimo */
+
     padding: 10px 16px;
-    /* Padding mínimo */
+
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.8) 0%,
             rgba(52, 55, 70, 0.9) 100%);
@@ -1890,50 +1692,48 @@
         inset 0 1px 0 rgba(248, 248, 242, 0.05);
 }
 
-/* Search input más pequeño */
+
 .rb-search-input {
     padding: 8px 16px 8px 40px;
-    /* Menos padding */
+
     font-size: 13px;
-    /* Texto más pequeño */
+
 }
 
 .rb-search-icon {
     left: 14px;
-    /* Reposicionado */
+
     font-size: 14px;
-    /* Icono más pequeño */
+
 }
 
-/* Selects más pequeños */
+
 .filter-select {
     padding: 6px 10px;
-    /* Menos padding */
+
     font-size: 12px;
-    /* Texto más pequeño */
+
     min-width: 140px;
-    /* Menos ancho */
+
 }
 
-/* ================================
-   📊 REPOSITORY STATUS - COMPACTO
-   ================================ */
+
 .repo-status {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 16px;
-    /* Menos espacio */
+
     padding: 8px 16px;
-    /* Padding mínimo */
+
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.6) 0%,
             rgba(52, 55, 70, 0.8) 100%);
     border: 1px solid var(--dracula-current-line);
     border-radius: 6px;
-    /* Menos redondeado */
+
     margin-bottom: 10px;
-    /* Margen mínimo */
+
     backdrop-filter: blur(10px);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
@@ -1942,16 +1742,16 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    /* Menos espacio */
+
     font-size: 12px;
-    /* Texto más pequeño */
+
     color: var(--dracula-foreground);
     font-weight: 500;
 }
 
 .status-indicator {
     width: 6px;
-    /* Indicadores más pequeños */
+
     height: 6px;
     border-radius: 50%;
     background: var(--dracula-red);
@@ -1962,18 +1762,16 @@
     background: rgba(189, 147, 249, 0.1);
     border: 1px solid rgba(189, 147, 249, 0.3);
     border-radius: 4px;
-    /* Menos redondeado */
+
     padding: 4px 8px;
-    /* Padding mínimo */
+
     color: var(--dracula-purple);
     font-size: 10px;
-    /* Texto muy pequeño */
+
     font-weight: 600;
 }
 
-/* ================================
-   📋 TABLA - FILAS MUY COMPACTAS
-   ================================ */
+
 .branches-table-container {
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.6) 0%,
@@ -1986,7 +1784,7 @@
         0 8px 32px rgba(0, 0, 0, 0.4),
         0 0 0 1px rgba(189, 147, 249, 0.1);
     min-height: 650px;
-    /* MÁS altura para ver más branches */
+
     position: relative;
 }
 
@@ -1994,15 +1792,15 @@
     display: grid;
     grid-template-columns: 2.5fr 1.2fr 2.5fr 1fr 0.8fr 1.8fr;
     gap: 16px;
-    /* Menos espacio */
+
     padding: 10px 16px;
-    /* Padding muy pequeño */
+
     background: linear-gradient(135deg,
             rgba(40, 42, 54, 0.9) 0%,
             rgba(68, 71, 90, 0.9) 100%);
     border-bottom: 1px solid var(--dracula-current-line);
     font-size: 10px;
-    /* Header muy pequeño */
+
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -2015,23 +1813,21 @@
     grid-template-columns: 2.5fr 1.2fr 2.5fr 1fr 0.8fr 1.8fr;
     gap: 16px;
     padding: 14px 16px;
-    /* MUCHO menos padding */
+
     border-bottom: 1px solid rgba(68, 71, 90, 0.3);
     transition: all 0.3s ease;
     position: relative;
     background: rgba(40, 42, 54, 0.3);
     min-height: 56px;
-    /* Altura MUY compacta */
+
 }
 
-/* ================================
-   🌿 BRANCH INFO - COMPACTO PERO VISIBLE
-   ================================ */
+
 .branch-name.clickable-branch {
     font-size: 13px;
-    /* Más pequeño pero legible */
+
     font-weight: 600;
-    /* Menos bold */
+
     color: var(--dracula-purple);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     cursor: pointer;
@@ -2040,11 +1836,11 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    /* Menos espacio */
+
     padding: 3px 6px;
-    /* Padding mínimo */
+
     border-radius: 4px;
-    /* Menos redondeado */
+
     background: rgba(189, 147, 249, 0.1);
     border: 1px solid rgba(189, 147, 249, 0.2);
     user-select: none;
@@ -2055,12 +1851,12 @@
     background: linear-gradient(45deg, var(--dracula-green), var(--dracula-cyan));
     color: var(--dracula-background);
     font-size: 8px;
-    /* Badge muy pequeño */
+
     font-weight: 700;
     padding: 1px 4px;
-    /* Padding mínimo */
+
     border-radius: 3px;
-    /* Muy redondeado */
+
     text-transform: uppercase;
     letter-spacing: 0.3px;
     box-shadow: 0 1px 3px rgba(80, 250, 123, 0.3);
@@ -2069,10 +1865,10 @@
 
 .repository-badge {
     font-size: 9px;
-    /* Badge muy pequeño */
+
     font-weight: 600;
     padding: 2px 6px;
-    /* Padding mínimo */
+
     border-radius: 8px;
     border: 1px solid;
     text-transform: uppercase;
@@ -2083,17 +1879,16 @@
     line-height: 1;
 }
 
-/* ================================
-   👤 AUTHOR INFO - COMPACTO
-   ================================ */
+
+
 .author-info {
     display: flex;
     align-items: center;
     gap: 6px;
-    /* Menos espacio */
+
     color: var(--dracula-foreground);
     font-size: 12px;
-    /* Texto más pequeño */
+
     font-weight: 500;
     line-height: 1;
 }
@@ -2102,18 +1897,16 @@
     color: var(--dracula-foreground);
     font-weight: 500;
     font-size: 12px;
-    /* Nombre más pequeño */
+
 }
 
 .author-icon,
 .date-icon {
     font-size: 12px !important;
-    /* Iconos más pequeños */
+
 }
 
-/* ================================
-   💻 COMMIT INFO - COMPACTO
-   ================================ */
+
 .commit-info {
     display: flex;
     align-items: center;
@@ -2125,7 +1918,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    /* Espacio mínimo */
+
     flex: 1;
     min-width: 0;
 }
@@ -2133,12 +1926,12 @@
 .commit-hash {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 10px;
-    /* Hash muy pequeño */
+
     color: var(--dracula-orange);
     font-weight: 600;
     background: rgba(255, 184, 108, 0.15);
     padding: 1px 4px;
-    /* Padding mínimo */
+
     border-radius: 3px;
     width: fit-content;
     border: 1px solid rgba(255, 184, 108, 0.3);
@@ -2147,7 +1940,7 @@
 
 .commit-message {
     font-size: 11px;
-    /* Mensaje más pequeño */
+
     color: var(--dracula-purple);
     white-space: nowrap;
     overflow: hidden;
@@ -2157,32 +1950,28 @@
     line-height: 1.1;
 }
 
-/* ================================
-   📅 DATE INFO - COMPACTO
-   ================================ */
+
 .date-info {
     display: flex;
     align-items: center;
     gap: 4px;
     color: var(--dracula-foreground);
     font-size: 11px;
-    /* Fecha más pequeña */
+
     font-weight: 500;
     line-height: 1;
 }
 
-/* ================================
-   📊 BEHIND INFO - COMPACTO
-   ================================ */
+
 .behind-badge {
     background: rgba(255, 85, 85, 0.2);
     color: var(--dracula-red);
     border: 1px solid rgba(255, 85, 85, 0.4);
     font-size: 12px;
-    /* Badge muy pequeño */
+
     font-weight: 600;
     padding: 2px 4px;
-    /* Padding mínimo */
+
     border-radius: 3px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     line-height: 1;
@@ -2191,27 +1980,20 @@
 .up-to-date {
     color: var(--dracula-green);
     font-size: 12px;
-    /* Checkmark más pequeño */
+
     filter: drop-shadow(0 0 4px rgba(80, 250, 123, 0.4));
     font-weight: bold;
 }
 
-/* ================================
-   🔘 BOTONES DE ACCIÓN - COMPACTOS
-   ================================ */
+
 .table-rb-action-button {
     display: flex;
     align-items: center;
     gap: 4px;
-    /* Menos espacio */
     padding: 6px 10px;
-    /* Padding mínimo */
     border: 1px solid;
-    /* Borde más delgado */
     border-radius: 4px;
-    /* Menos redondeado */
     font-size: 10px;
-    /* Texto muy pequeño */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -2237,9 +2019,7 @@
     box-shadow: 0 2px 6px rgba(255, 121, 198, 0.2);
 }
 
-/* ================================
-   📱 RESPONSIVE ADJUSTMENTS
-   ================================ */
+
 @media (min-width: 1200px) {
     .branches-header {
         padding: 14px 24px;
@@ -2269,7 +2049,7 @@
 
     .table-row {
         min-height: 60px;
-        /* Slightly larger on big screens */
+
         padding: 16px 18px;
     }
 }
@@ -2277,7 +2057,7 @@
 @media (max-width: 768px) {
     .table-row {
         min-height: 50px;
-        /* Even more compact on mobile */
+
         padding: 10px 12px;
     }
 
@@ -2300,40 +2080,36 @@
     }
 }
 
-/* ================================
-   🔧 FIXES ESPECÍFICOS
-   ================================ */
 
-/* ================================
-   🔘 BOTONES PERFECTAMENTE REDONDOS Y MÁS PEQUEÑOS
-   ================================ */
+
+
 .refresh-button,
 .rb-close-button {
     width: 20px !important;
-    /* MÁS pequeños */
+
     height: 20px !important;
     border-radius: 50% !important;
-    /* Forzar círculo perfecto */
+
     padding: 0 !important;
     font-size: 8px !important;
-    /* Iconos muy pequeños */
+
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     min-width: 20px !important;
-    /* Evitar deformación */
+
     max-width: 20px !important;
-    /* Evitar deformación */
+
     min-height: 20px !important;
-    /* Evitar deformación */
+
     max-height: 20px !important;
-    /* Evitar deformación */
+
     aspect-ratio: 1 / 1 !important;
-    /* Mantener proporción 1:1 */
+
     flex-shrink: 0 !important;
-    /* No permitir compresión */
+
     overflow: hidden;
 }
 
@@ -2356,13 +2132,13 @@
 .refresh-button:hover:not(:disabled),
 .rb-close-button:hover:not(:disabled) {
     transform: scale(1.15) !important;
-    /* Solo escala ligeramente */
+
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
 }
 
 .refresh-icon {
     font-size: 8px !important;
-    /* Icono refresh muy pequeño */
+
     line-height: 1 !important;
     display: block !important;
 }
@@ -2370,23 +2146,22 @@
 .rb-close-button::before {
     content: "" !important;
     font-size: 8px !important;
-    /* X muy pequeña */
+
     font-weight: bold !important;
     line-height: 1 !important;
     display: block !important;
 }
 
-/* Quitar cualquier contenido adicional que pueda deformar */
+
 .rb-close-button::after {
     display: none !important;
 }
 
-/* ================================
-      🎛️ LAYOUT DE CONTROLES CORREGIDO
-      ================================ */
+
+
 .branches-controls {
     display: flex !important;
-    /* Cambiar de grid a flex */
+
     justify-content: space-between !important;
     align-items: center !important;
     gap: 20px !important;
@@ -2403,15 +2178,13 @@
         inset 0 1px 0 rgba(248, 248, 242, 0.05);
 }
 
-/* ================================
-      📍 CONTROLS LEFT - REPOSITORY FILTER
-      ================================ */
+
 .controls-left {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
     flex-shrink: 0 !important;
-    /* No permitir compresión */
+
 }
 
 .filter-group {
@@ -2436,21 +2209,19 @@
     color: var(--dracula-foreground) !important;
     font-size: 12px !important;
     min-width: 180px !important;
-    /* Ancho fijo para repository */
+
     width: 180px !important;
     transition: all 0.3s ease !important;
 }
 
-/* ================================
-      🔍 CONTROLS CENTER - SEARCH MÁS LARGO
-      ================================ */
+
 .controls-center {
     display: flex !important;
     justify-content: center !important;
     flex: 1 !important;
-    /* Tomar espacio disponible */
+
     max-width: 500px !important;
-    /* Ancho máximo */
+
 }
 
 .search-group {
@@ -2464,7 +2235,7 @@
     align-items: center !important;
     width: 100% !important;
     max-width: 400px !important;
-    /* MÁS LARGO para nombres completos */
+
 }
 
 .rb-search-input {
@@ -2472,7 +2243,7 @@
     border: 1px solid var(--dracula-current-line) !important;
     border-radius: 6px !important;
     padding: 8px 6px 8px 35px !important;
-    /* Ajustar padding */
+
     color: var(--dracula-foreground) !important;
     font-size: 13px !important;
     width: 100% !important;
@@ -2490,17 +2261,15 @@
     filter: drop-shadow(0 0 4px rgba(139, 233, 253, 0.4)) !important;
 }
 
-/* ================================
-      📊 CONTROLS RIGHT - SORT BY AL FINAL
-      ================================ */
+
 .controls-right {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
     flex-shrink: 0 !important;
-    /* No permitir compresión */
+
     margin-left: auto !important;
-    /* Empujar completamente a la derecha */
+
 }
 
 .sort-group {
@@ -2518,7 +2287,7 @@
 
 .sort-group .filter-select {
     min-width: 120px !important;
-    /* Más pequeño que repository */
+
     width: 120px !important;
 }
 
@@ -2545,9 +2314,7 @@
     color: var(--dracula-purple) !important;
 }
 
-/* ================================
-      📱 RESPONSIVE ADJUSTMENTS
-      ================================ */
+
 @media (min-width: 1200px) {
 
     .refresh-button,
@@ -2559,7 +2326,7 @@
 
     .rb-search-input-container {
         max-width: 500px !important;
-        /* Aún más largo en desktop */
+
     }
 
     .filter-select {
@@ -2587,7 +2354,7 @@
 
     .controls-center {
         order: 3 !important;
-        /* Search va abajo */
+
         width: 100% !important;
         max-width: none !important;
     }
@@ -2628,11 +2395,9 @@
     }
 }
 
-/* ================================
-      🔧 FIXES ADICIONALES PARA BOTONES
-      ================================ */
 
-/* Asegurar que los botones no se deformen NUNCA */
+
+
 .header-actions {
     display: flex !important;
     gap: 6px !important;
@@ -2643,7 +2408,7 @@
     justify-content: center !important;
 }
 
-/* Override cualquier estilo que pueda deformar los botones */
+
 .refresh-button *,
 .rb-close-button * {
     transform: none !important;
@@ -2655,7 +2420,7 @@
     transform: none !important;
 }
 
-/* Asegurar que el spinning del refresh no deforme el botón */
+
 .refresh-icon.spinning {
     animation: smoothSpin 1.2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite !important;
     transform-origin: center !important;
@@ -2671,11 +2436,9 @@
     }
 }
 
-/* ================================
-      ✨ MEJORAS VISUALES
-      ================================ */
 
-/* Mejor separación visual entre secciones */
+
+
 .controls-left {
     border-right: 1px solid rgba(68, 71, 90, 0.5);
     padding-right: 16px;
@@ -2686,7 +2449,7 @@
     padding-left: 16px;
 }
 
-/* Focus states mejorados */
+
 .rb-search-input:focus {
     outline: none !important;
     border-color: var(--dracula-cyan) !important;
@@ -2702,28 +2465,24 @@
 }
 
 
-/* ================================
-   🎯 MODAL CENTRADO Y BIEN PROPORCIONADO
-   ================================ */
 
-/* ================================
-   🏗️ CONTENEDOR PRINCIPAL - MÁS CENTRADO
-   ================================ */
+
+
 .review-branches-container {
-    /* Centrar mejor y hacer más compacto */
+
     max-width: 1200px;
-    /* Menos ancho para centrarlo mejor */
+
     width: 85%;
-    /* Menos ancho del viewport */
+
     margin: 20px auto;
-    /* Centrado con margen superior */
+
 
     background: linear-gradient(135deg, var(--dracula-background) 0%, var(--dracula-current-line) 100%);
     border: 1px solid var(--dracula-purple);
     border-radius: 16px;
     padding: 24px;
     height: calc(100vh - 80px);
-    /* Menos altura para centrarlo */
+
     overflow-y: auto;
     backdrop-filter: blur(20px);
     box-shadow:
@@ -2732,9 +2491,8 @@
     position: relative;
 }
 
-/* ================================
-   📊 COMPARISON MODAL - SÚPER COOL DRACULA
-   ================================ */
+
+
 .rb-comparison-modal-overlay {
     position: fixed;
     top: 0;
@@ -2742,27 +2500,27 @@
     right: 0;
     bottom: 0;
     background: rgba(40, 42, 54, 0.95);
-    /* Dracula background con transparencia */
+
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
-    /* Centrado vertical */
+
     justify-content: center;
-    /* Centrado horizontal */
+
     z-index: 9999;
     padding: 40px 20px;
-    /* Padding para no tocar bordes */
+
 }
 
 .comparison-modal {
-    /* Tamaño más horizontal y centrado */
+
     width: 90%;
     max-width: 1000px;
-    /* Más horizontal */
+
     height: 70vh;
-    /* Altura fija más pequeña */
+
     max-height: 600px;
-    /* Máximo de altura */
+
 
     background: linear-gradient(135deg,
             var(--dracula-background) 0%,
@@ -2782,7 +2540,7 @@
     position: relative;
 }
 
-/* Efecto de brillo sutil en el modal */
+
 .comparison-modal::before {
     content: '';
     position: absolute;
@@ -2799,9 +2557,8 @@
     opacity: 0.8;
 }
 
-/* ================================
-   📋 MODAL HEADER - ESTILO DRACULA COOL
-   ================================ */
+
+
 .rb-modal-header {
     display: flex;
     justify-content: space-between;
@@ -2812,7 +2569,7 @@
             rgba(52, 55, 70, 0.9) 100%);
     border-bottom: 1px solid var(--dracula-current-line);
     flex-shrink: 0;
-    /* No se comprime */
+
 }
 
 .rb-modal-title {
@@ -2869,23 +2626,21 @@
     transform: scale(1.05);
 }
 
-/* ================================
-   📊 MODAL CONTENT - SIN SCROLL PRINCIPAL
-   ================================ */
+
+
 .rb-modal-content {
     flex: 1;
     padding: 24px;
     overflow: hidden;
-    /* Sin scroll aquí */
+
     display: flex;
     flex-direction: column;
     min-height: 0;
-    /* Importante para flex */
+
 }
 
-/* ================================
-   📈 COMPARISON HEADER - DRACULA STYLE
-   ================================ */
+
+
 .comparison-header {
     margin-bottom: 20px;
     flex-shrink: 0;
@@ -2898,7 +2653,7 @@
     font-size: 16px;
     flex-wrap: wrap;
     justify-content: center;
-    /* Centrado */
+
     background: var(--dracula-current-line);
     padding: 12px 20px;
     border-radius: 8px;
@@ -2942,9 +2697,7 @@
     font-weight: 500;
 }
 
-/* ================================
-   📊 COMPARISON STATS - SÚPER COOL
-   ================================ */
+
 .comparison-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -2981,7 +2734,7 @@
     opacity: 0.8;
 }
 
-/* Files Changed */
+
 .rb-stat-item:first-child {
     border-color: rgba(241, 250, 140, 0.4);
 }
@@ -2999,7 +2752,7 @@
     color: var(--dracula-yellow);
 }
 
-/* Additions */
+
 .rb-stat-item.additions {
     border-color: rgba(80, 250, 123, 0.4);
 }
@@ -3017,7 +2770,7 @@
     color: var(--dracula-green);
 }
 
-/* Deletions */
+
 .rb-stat-item.deletions {
     border-color: rgba(255, 85, 85, 0.4);
 }
@@ -3053,16 +2806,14 @@
     opacity: 0.9;
 }
 
-/* ================================
-   📁 FILES LIST - CON SCROLL AQUÍ
-   ================================ */
+
 .files-list {
     flex: 1;
-    /* Tomar espacio restante */
+
     display: flex;
     flex-direction: column;
     min-height: 0;
-    /* Importante para scroll */
+
 }
 
 .files-list h4 {
@@ -3087,12 +2838,12 @@
     border: 1px solid var(--dracula-current-line);
     border-radius: 8px;
     overflow-y: auto;
-    /* SCROLL SOLO AQUÍ */
+
     backdrop-filter: blur(10px);
     flex: 1;
-    /* Tomar espacio disponible */
+
     min-height: 0;
-    /* Importante para scroll */
+
 }
 
 .file-item {
@@ -3239,9 +2990,7 @@
     border: 1px solid rgba(255, 85, 85, 0.3);
 }
 
-/* ================================
-   📱 RESPONSIVE ADJUSTMENTS
-   ================================ */
+
 @media (min-width: 1200px) {
     .review-branches-container {
         max-width: 1300px;
@@ -3309,9 +3058,7 @@
     }
 }
 
-/* ================================
-   📜 SCROLLBAR CUSTOM PARA FILES
-   ================================ */
+
 .files-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -3331,30 +3078,21 @@
 }
 
 
-/* ================================
-   🎯 MODAL CENTRADO CON MÁS ANCHO HORIZONTAL
-   ================================ */
 
-/* ================================
-   🏗️ CONTENEDOR PRINCIPAL - MÁS ANCHO PARA LOS NOMBRES DE RAMAS
-   ================================ */
+
+
 .review-branches-container {
-    /* Más ancho horizontalmente para mostrar nombres de ramas completos */
+
     max-width: 1600px;
-    /* Mucho más ancho */
     width: 95%;
-    /* Casi todo el viewport */
     margin: 15px auto;
-    /* Centrado con menos margen */
     min-width: 1200px;
-    /* Ancho mínimo para asegurar espacio */
 
     background: linear-gradient(135deg, var(--dracula-background) 0%, var(--dracula-current-line) 100%);
     border: 1px solid var(--dracula-purple);
     border-radius: 16px;
     padding: 24px;
     height: calc(100vh - 60px);
-    /* Más altura también */
     overflow-y: auto;
     backdrop-filter: blur(20px);
     box-shadow:
@@ -3363,40 +3101,26 @@
     position: relative;
 }
 
-/* ================================
-   📋 TABLA DE RAMAS - COLUMNAS MÁS ANCHAS
-   ================================ */
+
 .table-header,
 .table-row {
-    /* Grid más ancho para nombres de ramas */
+
     grid-template-columns:
-        minmax(280px, 3fr)
-        /* Branch column - MÁS ANCHA */
-        minmax(180px, 1.5fr)
-        /* Author column */
-        minmax(320px, 2.5fr)
-        /* Commit column - MÁS ANCHA */
-        minmax(140px, 1fr)
-        /* Date column */
-        minmax(80px, 0.8fr)
-        /* Behind column */
-        minmax(200px, 1.5fr);
-    /* Actions column */
+        minmax(280px, 3fr) minmax(180px, 1.5fr) minmax(320px, 2.5fr) minmax(140px, 1fr) minmax(80px, 0.8fr) minmax(200px, 1.5fr);
+
     gap: 20px;
-    /* Más espacio entre columnas */
+
     padding: 16px 20px;
 }
 
-/* ================================
-   🌿 INFORMACIÓN DE RAMA - SIN TRUNCAMIENTO
-   ================================ */
+
 .branch-info {
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: 100%;
     min-width: 0;
-    /* Permite que flex funcione */
+
 }
 
 .branch-main {
@@ -3413,17 +3137,17 @@
     color: var(--dracula-green);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 
-    /* Permitir que el nombre se muestre completo */
+
     white-space: nowrap;
     overflow: visible;
-    /* Cambio: no cortar */
+
     text-overflow: visible;
-    /* Cambio: no truncar */
+
     max-width: none;
-    /* Sin límite de ancho */
+
     flex: 1;
     word-break: keep-all;
-    /* No romper palabras */
+
 }
 
 .branch-name.current-branch {
@@ -3435,9 +3159,7 @@
     border: 1px solid rgba(139, 233, 253, 0.3);
 }
 
-/* ================================
-   💻 INFORMACIÓN DE COMMIT - MÁS ANCHA
-   ================================ */
+
 .commit-details {
     display: flex;
     flex-direction: column;
@@ -3463,23 +3185,21 @@
     font-size: 13px;
     color: var(--dracula-purple);
 
-    /* Permitir que el mensaje se muestre en múltiples líneas si es necesario */
+
     white-space: normal;
-    /* Cambio: permitir wrap */
+
     overflow: visible;
-    /* Cambio: no cortar */
+
     text-overflow: visible;
-    /* Cambio: no truncar */
+
     line-height: 1.3;
     max-height: 2.6em;
-    /* Máximo 2 líneas */
+
     word-break: break-word;
-    /* Romper palabras largas */
+
 }
 
-/* ================================
-   📊 COMPARISON MODAL - TAMBIÉN MÁS ANCHO
-   ================================ */
+
 .rb-comparison-modal-overlay {
     position: fixed;
     top: 0;
@@ -3493,14 +3213,14 @@
     justify-content: center;
     z-index: 9999;
     padding: 20px;
-    /* Menos padding para más espacio */
+
 }
 
 .comparison-modal {
-    /* Más ancho para el modal también */
+
     width: 95%;
     max-width: 1400px;
-    /* Más ancho */
+
     height: 75vh;
     max-height: 700px;
 
@@ -3522,9 +3242,7 @@
     position: relative;
 }
 
-/* ================================
-   📁 FILES LIST - PATHS MÁS ANCHOS
-   ================================ */
+
 .rb-file-path {
     display: flex;
     align-items: center;
@@ -3539,26 +3257,24 @@
     font-size: 13px;
     color: var(--dracula-foreground);
 
-    /* Permitir que los paths se muestren completos */
+
     white-space: normal;
-    /* Permitir wrap */
+
     overflow: visible;
-    /* No cortar */
+
     text-overflow: visible;
-    /* No truncar */
+
     word-break: break-all;
-    /* Romper en cualquier carácter para paths */
+
     line-height: 1.3;
     flex: 1;
 }
 
-/* ================================
-   🔘 BOTONES DE ACCIÓN - MÁS ESPACIO
-   ================================ */
+
 .action-buttons {
     display: flex;
     gap: 12px;
-    /* Más espacio entre botones */
+
     justify-content: flex-end;
     width: 100%;
 }
@@ -3568,7 +3284,7 @@
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    /* Botones más anchos */
+
     border: 1px solid;
     border-radius: 8px;
     font-size: 12px;
@@ -3579,7 +3295,7 @@
     position: relative;
     overflow: hidden;
     min-width: 80px;
-    /* Ancho mínimo para botones */
+
     justify-content: center;
     text-align: center;
 }
@@ -3590,6 +3306,7 @@
             rgba(80, 250, 123, 0.25) 100%);
     border-color: rgba(80, 250, 123, 0.4);
     color: var(--dracula-green);
+
 }
 
 .checkout-button:hover:not(:disabled) {
@@ -3618,13 +3335,11 @@
     box-shadow: 0 4px 12px rgba(255, 121, 198, 0.3);
 }
 
-/* ================================
-   📱 RESPONSIVE - MANTENER ANCHO EN DESKTOP
-   ================================ */
+
 @media (min-width: 1400px) {
     .review-branches-container {
         max-width: 1800px;
-        /* Aún más ancho en pantallas grandes */
+
         width: 90%;
     }
 
@@ -3635,11 +3350,7 @@
     .table-header,
     .table-row {
         grid-template-columns:
-            minmax(320px, 3.5fr)
-            /* Aún más ancho para branch */
-            minmax(200px, 1.5fr) minmax(360px, 3fr)
-            /* Aún más ancho para commit */
-            minmax(160px, 1fr) minmax(100px, 0.8fr) minmax(220px, 1.5fr);
+            minmax(320px, 3.5fr) minmax(200px, 1.5fr) minmax(360px, 3fr) minmax(160px, 1fr) minmax(100px, 0.8fr) minmax(220px, 1.5fr);
         gap: 24px;
     }
 }
@@ -3655,9 +3366,7 @@
     }
 }
 
-/* ================================
-   🎨 DRACULA THEME COLORS
-   ================================ */
+
 :root {
     --dracula-background: #282a36;
     --dracula-current-line: #44475a;
@@ -3672,9 +3381,7 @@
     --dracula-yellow: #f1fa8c;
 }
 
-/* ================================
-   🎨 EFECTO DE BRILLO EN EL CONTENEDOR
-   ================================ */
+
 .review-branches-container::before {
     content: '';
     position: absolute;
@@ -3691,7 +3398,7 @@
     opacity: 0.6;
 }
 
-/* Efecto de brillo sutil en el modal */
+
 .comparison-modal::before {
     content: '';
     position: absolute;
@@ -3708,9 +3415,7 @@
     opacity: 0.8;
 }
 
-/* ================================
-   📋 MODAL HEADER - ESTILO DRACULA COOL
-   ================================ */
+
 .rb-modal-header {
     display: flex;
     justify-content: space-between;
@@ -3777,9 +3482,7 @@
     transform: scale(1.05);
 }
 
-/* ================================
-   📊 MODAL CONTENT
-   ================================ */
+
 .rb-modal-content {
     flex: 1;
     padding: 24px;
@@ -3789,9 +3492,7 @@
     min-height: 0;
 }
 
-/* ================================
-   📈 COMPARISON HEADER
-   ================================ */
+
 .comparison-header {
     margin-bottom: 20px;
     flex-shrink: 0;
@@ -3847,9 +3548,8 @@
     font-weight: 500;
 }
 
-/* ================================
-   📊 COMPARISON STATS
-   ================================ */
+
+
 .comparison-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -3886,7 +3586,7 @@
     opacity: 0.8;
 }
 
-/* Files Changed */
+
 .rb-stat-item:first-child {
     border-color: rgba(241, 250, 140, 0.4);
 }
@@ -3904,7 +3604,7 @@
     color: var(--dracula-yellow);
 }
 
-/* Additions */
+
 .rb-stat-item.additions {
     border-color: rgba(80, 250, 123, 0.4);
 }
@@ -3922,7 +3622,7 @@
     color: var(--dracula-green);
 }
 
-/* Deletions */
+
 .rb-stat-item.deletions {
     border-color: rgba(255, 85, 85, 0.4);
 }
@@ -3958,9 +3658,8 @@
     opacity: 0.9;
 }
 
-/* ================================
-   📁 FILES LIST
-   ================================ */
+
+
 .files-list {
     flex: 1;
     display: flex;
@@ -4121,9 +3820,7 @@
     border: 1px solid rgba(255, 85, 85, 0.3);
 }
 
-/* ================================
-   📜 SCROLLBAR CUSTOM
-   ================================ */
+
 .files-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -4142,15 +3839,14 @@
     background: linear-gradient(180deg, var(--dracula-pink), var(--dracula-cyan));
 }
 
-/* ================================
-   📱 RESPONSIVE TABLET/MOBILE
-   ================================ */
+
+
 @media (max-width: 1199px) {
     .review-branches-container {
         width: 98%;
         margin: 10px auto;
         min-width: 800px;
-        /* Mantener ancho mínimo */
+
     }
 
     .comparison-modal {
@@ -4168,7 +3864,7 @@
 @media (max-width: 768px) {
     .review-branches-container {
         min-width: 320px;
-        /* Ancho mínimo más pequeño en mobile */
+
         width: 100%;
         margin: 0;
         border-radius: 0;
@@ -4209,7 +3905,7 @@
         padding: 10px 12px;
     }
 
-    /* En mobile, ocultar algunas columnas para que el contenido quepa */
+
     .table-header,
     .table-row {
         display: flex;
@@ -4232,14 +3928,7 @@
 }
 
 
-/* ================================
-   📄 FILE DIFF VIEWER - TEMA DRACULA COMPLETO
-   🎨 Reorganizado con toques modernos y profesionales
-   ================================ */
 
-/* ================================
-   🎨 DRACULA THEME VARIABLES
-   ================================ */
 :root {
     --dracula-background: #282a36;
     --dracula-current-line: #44475a;
@@ -4254,16 +3943,15 @@
     --dracula-red: #ff5555;
     --dracula-yellow: #f1fa8c;
 
-    /* Extensiones personalizadas */
+
     --dracula-darker: #1e1f29;
     --dracula-lighter: #383a59;
     --dracula-glow: rgba(189, 147, 249, 0.3);
     --dracula-shadow: rgba(0, 0, 0, 0.6);
 }
 
-/* ================================
-   🌐 OVERLAY PRINCIPAL - DRACULA STYLE
-   ================================ */
+
+
 .rb-file-diff-overlay {
     position: fixed;
     top: 0;
@@ -4290,13 +3978,11 @@
 
     to {
         opacity: 1;
-        
+
     }
 }
 
-/* ================================
-   📱 MODAL PRINCIPAL - DISEÑO MODERNO
-   ================================ */
+
 .file-diff-modal {
     background: linear-gradient(135deg,
             var(--dracula-background) 0%,
@@ -4339,9 +4025,7 @@
     }
 }
 
-/* ================================
-   📋 HEADER MEJORADO - DRACULA PROFESSIONAL
-   ================================ */
+
 .file-diff-header {
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.95) 0%,
@@ -4352,7 +4036,7 @@
     position: relative;
     backdrop-filter: blur(20px);
 
-    /* Efecto de brillo sutil en la parte superior */
+
     border-top: 1px solid rgba(189, 147, 249, 0.3);
 }
 
@@ -4393,7 +4077,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    
+
     animation: iconFloat 3s ease-in-out infinite alternate;
 }
 
@@ -4464,9 +4148,7 @@
     box-shadow: 0 8px 25px rgba(255, 85, 85, 0.4);
 }
 
-/* ================================
-   🏷️ HEADER CENTER - BADGES Y STATS
-   ================================ */
+
 .file-diff-header-center {
     display: flex;
     justify-content: center;
@@ -4487,7 +4169,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     position: relative;
     overflow: hidden;
-    
+
 }
 
 @keyframes badgePulse {
@@ -4567,9 +4249,7 @@
     box-shadow: 0 0 15px rgba(255, 85, 85, 0.2);
 }
 
-/* ================================
-   🎛️ MODE TOGGLE - DRACULA SWITCHES
-   ================================ */
+
 .diff-mode-toggle {
     display: flex;
     justify-content: center;
@@ -4660,9 +4340,7 @@
     transform: scale(1.05);
 }
 
-/* ================================
-   📄 CONTENT AREA - DIFF VIEWER
-   ================================ */
+
 .file-diff-content {
     flex: 1;
     overflow: hidden;
@@ -4673,9 +4351,7 @@
     position: relative;
 }
 
-/* ================================
-   📊 UNIFIED VIEW - DRACULA THEME
-   ================================ */
+
 .diff-viewer.unified {
     flex: 1;
     overflow: auto;
@@ -4704,9 +4380,7 @@
     background-color: rgba(68, 71, 90, 0.3);
 }
 
-/* ================================
-   🔢 LINE NUMBERS - DRACULA STYLE
-   ================================ */
+
 .line-numbers {
     display: flex;
     background: linear-gradient(135deg,
@@ -4734,9 +4408,7 @@
     border-right: 1px solid rgba(68, 71, 90, 0.5);
 }
 
-/* ================================
-   📝 LINE CONTENT - COLORES DRACULA
-   ================================ */
+
 .line-content {
     flex: 1;
     display: flex;
@@ -4768,9 +4440,7 @@
     line-height: 22px;
 }
 
-/* ================================
-   🎨 DIFF LINE TYPES - DRACULA COLORS
-   ================================ */
+
 .diff-line-added {
     background: linear-gradient(90deg,
             rgba(80, 250, 123, 0.15) 0%,
@@ -4834,9 +4504,7 @@
     text-shadow: 0 0 8px rgba(189, 147, 249, 0.5);
 }
 
-/* ================================
-   ⚖️ SIDE BY SIDE VIEW - DRACULA PANELS
-   ================================ */
+
 .diff-viewer.side-by-side {
     display: flex;
     height: 100%;
@@ -4939,9 +4607,7 @@
     scrollbar-color: var(--dracula-purple) var(--dracula-background);
 }
 
-/* ================================
-   📜 SCROLLBARS DRACULA THEME
-   ================================ */
+
 .diff-panel-content::-webkit-scrollbar,
 .diff-viewer.unified::-webkit-scrollbar {
     width: 8px;
@@ -4971,9 +4637,7 @@
     background: var(--dracula-current-line);
 }
 
-/* ================================
-   🚫 EMPTY STATE - DRACULA STYLE
-   ================================ */
+
 .diff-rb-empty-state p {
     margin: 0;
     font-size: 16px;
@@ -4983,9 +4647,7 @@
     line-height: 1.5;
 }
 
-/* ================================
-   ⚡ LOADING OVERLAY - DRACULA SPINNER
-   ================================ */
+
 .rb-loading-overlay {
     position: fixed;
     top: 0;
@@ -5085,11 +4747,7 @@
     }
 }
 
-/* ================================
-   📱 RESPONSIVE DESIGN - MOBILE/TABLET
-   ================================ */
 
-/* Large Desktop (1400px+) */
 @media (min-width: 1400px) {
     .file-diff-modal {
         max-width: 1800px;
@@ -5113,7 +4771,7 @@
     }
 }
 
-/* Desktop (1200px - 1399px) */
+
 @media (min-width: 1200px) and (max-width: 1399px) {
     .file-diff-modal {
         max-width: 1400px;
@@ -5121,7 +4779,7 @@
     }
 }
 
-/* Tablet (768px - 1199px) */
+
 @media (max-width: 1199px) {
     .rb-file-diff-overlay {
         padding: 15px;
@@ -5160,7 +4818,7 @@
     }
 }
 
-/* Mobile Large (481px - 767px) */
+
 @media (max-width: 767px) {
     .rb-file-diff-overlay {
         padding: 10px;
@@ -5235,7 +4893,7 @@
         gap: 6px;
     }
 
-    /* Force unified view on mobile */
+
     .diff-viewer.side-by-side {
         flex-direction: column;
     }
@@ -5288,7 +4946,7 @@
     }
 }
 
-/* Mobile Small (320px - 480px) */
+
 @media (max-width: 480px) {
     .rb-file-diff-overlay {
         padding: 5px;
@@ -5442,14 +5100,7 @@
     }
 }
 
-/* ================================
-   🌟 SPECIAL EFFECTS Y ANIMATIONS
-   ================================ */
 
-
-
-
-/* Smooth transitions para todos los elementos */
 * {
     transition: border-color 0.2s ease,
         background-color 0.2s ease,
@@ -5457,7 +5108,7 @@
         transform 0.2s ease;
 }
 
-/* Prevent text selection en números de línea */
+
 .line-numbers,
 .line-prefix {
     -webkit-user-select: none;
@@ -5466,14 +5117,14 @@
     user-select: none;
 }
 
-/* Focus states para accesibilidad */
+
 .file-diff-close:focus,
 .mode-button:focus {
     outline: 2px solid var(--dracula-cyan);
     outline-offset: 2px;
 }
 
-/* Print styles (ocultar elementos innecesarios al imprimir) */
+
 @media print {
 
     .file-diff-header,
@@ -5533,22 +5184,16 @@
     font-weight: 600;
 }
 
-/* ================================
-   📋 FILE DIFF HEADER - ARREGLOS ESPECÍFICOS
-   ================================ */
 
-/* ================================
-   📱 HEADER PRINCIPAL - CON MÁRGENES CORRECTOS
-   ================================ */
 .file-diff-header {
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.95) 0%,
             rgba(52, 55, 70, 0.98) 100%);
     border-bottom: 2px solid var(--dracula-current-line);
     padding: 20px 24px;
-    /* Padding uniforme */
+
     margin-bottom: 0;
-    /* Sin margen inferior para que no se pierda */
+
     flex-shrink: 0;
     position: relative;
     backdrop-filter: blur(20px);
@@ -5571,15 +5216,13 @@
     opacity: 0.8;
 }
 
-/* ================================
-   🔝 HEADER TOP ROW - TÍTULO Y CERRAR
-   ================================ */
+
 .file-diff-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    /* Más espacio entre filas */
+
     width: 100%;
 }
 
@@ -5597,7 +5240,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    
+
     flex-shrink: 0;
 }
 
@@ -5651,29 +5294,27 @@
     box-shadow: 0 8px 25px rgba(255, 85, 85, 0.4);
 }
 
-/* ================================
-   🎯 HEADER CENTER - TODOS LOS ELEMENTOS CENTRADOS Y DISTRIBUIDOS
-   ================================ */
+
 .file-diff-header-center {
     display: flex;
     justify-content: center;
-    /* Centrado principal */
+
     align-items: center;
     width: 100%;
-    /* Todo el ancho disponible */
+
     max-width: 800px;
-    /* Ancho máximo del contenedor */
+
     margin: 0 auto;
-    /* Centrado del contenedor */
+
     gap: 24px;
-    /* Espacio uniforme entre elementos */
+
     flex-wrap: nowrap;
-    /* Una sola línea */
+
     padding: 0 20px;
-    /* Padding lateral */
+
 }
 
-/* Badge del tipo de cambio */
+
 .change-type-badge {
     padding: 8px 16px;
     border-radius: 20px;
@@ -5685,23 +5326,23 @@
     backdrop-filter: blur(15px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
-    /* No se comprime */
+
     min-width: 100px;
-    /* Ancho mínimo */
+
     text-align: center;
-    /* Texto centrado */
+
 }
 
-/* Stats del archivo */
+
 .file-diff-stats {
     display: flex;
     gap: 12px;
-    /* Gap reducido */
+
     font-size: 14px;
     font-weight: 700;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     flex-shrink: 0;
-    /* No se comprime */
+
     align-items: center;
 }
 
@@ -5728,18 +5369,16 @@
     box-shadow: 0 0 15px rgba(255, 85, 85, 0.2);
 }
 
-/* ================================
-   🎛️ MODE TOGGLE - CONTENEDOR CENTRADO CON BOTONES LADO A LADO
-   ================================ */
+
 .diff-mode-toggle {
     display: flex;
     justify-content: center;
-    /* Centrado principal */
+
     align-items: center;
     padding: 16px 24px;
-    /* Padding consistente */
+
     margin: 0;
-    /* Sin margen */
+
     background: linear-gradient(135deg,
             var(--dracula-current-line) 0%,
             rgba(68, 71, 90, 0.8) 100%);
@@ -5748,7 +5387,7 @@
     flex-shrink: 0;
     position: relative;
     width: 100%;
-    /* Todo el ancho */
+
 }
 
 .diff-mode-toggle::before {
@@ -5765,35 +5404,35 @@
     opacity: 0.6;
 }
 
-/* Contenedor principal de todos los elementos del modo */
+
 .mode-toggle-container {
     display: flex;
     justify-content: center;
-    /* Centrado principal */
+
     align-items: center;
     gap: 20px;
-    /* Espacio entre elementos */
+
     max-width: 600px;
-    /* Ancho máximo del contenedor */
+
     margin: 0 auto;
-    /* Centrado del contenedor */
+
     width: 100%;
 }
 
-/* Contenedor específico para los dos botones */
+
 .mode-buttons-container {
     display: flex;
     gap: 16px;
-    /* Espacio entre botones */
+
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    /* No se comprime */
+
 }
 
 .mode-button {
     padding: 12px 24px;
-    /* Padding consistente */
+
     border: 2px solid var(--dracula-current-line);
     background: linear-gradient(135deg,
             var(--dracula-background) 0%,
@@ -5809,14 +5448,14 @@
     gap: 8px;
     backdrop-filter: blur(15px);
     min-width: 140px;
-    /* Ancho mínimo consistente */
+
     justify-content: center;
     flex-shrink: 0;
-    /* No se comprimen */
+
     position: relative;
     overflow: hidden;
     text-align: center;
-    /* Texto centrado */
+
 }
 
 .mode-button::before {
@@ -5859,12 +5498,12 @@
     transform: scale(1.02);
 }
 
-/* Texto informativo */
+
 .mode-info {
     flex-shrink: 0;
-    /* No se comprime */
+
     text-align: center;
-    /* Centrado */
+
 }
 
 .mode-info .scroll-hint {
@@ -5873,14 +5512,10 @@
     font-style: italic;
     opacity: 0.8;
     white-space: nowrap;
-    /* No romper línea */
+
 }
 
-/* ================================
-   📱 RESPONSIVE ESPECÍFICO PARA CONTENEDORES CENTRADOS
-   ================================ */
 
-/* Tablet */
 @media (max-width: 1199px) {
     .file-diff-header {
         padding: 16px 20px;
@@ -5892,7 +5527,7 @@
 
     .file-diff-header-center {
         max-width: 700px;
-        /* Ancho reducido */
+
         gap: 20px;
         padding: 0 16px;
     }
@@ -5932,7 +5567,7 @@
     }
 }
 
-/* Mobile */
+
 @media (max-width: 767px) {
     .file-diff-header {
         padding: 12px 16px;
@@ -5944,7 +5579,7 @@
 
     .file-diff-header-center {
         flex-direction: column;
-        /* Stack vertical */
+
         gap: 12px;
         max-width: 100%;
         padding: 0 12px;
@@ -5967,7 +5602,7 @@
 
     .mode-toggle-container {
         flex-direction: column;
-        /* Stack vertical */
+
         gap: 12px;
         max-width: 100%;
     }
@@ -5995,7 +5630,7 @@
     }
 }
 
-/* Mobile Small */
+
 @media (max-width: 480px) {
     .file-diff-header {
         padding: 10px 12px;
@@ -6050,7 +5685,7 @@
     .mode-buttons-container {
         gap: 8px;
         flex-direction: row;
-        /* Mantener lado a lado incluso en mobile pequeño */
+
     }
 
     .mode-button {
@@ -6066,22 +5701,16 @@
 }
 
 
-/* ================================
-   📋 FILE DIFF HEADER - ARREGLOS ESPECÍFICOS
-   ================================ */
 
-/* ================================
-   📱 HEADER PRINCIPAL - CON MÁRGENES CORRECTOS
-   ================================ */
 .file-diff-header {
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.95) 0%,
             rgba(52, 55, 70, 0.98) 100%);
     border-bottom: 2px solid var(--dracula-current-line);
     padding: 20px 24px;
-    /* Padding uniforme */
+
     margin-bottom: 0;
-    /* Sin margen inferior para que no se pierda */
+
     flex-shrink: 0;
     position: relative;
     backdrop-filter: blur(20px);
@@ -6104,15 +5733,13 @@
     opacity: 0.8;
 }
 
-/* ================================
-   🔝 HEADER TOP ROW - TÍTULO Y CERRAR
-   ================================ */
+
 .file-diff-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    /* Más espacio entre filas */
+
     width: 100%;
 }
 
@@ -6130,7 +5757,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    
+
     flex-shrink: 0;
 }
 
@@ -6184,29 +5811,27 @@
     box-shadow: 0 8px 25px rgba(255, 85, 85, 0.4);
 }
 
-/* ================================
-   🎯 HEADER CENTER - TODOS LOS ELEMENTOS CENTRADOS Y DISTRIBUIDOS
-   ================================ */
+
 .file-diff-header-center {
     display: flex;
     justify-content: center;
-    /* Centrado principal */
+
     align-items: center;
     width: 100%;
-    /* Todo el ancho disponible */
+
     max-width: 800px;
-    /* Ancho máximo del contenedor */
+
     margin: 0 auto;
-    /* Centrado del contenedor */
+
     gap: 24px;
-    /* Espacio uniforme entre elementos */
+
     flex-wrap: nowrap;
-    /* Una sola línea */
+
     padding: 0 20px;
-    /* Padding lateral */
+
 }
 
-/* Badge del tipo de cambio */
+
 .change-type-badge {
     padding: 8px 16px;
     border-radius: 20px;
@@ -6218,23 +5843,23 @@
     backdrop-filter: blur(15px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
-    /* No se comprime */
+
     min-width: 100px;
-    /* Ancho mínimo */
+
     text-align: center;
-    /* Texto centrado */
+
 }
 
-/* Stats del archivo */
+
 .file-diff-stats {
     display: flex;
     gap: 12px;
-    /* Gap reducido */
+
     font-size: 14px;
     font-weight: 700;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     flex-shrink: 0;
-    /* No se comprime */
+
     align-items: center;
 }
 
@@ -6261,18 +5886,16 @@
     box-shadow: 0 0 15px rgba(255, 85, 85, 0.2);
 }
 
-/* ================================
-   🎛️ MODE TOGGLE - CONTENEDOR CENTRADO CON BOTONES LADO A LADO
-   ================================ */
+
 .diff-mode-toggle {
     display: flex;
     justify-content: center;
-    /* Centrado principal */
+
     align-items: center;
     padding: 16px 24px;
-    /* Padding consistente */
+
     margin: 0;
-    /* Sin margen */
+
     background: linear-gradient(135deg,
             var(--dracula-current-line) 0%,
             rgba(68, 71, 90, 0.8) 100%);
@@ -6281,7 +5904,7 @@
     flex-shrink: 0;
     position: relative;
     width: 100%;
-    /* Todo el ancho */
+
 }
 
 .diff-mode-toggle::before {
@@ -6298,44 +5921,40 @@
     opacity: 0.6;
 }
 
-/* Contenedor principal de todos los elementos del modo */
+
 .mode-toggle-container {
     display: flex;
     justify-content: center;
-    /* Centrado principal */
+
     align-items: center;
     gap: 20px;
-    /* Espacio entre elementos */
+
     max-width: 600px;
-    /* Ancho máximo del contenedor */
+
     margin: 0 auto;
-    /* Centrado del contenedor */
+
     width: 100%;
 }
 
-/* ================================
-   🔥 CSS NUCLEAR - FUERZA TOTAL PARA BOTONES MODO
-   ================================ */
 
-/* SELECTOR SÚPER ESPECÍFICO PARA ANULAR TODO */
 .diff-mode-toggle,
 .diff-mode-toggle *,
 .mode-toggle-container,
 .mode-toggle-container * {
-    /* Reset total */
+
     flex-direction: row !important;
     flex-wrap: nowrap !important;
 }
 
-/* CONTENEDOR PRINCIPAL - RESET TOTAL */
+
 .diff-mode-toggle {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     flex-direction: row !important;
-    /* FORZAR horizontal */
+
     flex-wrap: nowrap !important;
-    /* NUNCA wrap */
+
     padding: 16px 24px !important;
     margin: 0 !important;
     background: linear-gradient(135deg,
@@ -6347,65 +5966,65 @@
     width: 100% !important;
 }
 
-/* CONTENEDOR DE MODO - HORIZONTAL FORZADO */
+
 .mode-toggle-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     flex-direction: row !important;
-    /* FORZAR horizontal */
+
     flex-wrap: nowrap !important;
-    /* NUNCA wrap */
+
     gap: 20px !important;
     max-width: 600px !important;
     margin: 0 auto !important;
     width: auto !important;
-    /* Ancho automático */
+
 }
 
-/* CONTENEDOR DE BOTONES - MÁXIMA FUERZA */
+
 .mode-buttons-container {
     display: flex !important;
     flex-direction: row !important;
-    /* FORZAR horizontal */
+
     flex-wrap: nowrap !important;
-    /* NUNCA wrap */
+
     gap: 8px !important;
     align-items: center !important;
     justify-content: center !important;
     width: auto !important;
-    /* Ancho automático */
+
     min-width: auto !important;
     max-width: none !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
-/* BOTONES INDIVIDUALES - FUERZA NUCLEAR */
+
 .mode-button,
 .diff-mode-toggle .mode-button,
 .mode-toggle-container .mode-button,
 .mode-buttons-container .mode-button {
-    /* TAMAÑOS FIJOS PEQUEÑOS */
+
     width: 80px !important;
-    /* MÁS PEQUEÑO */
+
     height: 28px !important;
-    /* MÁS PEQUEÑO */
+
     min-width: 80px !important;
     max-width: 80px !important;
     min-height: 28px !important;
     max-height: 28px !important;
 
-    /* DISPLAY Y FLEX */
+
     display: flex !important;
     flex-direction: row !important;
-    /* Contenido horizontal */
+
     flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
 
-    /* ESTILO */
+
     padding: 2px 6px !important;
     margin: 0 !important;
     font-size: 10px !important;
@@ -6427,13 +6046,13 @@
     white-space: nowrap !important;
     text-overflow: ellipsis !important;
 
-    /* ANULAR CUALQUIER FLOAT O POSICIÓN */
+
     float: none !important;
     clear: both !important;
     position: relative !important;
 }
 
-/* ESTADO ACTIVO */
+
 .mode-button.rb-active,
 .diff-mode-toggle .mode-button.rb-active,
 .mode-buttons-container .mode-button.rb-active {
@@ -6446,7 +6065,7 @@
     box-shadow: 0 0 15px rgba(80, 250, 123, 0.3) !important;
 }
 
-/* HOVER */
+
 .mode-button:hover:not(.active),
 .diff-mode-toggle .mode-button:hover:not(.active) {
     background: linear-gradient(135deg,
@@ -6457,7 +6076,7 @@
     box-shadow: 0 4px 12px rgba(189, 147, 249, 0.2) !important;
 }
 
-/* INFORMACIÓN ADICIONAL */
+
 .mode-info {
     flex-shrink: 0 !important;
     text-align: center !important;
@@ -6475,11 +6094,7 @@
     padding: 0 !important;
 }
 
-/* ================================
-   🔥 RESPONSIVE NUCLEAR
-   ================================ */
 
-/* TODOS LOS BREAKPOINTS - FUERZA MÁXIMA */
 @media screen and (max-width: 9999px) {
     .mode-buttons-container {
         display: flex !important;
@@ -6566,12 +6181,12 @@
     transform: scale(1.02);
 }
 
-/* Texto informativo */
+
 .mode-info {
     flex-shrink: 0;
-    /* No se comprime */
+
     text-align: center;
-    /* Centrado */
+
 }
 
 .mode-info .scroll-hint {
@@ -6580,14 +6195,10 @@
     font-style: italic;
     opacity: 0.8;
     white-space: nowrap;
-    /* No romper línea */
+
 }
 
-/* ================================
-   📱 RESPONSIVE ESPECÍFICO PARA CONTENEDORES CENTRADOS
-   ================================ */
 
-/* Tablet */
 @media (max-width: 1199px) {
     .file-diff-header {
         padding: 16px 20px;
@@ -6599,7 +6210,7 @@
 
     .file-diff-header-center {
         max-width: 700px;
-        /* Ancho reducido */
+
         gap: 20px;
         padding: 0 16px;
     }
@@ -6624,16 +6235,12 @@
         gap: 16px;
     }
 
-    /* ================================
-   📱 RESPONSIVE SUPER AGRESIVO PARA BOTONES
-   ================================ */
 
-    /* Tablet - MANTENER PEQUEÑOS */
     @media (max-width: 1199px) {
         .mode-buttons-container {
             display: flex !important;
             flex-direction: row !important;
-            /* FORZAR horizontal */
+
             gap: 6px !important;
             justify-content: center !important;
             flex-wrap: nowrap !important;
@@ -6641,7 +6248,7 @@
 
         .mode-button {
             width: 85px !important;
-            /* Más pequeño en tablet */
+
             height: 30px !important;
             min-width: 85px !important;
             max-width: 85px !important;
@@ -6652,12 +6259,12 @@
         }
     }
 
-    /* Mobile - AÚN MÁS PEQUEÑOS PERO LADO A LADO */
+
     @media (max-width: 767px) {
         .mode-buttons-container {
             display: flex !important;
             flex-direction: row !important;
-            /* FORZAR horizontal incluso en mobile */
+
             gap: 4px !important;
             justify-content: center !important;
             flex-wrap: nowrap !important;
@@ -6666,7 +6273,7 @@
 
         .mode-button {
             width: 75px !important;
-            /* Súper pequeños en mobile */
+
             height: 28px !important;
             min-width: 75px !important;
             max-width: 75px !important;
@@ -6679,12 +6286,12 @@
         }
     }
 
-    /* Mobile Small - MINI BOTONES PERO LADO A LADO */
+
     @media (max-width: 480px) {
         .mode-buttons-container {
             display: flex !important;
             flex-direction: row !important;
-            /* NUNCA vertical */
+
             gap: 3px !important;
             justify-content: center !important;
             flex-wrap: nowrap !important;
@@ -6692,7 +6299,7 @@
 
         .mode-button {
             width: 65px !important;
-            /* Mini botones */
+
             height: 24px !important;
             min-width: 65px !important;
             max-width: 65px !important;
@@ -6703,7 +6310,7 @@
             gap: 1px !important;
             border-radius: 6px !important;
             font-weight: 700 !important;
-            /* Más bold para legibilidad */
+
         }
     }
 
@@ -6712,7 +6319,7 @@
     }
 }
 
-/* Mobile */
+
 @media (max-width: 767px) {
     .file-diff-header {
         padding: 12px 16px;
@@ -6724,7 +6331,7 @@
 
     .file-diff-header-center {
         flex-direction: column;
-        /* Stack vertical */
+
         gap: 12px;
         max-width: 100%;
         padding: 0 12px;
@@ -6747,7 +6354,7 @@
 
     .mode-toggle-container {
         flex-direction: column;
-        /* Stack vertical */
+
         gap: 12px;
         max-width: 100%;
     }
@@ -6758,9 +6365,7 @@
         flex-wrap: nowrap !important;
     }
 
-    .mode-button {
-        /* Ya están definidos en el responsive agresivo arriba */
-    }
+    .mode-button {}
 
     .mode-info {
         text-align: center;
@@ -6772,7 +6377,7 @@
     }
 }
 
-/* Mobile Small */
+
 @media (max-width: 480px) {
     .file-diff-header {
         padding: 10px 12px;
@@ -6824,13 +6429,9 @@
         gap: 10px;
     }
 
-    .mode-buttons-container {
-        /* Ya están definidos en el responsive agresivo arriba */
-    }
+    .mode-buttons-container {}
 
-    .mode-button {
-        /* Ya están definidos en el responsive agresivo arriba */
-    }
+    .mode-button {}
 
     .mode-info .scroll-hint {
         font-size: 10px;
@@ -6838,13 +6439,7 @@
 }
 
 
-/* ================================
-   📄 FILE DIFF MODAL - CENTRADO PERFECTO
-   ================================ */
 
-/* ================================
-   🌐 OVERLAY - CENTRADO ABSOLUTO
-   ================================ */
 .rb-file-diff-overlay {
     position: fixed;
     top: 0;
@@ -6863,9 +6458,7 @@
     overflow: hidden;
 }
 
-/* ================================
-   📱 MODAL - CENTRADO COMO COMPARISON MODAL
-   ================================ */
+
 .file-diff-modal {
     background: linear-gradient(135deg,
             var(--dracula-background) 0%,
@@ -6879,13 +6472,13 @@
         inset 0 1px 0 rgba(248, 248, 242, 0.1),
         0 0 40px var(--dracula-glow);
 
-    /* TAMAÑO IGUAL AL COMPARISON MODAL */
+
     width: 95%;
     max-width: 1400px;
-    /* Mismo que comparison-modal */
+
     height: 75vh;
     max-height: 700px;
-    /* Mismo que comparison-modal */
+
     min-width: 800px;
     min-height: 600px;
 
@@ -6895,23 +6488,19 @@
     animation: diffModalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     position: relative;
 
-    /* CENTRADO PERFECTO */
+
     margin: 0 auto;
 }
 
-/* ================================
-   🎛️ MODE TOGGLE - BOTONES LADO A LADO FORZADO
-   ================================ */
 
-/* RESET COMPLETO DEL CONTENEDOR */
 .diff-mode-toggle {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     flex-direction: row !important;
-    /* NUNCA cambiar */
+
     flex-wrap: nowrap !important;
-    /* NUNCA wrap */
+
     padding: 16px 24px !important;
     margin: 0 !important;
     background: linear-gradient(135deg,
@@ -6925,10 +6514,10 @@
     gap: 20px !important;
 }
 
-/* CONTENEDOR DE BOTONES - MÁXIMA FUERZA NUCLEAR */
+
 .diff-mode-toggle>*,
 .diff-mode-toggle .mode-button {
-    /* FORZAR TODO A HORIZONTAL */
+
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
@@ -6936,11 +6525,11 @@
     flex-wrap: nowrap !important;
 }
 
-/* BOTONES INDIVIDUALES - ESPECIFICIDAD MÁXIMA */
+
 .diff-mode-toggle .mode-button,
 .rb-file-diff-overlay .diff-mode-toggle .mode-button,
 .file-diff-modal .diff-mode-toggle .mode-button {
-    /* DIMENSIONES FIJAS */
+
     width: 140px !important;
     height: 40px !important;
     min-width: 140px !important;
@@ -6948,7 +6537,7 @@
     min-height: 40px !important;
     max-height: 40px !important;
 
-    /* LAYOUT FORZADO */
+
     display: inline-flex !important;
     flex-direction: row !important;
     align-items: center !important;
@@ -6956,10 +6545,10 @@
     flex-shrink: 0 !important;
     flex-grow: 0 !important;
 
-    /* ESTILO */
+
     padding: 8px 16px !important;
     margin: 0 8px !important;
-    /* Margen lateral para separación */
+
     font-size: 13px !important;
     font-weight: 600 !important;
     line-height: 1 !important;
@@ -6977,12 +6566,12 @@
     text-align: center !important;
     white-space: nowrap !important;
 
-    /* FLOTACIÓN */
+
     float: none !important;
     clear: none !important;
 }
 
-/* ESTADO ACTIVO - VERDE DRACULA */
+
 .diff-mode-toggle .mode-button.rb-active,
 .rb-file-diff-overlay .diff-mode-toggle .mode-button.rb-active,
 .file-diff-modal .diff-mode-toggle .mode-button.rb-active {
@@ -6998,7 +6587,7 @@
     transform: scale(1.05) !important;
 }
 
-/* HOVER STATE */
+
 .diff-mode-toggle .mode-button:hover:not(.active),
 .rb-file-diff-overlay .diff-mode-toggle .mode-button:hover:not(.active) {
     background: linear-gradient(135deg,
@@ -7009,11 +6598,7 @@
     box-shadow: 0 8px 25px rgba(189, 147, 249, 0.2) !important;
 }
 
-/* ================================
-   📱 RESPONSIVE - MANTENER BOTONES LADO A LADO
-   ================================ */
 
-/* Desktop Grande */
 @media (min-width: 1400px) {
     .file-diff-modal {
         max-width: 1600px;
@@ -7022,7 +6607,7 @@
     }
 }
 
-/* Desktop */
+
 @media (min-width: 1200px) and (max-width: 1399px) {
     .file-diff-modal {
         max-width: 1300px;
@@ -7030,7 +6615,7 @@
     }
 }
 
-/* Tablet */
+
 @media (max-width: 1199px) {
     .rb-file-diff-overlay {
         padding: 15px;
@@ -7043,7 +6628,7 @@
         min-width: 600px;
     }
 
-    /* BOTONES EN TABLET - LADO A LADO MÁS PEQUEÑOS */
+
     .diff-mode-toggle .mode-button {
         width: 120px !important;
         height: 36px !important;
@@ -7054,7 +6639,7 @@
     }
 }
 
-/* Mobile Large */
+
 @media (max-width: 767px) {
     .rb-file-diff-overlay {
         padding: 10px;
@@ -7070,7 +6655,7 @@
         max-width: none;
     }
 
-    /* BOTONES EN MOBILE - PEQUEÑOS PERO LADO A LADO */
+
     .diff-mode-toggle {
         padding: 12px 16px !important;
         gap: 12px !important;
@@ -7087,7 +6672,7 @@
     }
 }
 
-/* Mobile Small */
+
 @media (max-width: 480px) {
     .file-diff-modal {
         width: 100%;
@@ -7096,7 +6681,7 @@
         min-height: 400px;
     }
 
-    /* BOTONES MINI PERO LADO A LADO */
+
     .diff-mode-toggle {
         padding: 10px 12px !important;
         gap: 8px !important;
@@ -7114,11 +6699,7 @@
     }
 }
 
-/* ================================
-   🛡️ PROTECCIÓN ANTI-OVERRIDE
-   ================================ */
 
-/* ANULAR CUALQUIER CSS QUE FUERCE COLUMN */
 .diff-mode-toggle,
 .diff-mode-toggle>*,
 .diff-mode-toggle .mode-button {
@@ -7126,7 +6707,7 @@
     flex-wrap: nowrap !important;
 }
 
-/* ESPECÍFICO PARA MOBILE - NUNCA COLUMN */
+
 @media (max-width: 767px) {
 
     .diff-mode-toggle,
@@ -7138,7 +6719,7 @@
     }
 }
 
-/* ESPECÍFICO PARA MOBILE SMALL - NUNCA COLUMN */
+
 @media (max-width: 480px) {
 
     .diff-mode-toggle,
@@ -7150,9 +6731,6 @@
     }
 }
 
-/* ================================
-   ✨ EFECTOS ADICIONALES
-   ================================ */
 
 @keyframes diffOverlayFadeIn {
     from {
@@ -7162,7 +6740,7 @@
 
     to {
         opacity: 1;
-        
+
     }
 }
 
@@ -7180,7 +6758,7 @@
     }
 }
 
-/* Efecto hover en botones */
+
 .diff-mode-toggle .mode-button::before {
     content: '';
     position: absolute;
@@ -7199,9 +6777,7 @@
     left: 100%;
 }
 
-/* ================================
-   🎯 DRACULA THEME VARIABLES
-   ================================ */
+
 :root {
     --dracula-background: #282a36;
     --dracula-current-line: #44475a;
@@ -7221,40 +6797,32 @@
 }
 
 
-/* ================================
-   📋 FILE DIFF HEADER - ESPACIADO MEJORADO
-   ================================ */
 
-/* ================================
-   📱 HEADER PRINCIPAL - CON MÁRGENES SUPERIOR E INFERIOR
-   ================================ */
-   .file-diff-header {
+.file-diff-header {
     background: linear-gradient(135deg,
             rgba(68, 71, 90, 0.95) 0%,
             rgba(52, 55, 70, 0.98) 100%);
     border-bottom: 2px solid var(--dracula-current-line);
-    
-    /* 🔥 ESPACIADO MEJORADO */
+
+
     padding: 20px 24px;
-    margin: 15px 0;  /* 15px arriba y abajo */
-    border-radius: 12px 12px 0 0;  /* Redondeado solo arriba */
-    
+    margin: 15px 0;
+
+    border-radius: 12px 12px 0 0;
+
+
     flex-shrink: 0;
     position: relative;
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(189, 147, 249, 0.3);
-    
-    /* Sombra para separar visualmente */
-    box-shadow: 
+
+
+    box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(189, 147, 249, 0.1);
 }
 
-/* ================================
-   🌟 ALTERNATIVA: CONTENEDOR CON ESPACIADO
-   ================================ */
 
-/* Si prefieres mantener el header sin margen pero agregar espaciado del contenedor */
 .file-diff-modal {
     background: linear-gradient(135deg,
             var(--dracula-background) 0%,
@@ -7281,20 +6849,21 @@
     animation: diffModalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     position: relative;
     margin: 0 auto;
-    
-    /* 🔥 PADDING INTERNO PARA ESPACIADO */
-    padding: 15px;  /* Espaciado interno de 15px en todos los lados */
+
+
+    padding: 15px;
+
 }
 
-/* Ajustar el header para que no tenga margen si usas el padding del modal */
+
 .file-diff-modal .file-diff-header {
-    margin: 0;  /* Sin margen si el modal ya tiene padding */
-    border-radius: 12px;  /* Redondeado completo */
+    margin: 0;
+
+    border-radius: 12px;
+
 }
 
-/* ================================
-   🎛️ MODE TOGGLE - AJUSTE DE ESPACIADO
-   ================================ */
+
 .diff-mode-toggle {
     display: flex !important;
     justify-content: center !important;
@@ -7302,10 +6871,11 @@
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     padding: 16px 24px !important;
-    
-    /* 🔥 MARGEN AJUSTADO */
-    margin: 15px 0 0 0 !important;  /* 15px arriba, 0 abajo */
-    
+
+
+    margin: 15px 0 0 0 !important;
+
+
     background: linear-gradient(135deg,
             var(--dracula-current-line) 0%,
             rgba(68, 71, 90, 0.8) 100%) !important;
@@ -7315,14 +6885,12 @@
     position: relative !important;
     width: 100% !important;
     gap: 20px !important;
-    
-    /* Sombra sutil para separación */
+
+
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* ================================
-   📄 CONTENT AREA - ESPACIADO AJUSTADO
-   ================================ */
+
 .file-diff-content {
     flex: 1;
     overflow: hidden;
@@ -7331,101 +6899,101 @@
     min-height: 0;
     background: var(--dracula-background);
     position: relative;
-    
-    /* 🔥 MARGEN SUPERIOR PARA SEPARACIÓN */
-    margin-top: 0;  /* Sin margen ya que mode-toggle tiene margen */
-    border-radius: 0 0 12px 12px;  /* Redondeado solo abajo */
+
+
+    margin-top: 0;
+
+    border-radius: 0 0 12px 12px;
+
 }
 
-/* ================================
-   📱 RESPONSIVE - MANTENER ESPACIADO
-   ================================ */
 
-/* Desktop Grande */
 @media (min-width: 1400px) {
     .file-diff-modal {
-        padding: 20px;  /* Más espaciado en pantallas grandes */
+        padding: 20px;
+
     }
-    
+
     .file-diff-header {
-        margin: 20px 0;  /* Más margen en desktop */
+        margin: 20px 0;
+
     }
-    
+
     .diff-mode-toggle {
         margin: 20px 0 0 0 !important;
     }
 }
 
-/* Tablet */
+
 @media (max-width: 1199px) {
     .file-diff-modal {
-        padding: 12px;  /* Espaciado reducido en tablet */
+        padding: 12px;
+
     }
-    
+
     .file-diff-header {
         margin: 12px 0;
         padding: 16px 20px;
     }
-    
+
     .diff-mode-toggle {
         margin: 12px 0 0 0 !important;
         padding: 12px 20px !important;
     }
 }
 
-/* Mobile */
+
 @media (max-width: 767px) {
     .file-diff-modal {
-        padding: 10px;  /* Espaciado mínimo en mobile */
+        padding: 10px;
+
     }
-    
+
     .file-diff-header {
         margin: 10px 0;
         padding: 12px 16px;
         border-radius: 8px 8px 0 0;
     }
-    
+
     .diff-mode-toggle {
         margin: 10px 0 0 0 !important;
         padding: 10px 16px !important;
     }
-    
+
     .file-diff-content {
         border-radius: 0 0 8px 8px;
     }
 }
 
-/* Mobile Small */
+
 @media (max-width: 480px) {
     .file-diff-modal {
-        padding: 8px;  /* Espaciado ultra mínimo */
+        padding: 8px;
+
     }
-    
+
     .file-diff-header {
         margin: 8px 0;
         padding: 10px 12px;
         border-radius: 6px 6px 0 0;
     }
-    
+
     .diff-mode-toggle {
         margin: 8px 0 0 0 !important;
         padding: 8px 12px !important;
     }
-    
+
     .file-diff-content {
         border-radius: 0 0 6px 6px;
     }
 }
 
-/* ================================
-   ✨ EFECTOS ADICIONALES
-   ================================ */
 
-/* Efecto de separación visual entre secciones */
 .file-diff-header::after {
     content: '';
     position: absolute;
-    bottom: -15px;  /* Posicionado en el espacio inferior */
+    bottom: -15px;
+
     left: 20%;
     right: 20%;
     height: 1px;
@@ -7440,11 +7008,7 @@
 
 
 
-/* ================================
-   🛡️ OVERRIDE PROTECTION
-   ================================ */
 
-/* Asegurar que el espaciado se mantenga */
 .file-diff-header {
     margin-top: 15px !important;
     margin-bottom: 15px !important;
@@ -7454,62 +7018,58 @@
     margin-top: 15px !important;
 }
 
-/* En mobile, reducir pero mantener */
+
 @media (max-width: 767px) {
     .file-diff-header {
         margin-top: 10px !important;
         margin-bottom: 10px !important;
     }
-    
+
     .diff-mode-toggle {
         margin-top: 10px !important;
     }
 }
 
-/* ================================
-   🎯 HEADER SIN FONDO - TRANSPARENTE
-   ================================ */
-   .branches-header {
+
+.branches-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
     padding: 12px 20px;
     border-bottom: 1px solid var(--dracula-current-line);
-    /* QUITAR FONDO - TRANSPARENTE */
+
     background: transparent !important;
     border-radius: 8px;
     position: relative;
-    /* QUITAR BOX-SHADOW */
+
     box-shadow: none !important;
 }
 
-/* ================================
-   🔘 BOTÓN ICONO TRANSPARENTE
-   ================================ */
+
 .rb-header-icon {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    /* FONDO TRANSPARENTE */
+
     background: transparent !important;
     padding: 0;
-    /* TEXTO EN ROSA/MORADO */
+
     color: var(--dracula-pink);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    /* QUITAR SOMBRAS */
+
     box-shadow: none !important;
-    /* QUITAR ANIMACIÓN */
+
     animation: none !important;
     flex-shrink: 0;
-    /* BORDE OPCIONAL PARA VER EL BOTÓN */
+
     border: 1px solid rgba(255, 121, 198, 0.3);
 }
 
-/* HOVER PARA EL BOTÓN TRANSPARENTE */
+
 .rb-header-icon:hover {
     background: rgba(255, 121, 198, 0.1) !important;
     color: var(--dracula-purple);
@@ -7517,32 +7077,37 @@
     transform: scale(1.05);
 }
 
-/* ================================
-   🎯 CENTRAR ICONO EN RB-HEADER-INFO
-   ================================ */
-   .rb-header-info {
+
+.rb-header-info {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrar horizontalmente */
-    justify-content: center; /* Centrar verticalmente */
-    text-align: center; /* Centrar el texto */
-    gap: 8px; /* Espacio entre icono y textos */
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    gap: 8px;
+
 }
 
-/* Asegurar que el icono esté centrado */
+
 .rb-header-icon {
-    margin: 0 auto; /* Centrado adicional */
-    align-self: center; /* Centrado en flex */
+    margin: 0 auto;
+
+    align-self: center;
+
 }
 
-/* Centrar también los textos */
+
 .rb-header-title,
 .header-subtitle {
     text-align: center;
-    margin: 0; /* Quitar márgenes por defecto */
+    margin: 0;
+
 }
 
-/* Si quieres que todo el header tenga el icono al centro */
+
 .rb-header-left {
     display: flex;
     flex-direction: column;
@@ -7552,55 +7117,49 @@
     gap: 12px;
 }
 
-/* ================================
-   🔧 SOLUCIÓN DEFINITIVA - HEADERS COMPACTOS
-   ================================ */
 
-/* ================================
-   📝 REDUCIR TAMAÑO DE LETRA Y COMPACTAR
-   ================================ */
-   .diff-panel-header {
-    padding: 8px 12px !important; /* Menos padding */
+.diff-panel-header {
+    padding: 8px 12px !important;
+
     background: linear-gradient(135deg,
             var(--dracula-current-line) 0%,
             var(--dracula-lighter) 100%);
     border-bottom: 2px solid var(--dracula-current-line);
-    font-weight: 600 !important; /* Menos bold */
-    font-size: 10px !important; /* MUCHO más pequeño */
+    font-weight: 600 !important;
+
+    font-size: 10px !important;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
     position: relative;
-    line-height: 1.2 !important; /* Línea más compacta */
-    min-height: 28px !important; /* Altura mínima fija */
-    max-height: 28px !important; /* Altura máxima fija */
-    overflow: hidden; /* Ocultar overflow */
+    line-height: 1.2 !important;
+
+    min-height: 28px !important;
+
+    max-height: 28px !important;
+
+    overflow: hidden;
+
 }
 
-/* ================================
-   🏷️ LABELS MUY COMPACTOS CON TRUNCAMIENTO
-   ================================ */
+
 .header-label {
-    font-size: 9px !important; /* EXTRA pequeño */
+    font-size: 9px !important;
     font-weight: 500 !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    
-    /* TRUNCAMIENTO INTELIGENTE */
-    max-width: 200px; /* Ancho máximo */
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    
-    /* Abreviaciones automáticas */
-    word-spacing: -1px; /* Compactar palabras */
+    word-spacing: -1px;
+
 }
 
 
-/* ================================
-   🎨 COLORES ESPECÍFICOS COMPACTOS
-   ================================ */
+
 .diff-panel-header.old {
     background: linear-gradient(135deg,
             rgba(255, 85, 85, 0.1) 0%,
@@ -7610,7 +7169,8 @@
 
 .diff-panel-header.old .header-label {
     color: var(--dracula-red);
-    text-shadow: none; /* Quitar sombra para más claridad */
+    text-shadow: none;
+
 }
 
 .diff-panel-header.new {
@@ -7622,12 +7182,11 @@
 
 .diff-panel-header.new .header-label {
     color: var(--dracula-green);
-    text-shadow: none; /* Quitar sombra para más claridad */
+    text-shadow: none;
+
 }
 
-/* ================================
-   📱 RESPONSIVE ULTRA COMPACTO
-   ================================ */
+
 @media (max-width: 1199px) {
     .diff-panel-header {
         padding: 6px 8px !important;
@@ -7635,12 +7194,12 @@
         min-height: 24px !important;
         max-height: 24px !important;
     }
-    
+
     .header-label {
         font-size: 8px !important;
         max-width: 150px;
     }
-    
+
     .rb-header-info {
         font-size: 7px !important;
         padding: 1px 3px !important;
@@ -7655,12 +7214,12 @@
         min-height: 20px !important;
         max-height: 20px !important;
     }
-    
+
     .header-label {
         font-size: 7px !important;
         max-width: 100px;
     }
-    
+
     .rb-header-info {
         font-size: 6px !important;
         padding: 1px 2px !important;
@@ -7668,15 +7227,13 @@
     }
 }
 
-/* ================================
-   ✂️ ABREVIACIONES AUTOMÁTICAS
-   ================================ */
+
 .header-label:lang(en) {
-    /* Reemplazos automáticos con CSS (si el navegador lo soporta) */
+
     text-transform: none;
 }
 
-/* Para casos específicos muy largos */
+
 .diff-panel-header.old .header-label::before {
     content: "Original ";
     font-size: 8px;
@@ -7689,16 +7246,72 @@
     opacity: 0.7;
 }
 
-/* Ocultar el texto original y mostrar solo la versión corta */
+
 .diff-panel-header .header-label {
-    color: transparent; /* Ocultar texto original */
+    color: transparent;
+
 }
 
 .diff-panel-header.old .header-label::before {
-    color: var(--dracula-red); /* Mostrar versión corta */
+    color: var(--dracula-red);
+
 }
 
 .diff-panel-header.new .header-label::before {
-    color: var(--dracula-green); /* Mostrar versión corta */
+    color: var(--dracula-green);
+
 }
 
+.checkout-button,
+.compare-button {
+    width: 60px !important;
+    height: 22px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    padding: 0 !important;
+    font-size: 9px !important;
+    gap: 0 !important;
+    border-radius: 6px !important;
+    border-width: 1px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-weight: 700 !important;
+}
+
+@media (max-width: 767px) {
+
+    .checkout-button,
+    .compare-button {
+        width: 50px !important;
+        height: 20px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        font-size: 8px !important;
+        border-radius: 4px !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .checkout-button,
+    .compare-button {
+        width: 40px !important;
+        height: 18px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        min-height: 18px !important;
+        max-height: 18px !important;
+        font-size: 7px !important;
+        border-radius: 3px !important;
+    }
+}

@@ -1,16 +1,11 @@
-# backend/models/duplicate_models.py
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any, Literal
 from datetime import datetime
 from pathlib import Path
 import os
 
-# ============================================================================
-# REQUEST MODELS
-# ============================================================================
 
 class FileInfo(BaseModel):
-    """Información de archivo MDD/DDF"""
     name: str = Field(..., description="Nombre del archivo")
     path: str = Field(..., description="Ruta completa del archivo")
     size: int = Field(..., description="Tamaño del archivo en bytes")
@@ -34,7 +29,6 @@ class FileInfo(BaseModel):
         return v
 
 class DuplicationConfig(BaseModel):
-    """Configuración para el proceso de duplicación"""
     duplicate_count: int = Field(
         default=5, 
         ge=1, 
@@ -61,7 +55,7 @@ class DuplicationConfig(BaseModel):
     )
 
 class DuplicateRequest(BaseModel):
-    """Request para iniciar proceso de duplicación"""
+    
     source_files: List[FileInfo] = Field(..., min_items=1, description="Archivos fuente MDD/DDF")
     project_name: str = Field(..., min_length=1, max_length=100, description="Nombre del proyecto")
     output_path: str = Field(..., description="Directorio de salida")
@@ -69,7 +63,7 @@ class DuplicateRequest(BaseModel):
     
     @validator('project_name')
     def validate_project_name(cls, v):
-        # Remover caracteres no válidos para nombres de archivo
+        
         invalid_chars = '<>:"/\\|?*'
         for char in invalid_chars:
             if char in v:
@@ -86,16 +80,16 @@ class DuplicateRequest(BaseModel):
         return v
 
 class ValidationRequest(BaseModel):
-    """Request para validar archivos MDD/DDF"""
+    
     files: List[FileInfo] = Field(..., min_items=1, description="Archivos a validar")
     strict_mode: bool = Field(default=False, description="Modo de validación estricta")
 
-# ============================================================================
-# RESPONSE MODELS
-# ============================================================================
+
+
+
 
 class ValidationResult(BaseModel):
-    """Resultado de validación de un archivo"""
+    
     file_name: str = Field(..., description="Nombre del archivo validado")
     is_valid: bool = Field(..., description="¿Es válido el archivo?")
     file_type: Optional[str] = Field(None, description="Tipo detectado del archivo")
@@ -106,7 +100,7 @@ class ValidationResult(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Metadatos adicionales")
 
 class ValidationResponse(BaseModel):
-    """Respuesta completa de validación"""
+    
     overall_valid: bool = Field(..., description="¿Son válidos todos los archivos?")
     files_validated: int = Field(..., description="Número de archivos validados")
     results: List[ValidationResult] = Field(..., description="Resultados por archivo")
@@ -114,7 +108,7 @@ class ValidationResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now, description="Timestamp de la validación")
 
 class ProcessingStage(BaseModel):
-    """Etapa del proceso de duplicación"""
+    
     stage_id: str = Field(..., description="ID único de la etapa")
     stage_name: str = Field(..., description="Nombre descriptivo de la etapa")
     progress: float = Field(..., ge=0, le=100, description="Progreso de la etapa (0-100)")
@@ -125,7 +119,7 @@ class ProcessingStage(BaseModel):
     error_message: Optional[str] = Field(None, description="Mensaje de error si aplica")
 
 class ProcessingProgress(BaseModel):
-    """Progreso del proceso de duplicación"""
+    
     job_id: str = Field(..., description="ID único del trabajo")
     overall_progress: float = Field(..., ge=0, le=100, description="Progreso general (0-100)")
     current_stage: Optional[str] = Field(None, description="Etapa actual")
@@ -137,7 +131,7 @@ class ProcessingProgress(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now, description="Timestamp actual")
 
 class OutputFile(BaseModel):
-    """Información de archivo de salida generado"""
+    
     name: str = Field(..., description="Nombre del archivo")
     path: str = Field(..., description="Ruta completa del archivo")
     size: int = Field(..., description="Tamaño del archivo en bytes")
@@ -146,7 +140,7 @@ class OutputFile(BaseModel):
     checksum: Optional[str] = Field(None, description="Checksum MD5 del archivo")
 
 class DuplicationResult(BaseModel):
-    """Resultado completo del proceso de duplicación"""
+    
     job_id: str = Field(..., description="ID del trabajo")
     success: bool = Field(..., description="¿Fue exitoso el proceso?")
     project_name: str = Field(..., description="Nombre del proyecto")
@@ -159,12 +153,12 @@ class DuplicationResult(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now, description="Timestamp de finalización")
     error_message: Optional[str] = Field(None, description="Mensaje de error si aplica")
 
-# ============================================================================
-# STATUS MODELS
-# ============================================================================
+
+
+
 
 class JobStatus(BaseModel):
-    """Estado de un trabajo de duplicación"""
+    
     job_id: str = Field(..., description="ID único del trabajo")
     status: Literal["queued", "running", "completed", "failed", "cancelled"] = Field(..., description="Estado del trabajo")
     created_at: datetime = Field(default_factory=datetime.now, description="Timestamp de creación")
@@ -174,7 +168,7 @@ class JobStatus(BaseModel):
     result: Optional[DuplicationResult] = Field(None, description="Resultado si está completado")
 
 class SystemStatus(BaseModel):
-    """Estado general del sistema de duplicación"""
+    
     active_jobs: int = Field(default=0, description="Trabajos activos")
     queued_jobs: int = Field(default=0, description="Trabajos en cola")
     completed_jobs: int = Field(default=0, description="Trabajos completados")
@@ -184,12 +178,12 @@ class SystemStatus(BaseModel):
     disk_space: Optional[int] = Field(None, description="Espacio en disco disponible en MB")
     uptime: Optional[int] = Field(None, description="Tiempo de actividad en segundos")
 
-# ============================================================================
-# ERROR MODELS
-# ============================================================================
+
+
+
 
 class ErrorDetail(BaseModel):
-    """Detalle de error específico"""
+    
     error_code: str = Field(..., description="Código de error")
     error_message: str = Field(..., description="Mensaje de error")
     file_name: Optional[str] = Field(None, description="Archivo relacionado al error")
@@ -198,7 +192,7 @@ class ErrorDetail(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now, description="Timestamp del error")
 
 class DuplicationError(BaseModel):
-    """Error durante el proceso de duplicación"""
+    
     job_id: str = Field(..., description="ID del trabajo que falló")
     error_type: str = Field(..., description="Tipo de error")
     error_details: List[ErrorDetail] = Field(..., description="Detalles específicos del error")
@@ -206,12 +200,12 @@ class DuplicationError(BaseModel):
     can_retry: bool = Field(default=False, description="¿Se puede reintentar el proceso?")
     timestamp: datetime = Field(default_factory=datetime.now, description="Timestamp del error")
 
-# ============================================================================
-# UTILITY MODELS
-# ============================================================================
+
+
+
 
 class FileStats(BaseModel):
-    """Estadísticas de archivo procesado"""
+    
     original_records: int = Field(..., description="Registros originales")
     duplicate_records: int = Field(..., description="Registros duplicados")
     total_records: int = Field(..., description="Total de registros finales")
@@ -221,19 +215,19 @@ class FileStats(BaseModel):
     processing_time: float = Field(..., description="Tiempo de procesamiento en segundos")
 
 class RenumberingStrategy(BaseModel):
-    """Estrategia de renumeración de IDs"""
+    
     strategy_type: Literal["linear", "exponential", "custom"] = Field(default="linear", description="Tipo de estrategia")
     base_offset: int = Field(default=1000, description="Offset base")
     multiplier: float = Field(default=1.0, description="Multiplicador para estrategias avanzadas")
     custom_ranges: Optional[List[tuple]] = Field(None, description="Rangos personalizados si aplica")
     preserve_zero: bool = Field(default=True, description="Preservar IDs con valor 0")
 
-# ============================================================================
-# CONFIG MODELS
-# ============================================================================
+
+
+
 
 class ProcessingConfig(BaseModel):
-    """Configuración avanzada de procesamiento"""
+    
     max_concurrent_jobs: int = Field(default=3, ge=1, le=10, description="Máximo de trabajos concurrentes")
     chunk_size: int = Field(default=10000, ge=1000, le=100000, description="Tamaño de chunk para procesamiento")
     memory_limit_mb: int = Field(default=512, ge=128, le=4096, description="Límite de memoria en MB")
@@ -245,7 +239,7 @@ class ProcessingConfig(BaseModel):
     backup_originals: bool = Field(default=False, description="Crear backup de archivos originales")
 
 class ExportFormat(BaseModel):
-    """Formato de exportación"""
+    
     format_type: Literal["mdd", "ddf", "csv", "json", "xml"] = Field(..., description="Tipo de formato")
     encoding: str = Field(default="utf-8", description="Codificación del archivo")
     separator: Optional[str] = Field(None, description="Separador para formatos CSV")

@@ -1,4 +1,3 @@
-// src/components/SplashScreen.tsx - VERSIÓN COMPACTA Y CENTRADA
 import React, { useState, useEffect } from 'react';
 import './SplashScreen.css';
 
@@ -12,7 +11,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
     const [logoVisible, setLogoVisible] = useState(false);
     const [systemsOnline, setSystemsOnline] = useState<Record<string, boolean>>({});
 
-    // Sistemas reducidos
+    
     const systems = [
         { id: 'neural', name: 'Neural Networks', delay: 600 },
         { id: 'quantum', name: 'Quantum Core', delay: 1100 },
@@ -21,17 +20,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
     ];
 
     useEffect(() => {
-        // Mostrar logo después de 300ms
+        
         setTimeout(() => setLogoVisible(true), 300);
 
-        // Activar sistemas progresivamente
+        
         systems.forEach((system) => {
             setTimeout(() => {
                 setSystemsOnline(prev => ({ ...prev, [system.id]: true }));
             }, system.delay);
         });
 
-        // Progreso más directo
+        
         const loadingSteps = [
             { progress: 15, step: '🔧 Initializing...', delay: 400 },
             { progress: 35, step: '🧠 Loading Neural Networks...', delay: 500 },
@@ -65,7 +64,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
         executeStep();
     }, [onLoadingComplete]);
 
-    // Estilos compactos inline
+    
     const styles = {
         container: {
             position: 'fixed' as const,
@@ -93,7 +92,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             transition: 'all 1s cubic-bezier(0.34, 1.56, 0.64, 1)'
         },
 
-        // Icono más pequeño
+        
         icon: {
             width: '60px',
             height: '60px',
@@ -110,7 +109,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             animation: 'iconFloat 4s ease infinite'
         },
 
-        // Título más compacto
+        
         title: {
             fontSize: 'clamp(1.8rem, 5vw, 2.5rem)',
             fontWeight: 900,
@@ -151,7 +150,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             marginBottom: '25px'
         },
 
-        // Progreso más pequeño
+        
         progressContainer: {
             position: 'relative' as const,
             width: '140px',
@@ -181,7 +180,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             fontFamily: 'monospace'
         },
 
-        // Estado más compacto
+        
         currentStep: {
             display: 'flex',
             alignItems: 'center',
@@ -206,7 +205,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             fontWeight: 500
         },
 
-        // Panel de sistemas más pequeño
+        
         systemsPanel: {
             width: '100%',
             maxWidth: '320px'
@@ -261,7 +260,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
 
     return (
         <div style={styles.container}>
-            {/* Efecto de fondo sutil */}
+            
             <div style={{
                 position: 'absolute',
                 top: 0,
@@ -272,9 +271,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                 animation: 'gradientPulse 6s ease infinite'
             }}></div>
 
-            {/* Contenido principal compacto */}
+            
             <div style={styles.content}>
-                {/* Icono simple */}
+                
                 <div style={styles.icon}>
                     <svg style={styles.iconSvg} viewBox="0 0 24 24" fill="none">
                         <path
@@ -297,25 +296,25 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                     </svg>
                 </div>
 
-                {/* Título compacto */}
+                
                 <h1 style={styles.title}>
                     KAPTOOLS • NEXUS
                 </h1>
 
-                {/* Subtítulo */}
+                
                 <div style={styles.subtitle}>
                     KANTAR • KAP • DP
                 </div>
 
-                {/* Versión */}
+                
                 <div style={styles.version}>
                     v2.0.0
                 </div>
 
-                {/* Progreso circular compacto */}
+                
                 <div style={styles.progressContainer}>
                     <svg style={styles.progressSvg} viewBox="0 0 120 120">
-                        {/* Track principal */}
+                        
                         <circle
                             cx="60"
                             cy="60"
@@ -325,7 +324,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                             strokeWidth="3"
                         />
 
-                        {/* Progreso */}
+                        
                         <circle
                             cx="60"
                             cy="60"
@@ -350,19 +349,19 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                         </defs>
                     </svg>
 
-                    {/* Porcentaje central */}
+                    
                     <div style={styles.progressText}>
                         {progress}%
                     </div>
                 </div>
 
-                {/* Estado actual compacto */}
+                
                 <div style={styles.currentStep}>
                     <div style={styles.stepIcon}>⚡</div>
                     <span style={styles.stepText}>{currentStep}</span>
                 </div>
 
-                {/* Panel de sistemas compacto */}
+                
                 <div style={styles.systemsPanel}>
                     <div style={styles.systemsGrid}>
                         {systems.map((system) => (
@@ -378,7 +377,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                 </div>
             </div>
 
-            {/* CSS Animations compactas */}
+            
             <style>{`
                 @keyframes iconFloat {
                     0%, 100% { transform: translateY(0); }

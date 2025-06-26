@@ -1,6 +1,3 @@
-/* src/components/DownloadFiles.css - CORREGIDO CON NOMBRES DE CLASES ACTUALIZADOS */
-
-/* 🔥 CLASES CORREGIDAS - download-df-modal-backdrop */
 .download-df-modal-backdrop {
     position: fixed;
     top: 0;
@@ -55,7 +52,7 @@
     }
 }
 
-/* 🔥 HEADER CORREGIDO - download-df-modal-header */
+
 .download-df-modal-header {
     display: flex;
     align-items: center;
@@ -110,7 +107,7 @@
     opacity: 0.9;
 }
 
-/* 🔥 CLOSE BUTTON CORREGIDO - df-close-button */
+
 .df-close-button {
     width: 36px;
     height: 36px;
@@ -141,7 +138,7 @@
     outline-offset: 2px;
 }
 
-/* CONTENT */
+
 .download-modal-content {
     padding: 24px;
     display: flex;
@@ -156,7 +153,7 @@
     pointer-events: none;
 }
 
-/* FORM STYLES */
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -222,7 +219,7 @@
     }
 }
 
-/* INPUTS */
+
 .cyber-input,
 .cyber-select {
     padding: 14px 16px;
@@ -296,7 +293,7 @@
     font-weight: 600;
 }
 
-/* TOKEN CHECKBOX */
+
 .token-checkbox {
     margin-top: 8px;
 }
@@ -384,7 +381,7 @@
     }
 }
 
-/* WORKSPACE INFO */
+
 .workspace-info {
     display: flex;
     align-items: center;
@@ -424,7 +421,7 @@
     word-break: break-all;
 }
 
-/* MODAL ACTIONS */
+
 .download-modal-actions {
     display: flex;
     gap: 12px;
@@ -514,7 +511,7 @@
     outline-offset: 2px;
 }
 
-/* 🔥 LOADING SPINNER CORREGIDO - df-loading-spinner */
+
 .df-loading-spinner {
     width: 16px;
     height: 16px;
@@ -546,7 +543,7 @@
     }
 }
 
-/* 🔥 PROGRESS OVERLAY CORREGIDO - df-progress-overlay */
+
 .df-progress-overlay {
     position: absolute;
     top: 0;
@@ -808,7 +805,7 @@
     }
 }
 
-/* SUCCESS/ERROR MESSAGES */
+
 .success-message {
     background: rgba(0, 255, 135, 0.1);
     border: 1px solid rgba(0, 255, 135, 0.3);
@@ -929,7 +926,7 @@
     line-height: 1.4;
 }
 
-/* VALIDATION ERRORS */
+
 .form-group.df-error .cyber-input,
 .form-group.df-error .cyber-select {
     border-color: #ef4444;
@@ -990,7 +987,7 @@
     background: rgba(26, 29, 58, 0.6);
 }
 
-/* MODAL STATES */
+
 .download-modal.df-loading {
     pointer-events: none;
 }
@@ -1030,7 +1027,7 @@
     }
 }
 
-/* PERFORMANCE OPTIMIZATIONS */
+
 .download-modal,
 .df-progress-overlay {
     will-change: transform, opacity;
@@ -1052,7 +1049,7 @@
     z-index: -1;
 }
 
-/* SCROLLBAR STYLES */
+
 .download-modal::-webkit-scrollbar {
     width: 6px;
 }
@@ -1085,7 +1082,7 @@
     border-radius: 3px;
 }
 
-/* RESPONSIVE DESIGN */
+
 @media (max-width: 1200px) {
     .download-modal {
         max-width: 450px;
@@ -1135,7 +1132,7 @@
     .cyber-input,
     .cyber-select {
         padding: 12px 14px;
-        font-size: 13px;
+        font-size: 15px;
     }
 
     .workspace-info {
@@ -1238,7 +1235,7 @@
     }
 }
 
-/* ACCESSIBILITY */
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -1271,7 +1268,7 @@
     }
 }
 
-/* UTILITY CLASSES */
+
 .download-df-modal-backdrop::-webkit-scrollbar {
     display: none;
 }
@@ -1285,7 +1282,7 @@ body:has(.download-df-modal-backdrop) {
     overflow: hidden;
 }
 
-/* ADVANCED ANIMATIONS */
+
 .download-modal-content.animate-in .form-group {
     animation: slide-in-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     animation-fill-mode: both;
@@ -1300,7 +1297,7 @@ body:has(.download-df-modal-backdrop) {
 }
 
 
-/* PRINT STYLES */
+
 @media print {
     .download-df-modal-backdrop {
         display: none;
@@ -1308,9 +1305,9 @@ body:has(.download-df-modal-backdrop) {
 }
 
 
-/* src/components/DownloadFiles.css - DISEÑO LIMPIO Y FUNCIONAL */
 
-/* BACKDROP */
+
+
 .download-df-modal-backdrop {
     position: fixed;
     top: 0;
@@ -1335,7 +1332,7 @@ body:has(.download-df-modal-backdrop) {
     }
 }
 
-/* MODAL PRINCIPAL */
+
 .download-modal {
     background: rgba(37, 42, 74, 0.95);
     border: 1px solid rgba(108, 92, 231, 0.3);
@@ -1359,7 +1356,7 @@ body:has(.download-df-modal-backdrop) {
     }
 }
 
-/* HEADER */
+
 .download-df-modal-header {
     display: flex;
     align-items: center;
@@ -1406,7 +1403,7 @@ body:has(.download-df-modal-backdrop) {
     border-radius: 6px;
     background: rgba(147, 23, 204, 0.1);
     border: 1px solid rgba(185, 37, 230, 0.2);
-    color: #9e36e4;
+    color: #e4364d;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -1420,7 +1417,7 @@ body:has(.download-df-modal-backdrop) {
     transform: scale(1.05);
 }
 
-/* CONTENT */
+
 .download-modal-content {
     padding: 24px;
     display: flex;
@@ -1434,7 +1431,7 @@ body:has(.download-df-modal-backdrop) {
     pointer-events: none;
 }
 
-/* FORM GROUPS */
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -1464,7 +1461,7 @@ body:has(.download-df-modal-backdrop) {
     align-items: center;
 }
 
-/* INPUTS */
+
 .cyber-input,
 .cyber-select {
     padding: 12px 14px;
@@ -1510,7 +1507,7 @@ body:has(.download-df-modal-backdrop) {
     padding: 8px;
 }
 
-/* CHECKBOX */
+
 .token-checkbox {
     margin-top: 6px;
 }
@@ -1559,7 +1556,7 @@ body:has(.download-df-modal-backdrop) {
     letter-spacing: 0.5px;
 }
 
-/* WORKSPACE INFO */
+
 .workspace-info {
     display: flex;
     align-items: center;
@@ -1600,7 +1597,7 @@ body:has(.download-df-modal-backdrop) {
     word-break: break-all;
 }
 
-/* VALIDATION ERRORS */
+
 .error-text-validation {
     color: #ef4444;
     font-size: 11px;
@@ -1608,7 +1605,7 @@ body:has(.download-df-modal-backdrop) {
     font-weight: 500;
 }
 
-/* ACTIONS */
+
 .download-modal-actions {
     display: flex;
     gap: 12px;
@@ -1662,7 +1659,7 @@ body:has(.download-df-modal-backdrop) {
     transform: none;
 }
 
-/* LOADING SPINNER */
+
 .df-loading-spinner {
     width: 14px;
     height: 14px;
@@ -1678,7 +1675,7 @@ body:has(.download-df-modal-backdrop) {
     }
 }
 
-/* PROGRESS OVERLAY */
+
 .df-progress-overlay {
     position: absolute;
     top: 0;
@@ -1806,7 +1803,7 @@ body:has(.download-df-modal-backdrop) {
     width: 100%;
 }
 
-/* SUCCESS MESSAGE */
+
 .success-message {
     background: rgba(0, 255, 135, 0.1);
     border: 1px solid rgba(0, 255, 135, 0.3);
@@ -1855,7 +1852,7 @@ body:has(.download-df-modal-backdrop) {
     margin-top: 8px;
 }
 
-/* ERROR MESSAGE */
+
 .df-error-message {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
@@ -1884,7 +1881,7 @@ body:has(.download-df-modal-backdrop) {
     line-height: 1.4;
 }
 
-/* RESPONSIVE */
+
 @media (max-width: 768px) {
     .download-df-modal-backdrop {
         padding: 15px;
@@ -1984,7 +1981,7 @@ body:has(.download-df-modal-backdrop) {
     }
 }
 
-/* UTILITIES */
+
 .download-df-modal-backdrop::-webkit-scrollbar {
     display: none;
 }
@@ -1996,4 +1993,342 @@ body:has(.download-df-modal-backdrop) {
 
 body:has(.download-df-modal-backdrop) {
     overflow: hidden;
+}
+
+
+/* RESPONSIVE DESIGN FIXES - Solo los cambios necesarios */
+
+/* Fix para evitar scroll horizontal */
+* {
+    box-sizing: border-box;
+}
+
+.download-df-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 29, 58, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: backdrop-appear 0.3s ease-out;
+    padding: 20px;
+    overflow-x: hidden; /* Prevenir scroll horizontal */
+}
+
+.download-modal {
+    background: rgba(37, 42, 74, 0.95);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 450px;
+    animation: modal-appear 0.3s ease-out;
+    overflow: hidden;
+    min-width: 0; /* Permitir que se contraiga */
+}
+
+/* Responsive para pantallas grandes */
+@media (min-width: 1400px) {
+    .download-modal {
+        max-width: 500px;
+    }
+    
+    .download-modal-content {
+        padding: 28px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .download-modal {
+        max-width: 480px;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .download-modal {
+        max-width: 450px;
+    }
+}
+
+/* Responsive para tablets */
+@media (max-width: 991px) {
+    .download-df-modal-backdrop {
+        padding: 15px;
+    }
+    
+    .download-modal {
+        max-width: 420px;
+    }
+}
+
+/* Responsive para tablets pequeñas */
+@media (max-width: 768px) {
+    .download-df-modal-backdrop {
+        padding: 10px;
+    }
+    
+    .download-modal {
+        margin: 0;
+        max-width: none;
+        width: calc(100vw - 20px); /* Asegurar que no exceda el viewport */
+    }
+
+    .download-df-modal-header {
+        padding: 18px 20px;
+    }
+
+    .df-header-content {
+        gap: 10px;
+    }
+
+    .df-header-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .header-text h2 {
+        font-size: 1.1rem;
+    }
+
+    .header-text p {
+        font-size: 12px;
+    }
+
+    .download-modal-content {
+        padding: 18px 20px;
+        gap: 16px;
+    }
+
+    .download-modal-actions {
+        padding: 14px 20px 18px;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Responsive para móviles */
+@media (max-width: 640px) {
+    .download-df-modal-backdrop {
+        padding: 8px;
+    }
+    
+    .download-modal {
+        width: calc(100vw - 16px); /* Margen mínimo en móviles */
+        min-height: auto;
+    }
+
+    .download-df-modal-header {
+        padding: 16px 18px;
+    }
+
+    .df-header-content {
+        gap: 8px;
+    }
+
+    .df-header-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .header-text h2 {
+        font-size: 1rem;
+    }
+
+    .header-text p {
+        font-size: 11px;
+    }
+
+    .df-close-button {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+
+    .download-modal-content {
+        padding: 16px 18px;
+        gap: 14px;
+    }
+
+    .form-group {
+        gap: 6px;
+    }
+
+    .form-label {
+        font-size: 11px;
+    }
+
+    .cyber-input,
+    .cyber-select {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .workspace-info {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .info-path {
+        font-size: 10px;
+        word-break: break-all; /* Romper palabras largas */
+    }
+
+    .download-modal-actions {
+        padding: 12px 18px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-button {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Responsive para móviles muy pequeños */
+@media (max-width: 480px) {
+    .download-df-modal-backdrop {
+        padding: 5px;
+    }
+    
+    .download-modal {
+        width: calc(100vw - 10px);
+    }
+
+    .download-df-modal-header {
+        padding: 14px 16px;
+    }
+
+    .download-modal-content {
+        padding: 14px 16px;
+    }
+
+    .download-modal-actions {
+        padding: 10px 16px 14px;
+    }
+
+    .cyber-input,
+    .cyber-select {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .form-label {
+        font-size: 10px;
+    }
+
+    .workspace-info {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+}
+
+/* Fix para prevenir overflow en inputs largos */
+.cyber-input,
+.cyber-select {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cyber-input:focus,
+.cyber-select:focus {
+    white-space: normal;
+}
+
+/* Fix para texto largo en workspace info */
+.workspace-info {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.info-item strong {
+    display: inline-block;
+    min-width: 60px;
+}
+
+.info-value {
+    word-break: break-word;
+}
+
+.info-path {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+
+/* Asegurar que el body no tenga overflow horizontal cuando el modal esté abierto */
+body:has(.download-df-modal-backdrop) {
+    overflow-x: hidden;
+}
+
+/* Fix para modal en landscape móvil */
+@media (max-height: 600px) and (orientation: landscape) {
+    .download-df-modal-backdrop {
+        padding: 5px;
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+    
+    .download-modal {
+        max-height: calc(100vh - 20px);
+        overflow-y: auto;
+    }
+    
+    .download-modal-content {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+}
+
+/* Progress modal responsive fixes */
+@media (max-width: 640px) {
+    .progress-modal {
+        margin: 10px;
+        padding: 20px;
+        max-width: none;
+        width: calc(100vw - 20px);
+    }
+
+    .progress-header {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .progress-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .progress-title h3 {
+        font-size: 1rem;
+    }
+
+    .progress-title p {
+        font-size: 10px;
+    }
+
+    .progress-actions {
+        flex-direction: column;
+        margin-top: 20px;
+        gap: 8px;
+    }
+}
+
+/* Fix para evitar que el contenido se salga en pantallas muy anchas */
+@media (min-width: 1600px) {
+    .download-modal {
+        max-width: 550px;
+    }
+    
+    .download-modal-content {
+        padding: 32px;
+        gap: 24px;
+    }
 }

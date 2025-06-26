@@ -1,4 +1,4 @@
-# backend/services/product_service.py - VERSIÓN MEJORADA
+
 import asyncio
 import aiohttp
 import ssl
@@ -8,7 +8,7 @@ from datetime import datetime
 import logging
 
 class ProductInfo(BaseModel):
-    """Product information model"""
+
     kapid: str
     server: str
     creator: str = ""
@@ -27,7 +27,7 @@ class ProductService:
             "Sandbox3", "Sandbox4", "Sandbox5", "Sandbox6", "Sandbox7", "Sandbox8",
             "Sandbox9", "Sandbox10", "Sandbox11", "Sandbox12", "Sandbox13", "Staging"
         ]
-        # Configurar logging
+        
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
     
@@ -37,11 +37,8 @@ class ProductService:
         server: str, 
         token: str
     ) -> Dict[str, any]:
-        """
-        Fetch product data from KAP API with improved error handling
-        """
         try:
-            # Validate inputs
+            
             if not all([kapid, server, token]):
                 return {
                     "success": False,
@@ -58,25 +55,25 @@ class ProductService:
                     "data": None
                 }
             
-            # Build API URL
+            
             kapid_upper = kapid.upper().strip()
             url = f"https://{server.lower()}-kap-studydef.azurewebsites.net/studies/{kapid_upper}"
             
             self.logger.info(f"🔍 Consultando: {url}")
             
-            # Headers
+            
             headers = {
                 "x-jetstream-devtoken": token.strip(),
                 "User-Agent": "KapTools-Nexus/2.0",
                 "Accept": "application/json"
             }
             
-            # Create SSL context
+            
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
             
-            # Make HTTP request
+            
             timeout = aiohttp.ClientTimeout(total=30)
             
             async with aiohttp.ClientSession(
@@ -85,13 +82,13 @@ class ProductService:
             ) as session:
                 async with session.get(url, headers=headers) as response:
                     
-                    # Log response details
+                    
                     self.logger.info(f"📊 Status: {response.status}")
                     
                     if response.status == 200:
                         json_data = await response.json()
                         
-                        # Parse response data
+                        
                         product_info = self._parse_product_data(json_data, kapid_upper, server)
                         
                         return {
@@ -119,7 +116,7 @@ class ProductService:
                         }
                     
                     elif response.status == 500:
-                        # 🔥 MANEJO ESPECÍFICO PARA ERROR 500
+                        
                         error_text = await response.text()
                         
                         try:
@@ -149,7 +146,7 @@ class ProductService:
                                 "data": None
                             }
                         except:
-                            # Si no se puede parsear el JSON del error
+                            
                             return {
                                 "success": False,
                                 "message": f"🔥 Error 500: Servidor KAP no disponible",
@@ -208,25 +205,25 @@ class ProductService:
             }
     
     def _parse_product_data(self, json_data: Dict, kapid: str, server: str) -> ProductInfo:
-        """Parse JSON response to extract product information"""
+
         try:
-            # Extract creator information
+            
             creator = ""
             created_by = json_data.get("created_by", {})
             if isinstance(created_by, dict):
                 creator = created_by.get("full_name", "")
             
-            # Extract product type
+            
             product_type = ""
             product_type_obj = json_data.get("product_type", {})
             if isinstance(product_type_obj, dict):
                 product_type = product_type_obj.get("id", "")
             
-            # Extract version and platform
+            
             version = json_data.get("product_version", "")
             platform = json_data.get("platform", "")
             
-            # Extract wave information
+            
             wave_id = ""
             status = ""
             waves = json_data.get("waves", [])
@@ -236,7 +233,7 @@ class ProductService:
                     wave_id = first_wave.get("id", "")
                     status = first_wave.get("status", "")
             
-            # Extract language
+            
             language = ""
             languages = json_data.get("languages", [])
             if languages and isinstance(languages, list):
@@ -244,7 +241,7 @@ class ProductService:
                 if isinstance(first_language, dict):
                     language = first_language.get("name", "")
             
-            # Extract creation date
+            
             creation_date = json_data.get("created_timestamp", "")
             
             return ProductInfo(
@@ -262,7 +259,7 @@ class ProductService:
             )
             
         except Exception as e:
-            # Return basic info if parsing fails
+            
             return ProductInfo(
                 kapid=kapid,
                 server=server,
@@ -271,11 +268,11 @@ class ProductService:
             )
     
     def get_available_servers(self) -> list[str]:
-        """Get list of available servers"""
+
         return self.available_servers.copy()
     
     def validate_kapid(self, kapid: str) -> Dict[str, any]:
-        """Validate KapID format"""
+
         if not kapid or not kapid.strip():
             return {
                 "valid": False,
@@ -284,7 +281,7 @@ class ProductService:
         
         kapid = kapid.strip().upper()
         
-        # Basic validation (adjust as needed)
+        
         if len(kapid) < 3:
             return {
                 "valid": False,

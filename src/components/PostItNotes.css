@@ -1,15 +1,13 @@
-/* src/components/PostItNotes.css */
 
-/* Variables consistentes con tu aplicación */
 :root {
-    /* Colores base profesionales */
+    
     --navy-900: #0f1629;
     --navy-800: #1a202c;
     --navy-700: #2d3748;
     --navy-600: #4a5568;
     --navy-500: #718096;
 
-    /* Colores de acento */
+    
     --gold-500: #f6ad55;
     --gold-400: #fbb042;
     --blue-400: #63b3ed;
@@ -17,7 +15,7 @@
     --red-400: #fc8181;
     --green-400: #68d391;
 
-    /* Colores específicos del proyecto */
+    
     --primary-purple: #6c5ce7;
     --primary-pink: #ff6b9d;
     --success-green: #00ff87;
@@ -29,11 +27,11 @@
     --bg-secondary: #252a4a;
     --bg-card: rgba(37, 42, 74, 0.6);
 
-    /* Gradientes profesionales */
+    
     --gradient-primary: linear-gradient(135deg, var(--navy-700) 0%, var(--navy-600) 100%);
     --gradient-accent: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 100%);
 
-    /* Sombras profesionales */
+    
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
     --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -41,7 +39,7 @@
     --shadow-glow: 0 0 20px rgba(246, 173, 85, 0.3);
 }
 
-/* Backdrop del modal - Mismo estilo que la app principal */
+
 .postit-notes-backdrop {
     position: fixed;
     top: 0;
@@ -73,7 +71,7 @@
     }
 }
 
-/* Contenedor principal - Mismo estilo que tu app */
+
 .postit-notes-container {
     width: 100%;
     height: 100%;
@@ -97,7 +95,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Header estilo Apple - Consistente con la app principal */
+
 .postit-app-header {
     padding: 20px 24px;
     background: 
@@ -235,7 +233,7 @@
     transform: rotate(90deg) scale(1.05);
 }
 
-/* Tablero de notas - Mismo fondo que la app principal */
+
 .notes-board {
     flex: 1;
     padding: 24px;
@@ -251,7 +249,7 @@
     background-size: 40px 40px;
 }
 
-/* Nota individual estilo Post-it - Sin animaciones de flotación */
+
 .postit-note {
     width: 280px;
     min-height: 200px;
@@ -262,7 +260,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     animation: noteAppear 0.3s ease-out;
     transform-origin: top center;
-    /* Efecto vidrio empañado mejorado */
+    
     backdrop-filter: blur(25px) saturate(1.8) brightness(1.2);
     -webkit-backdrop-filter: blur(25px) saturate(1.8) brightness(1.2);
 }
@@ -278,7 +276,7 @@
     }
 }
 
-/* Pin de la nota con color magenta vibrante */
+
 .postit-note::before {
     content: '';
     position: absolute;
@@ -298,7 +296,7 @@
     z-index: 10;
 }
 
-/* Agujero del pin con sombra magenta */
+
 .postit-note::after {
     content: '';
     position: absolute;
@@ -334,7 +332,7 @@
         inset 0 -1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Rotaciones aleatorias para efecto más natural */
+
 .postit-note:nth-child(3n+1) { 
     transform: rotate(-2deg); 
 }
@@ -351,7 +349,7 @@
     transform: rotate(-3deg); 
 }
 
-/* Colores de notas - MÁS VIVOS Y SATURADOS para mejor contraste */
+
 .postit-note-yellow {
     background: 
         linear-gradient(135deg, rgba(255, 215, 0, 0.85), rgba(255, 193, 7, 0.80)),
@@ -430,7 +428,7 @@
         inset 0 -1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Contenido de la nota con mejor contraste para colores vivos */
+
 .postit-note-header {
     display: flex;
     justify-content: space-between;
@@ -533,7 +531,7 @@
     overflow: hidden;
 }
 
-/* Placeholders con mejor contraste */
+
 .note-title::placeholder {
     color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
@@ -546,7 +544,7 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* Estados focus con mejor contraste */
+
 .note-title:focus {
     background: rgba(0, 0, 0, 0.3);
     text-shadow: 
@@ -563,7 +561,7 @@
     border-color: rgba(255, 255, 255, 0.4);
 }
 
-/* Específico para nota amarilla (texto negro) */
+
 .postit-note-yellow .postit-note-timestamp,
 .postit-note-yellow .note-title,
 .postit-note-yellow .note-content {
@@ -579,7 +577,7 @@
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
-/* Estado vacío */
+
 .postit-empty-state {
     position: absolute;
     top: 50%;
@@ -617,7 +615,7 @@
     margin: 0;
 }
 
-/* Animaciones de notificación */
+
 @keyframes slideInNotification {
     from {
         opacity: 0;
@@ -640,7 +638,7 @@
     }
 }
 
-/* Responsive para laptops y pantallas medianas */
+
 @media (max-width: 1366px) {
     .postit-notes-container {
         max-width: 95vw;
@@ -680,7 +678,7 @@
     }
 }
 
-/* Responsive para tablets */
+
 @media (max-width: 1024px) {
     .postit-app-header {
         padding: 16px;
@@ -732,7 +730,7 @@
     }
 }
 
-/* Responsive para móviles */
+
 @media (max-width: 768px) {
     .postit-notes-backdrop {
         padding: 10px;
@@ -825,7 +823,7 @@
         padding: 6px;
     }
 
-    /* Pin más pequeño en móvil */
+    
     .postit-note::before {
         width: 12px;
         height: 12px;
@@ -839,9 +837,9 @@
     }
 }
 
-/* Ajustes específicos para posicionamiento responsivo */
+
 @media (max-width: 1366px) {
-    /* Limitar posiciones para pantallas más pequeñas */
+    
     .notes-board {
         position: relative;
         overflow-x: auto;
@@ -850,7 +848,7 @@
 }
 
 @media (max-width: 1024px) {
-    /* En tablets, ajustar las posiciones máximas */
+    
     .postit-note {
         position: absolute;
         max-width: calc(100vw - 60px);
@@ -858,7 +856,7 @@
 }
 
 @media (max-width: 768px) {
-    /* En móviles, cambiar a layout más controlado */
+    
     .notes-board {
         overflow-x: hidden;
         overflow-y: auto;
@@ -874,7 +872,7 @@
         max-width: 280px;
     }
 
-    /* Ocultar rotaciones en móvil para mejor organización */
+    
     .postit-note:nth-child(3n+1),
     .postit-note:nth-child(3n+2), 
     .postit-note:nth-child(3n+3),

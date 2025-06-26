@@ -1,5 +1,3 @@
-# backend/main.py - PARTE 1/4 - IMPORTS Y CONFIGURACIÓN
-
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -19,13 +17,17 @@ import base64
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+import sys
+import codecs
 
 
+try:
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+except AttributeError:
+    # En PyInstaller, stdout/stderr pueden ser None
+    pass
 
-
-# ================================
-# IMPORTAR SERVICIOS
-# ================================
 
 try:
     from services.product_service import ProductService
@@ -33,7 +35,7 @@ try:
     from services.azure_service import AzureService
     from mdd_real_service import mdd_real_service
     
-    # Inicializar servicios
+    
     product_service = ProductService()
     git_service = GitService()
     azure_service = AzureService()
@@ -45,7 +47,7 @@ try:
 except ImportError as e:
     print(f"⚠️  Warning: Could not import services: {e}")
     
-    # Crear servicios básicos como fallback
+    
     try:
         from services.product_service import ProductService
         product_service = ProductService()
@@ -62,36 +64,43 @@ except ImportError as e:
     
     SERVICES_AVAILABLE = False
 
-# ================================
-# CONFIGURAR LOGGING Y APP
-# ================================
+
+
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="KapTools Nexus API", version="2.0.0")
 
-# Configurar CORS
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:1420",  # Puerto de React en Tauri
-        "http://localhost:3000",  # Puerto de React dev
-        "tauri://localhost",      # Para Tauri builds
-        "*"                       # Permitir todos para desarrollo
+        "http://localhost:1420",
+        "http://localhost:3000",
+        "tauri://localhost",
+        "https://tauri.localhost",
+        "http://tauri.localhost",
+        "tauri://localhost:1420",
+        "capacitor://localhost",
+        "http://127.0.0.1:1420",
+        "https://127.0.0.1:1420",
+        "*"                       
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_origin_regex=r"^tauri://.*$",
 )
 
-# ================================
-# MODELOS DE DATOS
-# ================================
+
+
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Handler para capturar errores de validación detallados"""
+
     print(f"🔍 VALIDATION ERROR DEBUG:")
     print(f"📍 URL: {request.url}")
     print(f"📍 Method: {request.method}")
@@ -168,18 +177,18 @@ class DuplicateMDDRequest(BaseModel):
 class CreateStructureRequest(BaseModel):
     project_name: str
     workspace_path: str
-    mdd_file_content: str  # Base64 encoded content
+    mdd_file_content: str  
     mdd_filename: str
-    ddf_file_content: str  # ✅ Agregar DDF Base64 content
-    ddf_filename: str      # ✅ Agregar DDF filename
+    ddf_file_content: str  
+    ddf_filename: str      
     template_location: str = ""
     library_location: str = ""
     date_start: str = "19991201"
     date_end: str = "99999999"
 
-# ================================
-# 🔥 MODELOS CORREGIDOS PARA CREATE STRUCTURE
-# ================================
+
+
+
 
 class CreateStructureResponse(BaseModel):
     success: bool
@@ -187,9 +196,9 @@ class CreateStructureResponse(BaseModel):
     data: Optional[Dict[str, Any]] = None
     processing_logs: Optional[List[str]] = None
 
-# ================================
-# ENDPOINTS BÁSICOS
-# ================================
+
+
+
 
 @app.get("/")
 async def root():
@@ -215,7 +224,7 @@ async def root():
 
 @app.get("/health/create-structure")
 async def health_create_structure():
-    """Health check específico para create structure"""
+
     
     checks = {
         "endpoint_accessible": True,
@@ -265,15 +274,15 @@ async def health_check():
         }
     }
 
-# backend/main.py - PARTE 2/4 - GIT OPERATIONS
 
-# ================================
-# GIT OPERATIONS - BÁSICAS
-# ================================
+
+
+
+
 
 @app.post("/git/clone-microservices")
 async def clone_microservices(request: CloneRequest):
-    """Clone Git microservices to specified path"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
     
@@ -293,7 +302,7 @@ async def clone_microservices(request: CloneRequest):
 
 @app.get("/git/validate-workspace")
 async def validate_workspace(workspace_path: str):
-    """Validate workspace and check if microservices exist"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -311,17 +320,17 @@ async def validate_workspace(workspace_path: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Workspace validation error: {str(e)}")
 
-# ================================
-# GIT OPERATIONS - REVIEW BRANCHES
-# ================================
+
+
+
 
 @app.get("/git/branches")
 async def get_branches(
     project_path: str,
-    repo: str = "both",  # 'content', 'dimensions', or 'both'
+    repo: str = "both",  
     limit: int = 15
 ):
-    """Obtiene las ramas más recientes de los repositorios"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -332,7 +341,7 @@ async def get_branches(
             logger.error(f"❌ Invalid project path: {project_path}")
             raise HTTPException(status_code=400, detail="Invalid project path")
         
-        # Validar primero que existen los repositorios
+        
         try:
             validation = git_service.validate_repositories_for_branches(project_path)
             logger.info(f"🔍 Repository validation: {validation}")
@@ -347,29 +356,29 @@ async def get_branches(
             logger.error(f"💥 Validation failed: {str(e)}")
             raise HTTPException(status_code=400, detail=f"Repository validation failed: {str(e)}")
         
-        # Obtener branches con manejo de errores mejorado
+        
         try:
             branches = git_service.get_recent_branches(project_path, repo, limit)
             logger.info(f"✅ Found {len(branches)} branches")
             
-            # Asegurar que branches es una lista
+            
             if not isinstance(branches, list):
                 logger.warning(f"⚠️ Branches is not a list: {type(branches)}")
                 branches = []
             
-            # Convertir a dict si es necesario
+            
             branches_data = []
             for branch in branches:
                 try:
                     if hasattr(branch, 'dict'):
-                        # Es un objeto Pydantic
+                        
                         branch_dict = branch.dict()
-                        # Convertir datetime a string para JSON
+                        
                         if 'date' in branch_dict and hasattr(branch_dict['date'], 'isoformat'):
                             branch_dict['date'] = branch_dict['date'].isoformat()
                         branches_data.append(branch_dict)
                     elif isinstance(branch, dict):
-                        # Ya es un dict
+                        
                         branches_data.append(branch)
                     else:
                         logger.warning(f"⚠️ Unexpected branch type: {type(branch)}")
@@ -379,7 +388,7 @@ async def get_branches(
                     
         except Exception as e:
             logger.error(f"💥 Error getting branches: {str(e)}")
-            # En caso de error, devolver lista vacía pero con éxito
+            
             branches_data = []
             logger.info("🔧 Returning empty branches list due to error")
         
@@ -403,7 +412,7 @@ async def get_branches(
 
 @app.get("/git/validate-repositories")
 async def validate_repositories_for_branches(project_path: str):
-    """Validar repositorios específicamente para Review Branches"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -414,7 +423,7 @@ async def validate_repositories_for_branches(project_path: str):
             logger.error(f"❌ Invalid project path: {project_path}")
             raise HTTPException(status_code=400, detail="Invalid project path")
         
-        # Validar que existen los repositorios
+        
         validation = git_service.validate_repositories_for_branches(project_path)
         logger.info(f"✅ Validation result: {validation}")
         
@@ -432,7 +441,7 @@ async def validate_repositories_for_branches(project_path: str):
 
 @app.post("/git/fetch-all")
 async def fetch_all_repositories(project_path: str):
-    """Hacer fetch de todas las ramas remotas"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -457,10 +466,10 @@ async def fetch_all_repositories(project_path: str):
 @app.post("/git/checkout")
 async def checkout_branch(
     project_path: str,
-    repo_name: str,  # 'content' or 'dimensions'
+    repo_name: str,  
     branch_name: str
 ):
-    """Hace checkout a una rama específica"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -475,7 +484,7 @@ async def checkout_branch(
         
         result = git_service.checkout_branch(project_path, repo_name, branch_name)
         
-        # Convertir resultado a dict
+        
         result_data = result.dict() if hasattr(result, 'dict') else result
         
         if result.success:
@@ -494,11 +503,11 @@ async def checkout_branch(
 @app.get("/git/compare")
 async def compare_branches(
     project_path: str,
-    repo_name: str,  # 'content' or 'dimensions'
+    repo_name: str,  
     branch_name: str,
     base_branch: str = "master"
 ):
-    """Compara una rama con master (o otra rama base)"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -513,7 +522,7 @@ async def compare_branches(
         
         comparison = git_service.compare_branch_with_master(project_path, repo_name, branch_name)
         
-        # Convertir a dict
+        
         comparison_data = comparison.dict() if hasattr(comparison, 'dict') else comparison
         
         logger.info(f"✅ Comparison completed: {comparison_data.get('summary', 'No summary')}")
@@ -538,7 +547,7 @@ async def get_file_diff_endpoint(
     file_path: str,
     base_branch: str = "master"
 ):
-    """Obtener diferencias de un archivo específico"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -553,7 +562,7 @@ async def get_file_diff_endpoint(
         
         diff = git_service.get_file_diff(project_path, repo_name, branch_name, file_path)
         
-        # Convertir a dict si es un objeto Pydantic
+        
         diff_data = diff.dict() if hasattr(diff, 'dict') else diff
         
         return {
@@ -573,7 +582,7 @@ async def get_file_diff_endpoint(
 
 @app.get("/git/status")
 async def get_repository_status(project_path: str):
-    """Obtiene el estado actual de ambos repositorios"""
+
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
         
@@ -585,12 +594,12 @@ async def get_repository_status(project_path: str):
         
         status = git_service.get_repository_status(project_path)
         
-        # Convertir RepositoryStatus a dict
+        
         status_dict = {}
         for repo_name, repo_status in status.items():
             if hasattr(repo_status, 'dict'):
                 status_data = repo_status.dict()
-                # Convertir datetime a string para JSON
+                
                 if 'last_commit_date' in status_data and status_data['last_commit_date']:
                     if hasattr(status_data['last_commit_date'], 'isoformat'):
                         status_data['last_commit_date'] = status_data['last_commit_date'].isoformat()
@@ -615,7 +624,7 @@ async def get_repository_status(project_path: str):
 
 @app.get("/git/debug-repos")
 async def debug_repositories(project_path: str):
-    """Endpoint de debugging para verificar el estado de los repositorios"""
+
     if not git_service:
         return {"error": "Git service not available"}
     
@@ -629,7 +638,7 @@ async def debug_repositories(project_path: str):
         }
         
         if project_path and os.path.exists(project_path):
-            # Verificar cada repositorio individualmente
+            
             repos = {
                 "content": "outputs-dimensions-content",
                 "dimensions": "outputs-dimensions"
@@ -645,7 +654,7 @@ async def debug_repositories(project_path: str):
                     "contents": os.listdir(repo_path) if os.path.exists(repo_path) else []
                 }
             
-            # Intentar validación
+            
             try:
                 validation = git_service.validate_repositories_for_branches(project_path)
                 debug_info["validation"] = validation
@@ -657,17 +666,17 @@ async def debug_repositories(project_path: str):
     except Exception as e:
         return {"error": f"Debug failed: {str(e)}"}
 
-# backend/main.py - PARTE 3/4 - AZURE Y CREATE STRUCTURE CORREGIDO
 
-# backend/main.py - PARTE 3/4 - AZURE Y CREATE STRUCTURE CORREGIDO
 
-# ================================
-# AZURE OPERATIONS  
-# ================================
+
+
+
+
+
 
 @app.post("/azure/download-files")
 async def download_azure_files(request: AzureDownloadRequest):
-    """Download Azure files for a project"""
+
     if not azure_service:
         raise HTTPException(status_code=503, detail="Azure service not available")
         
@@ -686,7 +695,7 @@ async def download_azure_files(request: AzureDownloadRequest):
 
 @app.get("/azure/servers")
 async def get_available_servers():
-    """Get list of available Azure servers"""
+
     if not azure_service:
         raise HTTPException(status_code=503, detail="Azure service not available")
         
@@ -702,16 +711,12 @@ async def get_available_servers():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting servers: {str(e)}")
 
-# ================================
-# 🔥 CREATE STRUCTURE OPERATIONS - VERSIÓN CORREGIDA
-# ================================
+
+
+
 
 @app.post("/data-processing/create-structure")
 async def create_structure_endpoint(request: CreateStructureRequest):
-    """
-    ✅ ENDPOINT ACTUALIZADO - Maneja MDD y DDF
-    """
-    
     print(f"🚀 Creating structure for: {request.project_name}")
     logs = []
     
@@ -724,11 +729,11 @@ async def create_structure_endpoint(request: CreateStructureRequest):
     try:
         add_log("🔍 Starting structure creation with MDD and DDF...")
         
-        # ================================
-        # VALIDACIONES BÁSICAS
-        # ================================
         
-        # Validar project name
+        
+        
+        
+        
         project_name = request.project_name.strip()
         if not project_name:
             raise HTTPException(status_code=400, detail="Project name is required")
@@ -736,7 +741,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         if not re.match(r'^[a-zA-Z0-9_-]+$', project_name):
             raise HTTPException(status_code=400, detail="Invalid project name. Only letters, numbers, underscores, and hyphens allowed.")
         
-        # Validar workspace
+        
         workspace_path = request.workspace_path.strip()
         if not workspace_path:
             raise HTTPException(status_code=400, detail="Workspace path is required")
@@ -744,7 +749,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         if not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail=f"Workspace not found: {workspace_path}")
         
-        # Validar microservicios
+        
         outputs_content = os.path.join(workspace_path, "outputs-dimensions-content")
         outputs_dimensions = os.path.join(workspace_path, "outputs-dimensions")
         
@@ -756,9 +761,9 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         
         add_log("✅ Basic validations passed")
         
-        # ================================
-        # PROCESAR ARCHIVO MDD
-        # ================================
+        
+        
+        
         
         add_log("📋 Processing MDD file...")
         
@@ -766,7 +771,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
             raise HTTPException(status_code=400, detail="MDD file content is required")
         
         try:
-            # Decodificar MDD base64
+            
             mdd_content = base64.b64decode(request.mdd_file_content)
             add_log(f"📊 MDD decoded: {len(mdd_content)} bytes")
         except Exception as e:
@@ -775,16 +780,16 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         if len(mdd_content) == 0:
             raise HTTPException(status_code=400, detail="MDD file is empty")
         
-        # Validar MDD filename
+        
         if not request.mdd_filename:
             raise HTTPException(status_code=400, detail="MDD filename is required")
         
         if not request.mdd_filename.lower().endswith('.mdd'):
             raise HTTPException(status_code=400, detail="MDD file must have .mdd extension")
         
-        # ================================
-        # PROCESAR ARCHIVO DDF
-        # ================================
+        
+        
+        
         
         add_log("💾 Processing DDF file...")
         
@@ -792,7 +797,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
             raise HTTPException(status_code=400, detail="DDF file content is required")
         
         try:
-            # Decodificar DDF base64
+            
             ddf_content = base64.b64decode(request.ddf_file_content)
             add_log(f"📊 DDF decoded: {len(ddf_content)} bytes")
         except Exception as e:
@@ -801,14 +806,14 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         if len(ddf_content) == 0:
             raise HTTPException(status_code=400, detail="DDF file is empty")
         
-        # Validar DDF filename
+        
         if not request.ddf_filename:
             raise HTTPException(status_code=400, detail="DDF filename is required")
         
         if not request.ddf_filename.lower().endswith('.ddf'):
             raise HTTPException(status_code=400, detail="DDF file must have .ddf extension")
         
-        # ✅ VALIDAR QUE MDD Y DDF TENGAN EL MISMO NOMBRE BASE
+        
         mdd_basename = os.path.splitext(request.mdd_filename)[0]
         ddf_basename = os.path.splitext(request.ddf_filename)[0]
         
@@ -820,16 +825,16 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         
         add_log(f"✅ File names match: {mdd_basename}")
         
-        # ================================
-        # CONFIGURAR RUTAS
-        # ================================
+        
+        
+        
         
         template_location = request.template_location or os.path.join(outputs_content, "Template_Configuration")
         library_location = request.library_location or os.path.join(outputs_dimensions, "KAPLibrary")
         
         template_project_path = os.path.join(outputs_dimensions, "Template_Project")
         
-        # Verificar rutas críticas
+        
         if not os.path.exists(template_location):
             raise HTTPException(status_code=400, detail=f"Template_Configuration not found: {template_location}")
         
@@ -838,17 +843,17 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         
         add_log("✅ Paths validated")
         
-        # ================================
-        # CREAR ESTRUCTURA
-        # ================================
+        
+        
+        
         
         add_log("🏗️ Creating project structure...")
         
-        # Crear Projects folder
+        
         projects_path = os.path.join(outputs_content, "Projects")
         os.makedirs(projects_path, exist_ok=True)
         
-        # Verificar si el proyecto ya existe
+        
         new_project_path = os.path.join(projects_path, project_name)
         
         if os.path.exists(new_project_path):
@@ -856,20 +861,20 @@ async def create_structure_endpoint(request: CreateStructureRequest):
         
         add_log(f"📂 Creating project at: {new_project_path}")
         
-        # Copiar Template_Project
+        
         add_log("📋 Copying Template_Project...")
         await copy_directory_async(template_project_path, new_project_path, add_log)
         
-        # Copiar configuración a Automation
+        
         automation_path = os.path.join(new_project_path, "Automation")
         add_log("⚙️ Copying configuration...")
         
-        # Copiar archivos de Template_Configuration
+        
         await copy_directory_async(template_location, automation_path, add_log)
         
-        # ================================
-        # CONFIGURAR JOB.INI
-        # ================================
+        
+        
+        
         
         job_ini_path = os.path.join(new_project_path, "job.ini")
         files_created = ["Project structure"]
@@ -881,11 +886,11 @@ async def create_structure_endpoint(request: CreateStructureRequest):
                 with open(job_ini_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Normalizar rutas
+                
                 template_location_normalized = template_location.replace('/', '\\') + '\\'
                 library_location_normalized = library_location.replace('/', '\\') + '\\'
                 
-                # Reemplazos
+                
                 replacements = {
                     "[CHANGE|DATESTART]": request.date_start,
                     "[CHANGE|DATEEND]": request.date_end,
@@ -909,19 +914,19 @@ async def create_structure_endpoint(request: CreateStructureRequest):
             except Exception as e:
                 add_log(f"⚠️ Warning: Could not configure job.ini: {str(e)}")
         
-        # ================================
-        # 🔥 GUARDAR AMBOS ARCHIVOS MDD Y DDF
-        # ================================
+        
+        
+        
         
         mdd_folder = os.path.join(new_project_path, "MDD")
         add_log("💾 Saving MDD and DDF files...")
 
         try:
-            # Asegurar que la carpeta MDD existe
+            
             os.makedirs(mdd_folder, exist_ok=True)
             add_log(f"📁 MDD folder ensured: {mdd_folder}")
 
-            # Guardar archivo MDD
+            
             mdd_path = os.path.join(mdd_folder, request.mdd_filename)
             with open(mdd_path, 'wb') as f:
                 f.write(mdd_content)
@@ -929,7 +934,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
             files_created.append(f"MDD/{request.mdd_filename}")
             add_log(f"📋 MDD file saved: {request.mdd_filename}")
 
-            # ✅ GUARDAR ARCHIVO DDF
+            
             ddf_path = os.path.join(mdd_folder, request.ddf_filename)
             with open(ddf_path, 'wb') as f:
                 f.write(ddf_content)
@@ -937,7 +942,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
             files_created.append(f"MDD/{request.ddf_filename}")
             add_log(f"💾 DDF file saved: {request.ddf_filename}")
 
-            # Verificar que ambos archivos se guardaron
+            
             if os.path.exists(mdd_path) and os.path.exists(ddf_path):
                 add_log(f"✅ Both files confirmed saved in: {mdd_folder}")
             else:
@@ -947,9 +952,9 @@ async def create_structure_endpoint(request: CreateStructureRequest):
             add_log(f"⚠️ Warning: Could not save MDD/DDF files: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Failed to save MDD/DDF files: {str(e)}")
         
-        # ================================
-        # FINALIZAR
-        # ================================
+        
+        
+        
         
         add_log("🎉 Structure created successfully with MDD and DDF!")
         
@@ -964,7 +969,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
                 "template_location": template_location,
                 "library_location": library_location,
                 "mdd_file": request.mdd_filename,
-                "ddf_file": request.ddf_filename,  # ✅ Incluir DDF en respuesta
+                "ddf_file": request.ddf_filename,  
                 "automation_path": automation_path,
                 "mdd_path": os.path.join(mdd_folder, request.mdd_filename) if os.path.exists(mdd_folder) else None,
                 "ddf_path": os.path.join(mdd_folder, request.ddf_filename) if os.path.exists(mdd_folder) else None
@@ -984,7 +989,7 @@ async def create_structure_endpoint(request: CreateStructureRequest):
 
 
 async def copy_directory_async(source: str, destination: str, add_log, batch_size: int = 20):
-    """Copia directorio de forma asíncrona en lotes"""
+
     
     if not os.path.exists(source):
         raise Exception(f"Source directory does not exist: {source}")
@@ -995,14 +1000,14 @@ async def copy_directory_async(source: str, destination: str, add_log, batch_siz
     
     try:
         for root, dirs, files in os.walk(source):
-            # Crear directorios
+            
             for dir_name in dirs:
                 src_dir = os.path.join(root, dir_name)
                 rel_dir = os.path.relpath(src_dir, source)
                 dest_dir = os.path.join(destination, rel_dir)
                 os.makedirs(dest_dir, exist_ok=True)
             
-            # Copiar archivos en lotes
+            
             for i in range(0, len(files), batch_size):
                 batch_files = files[i:i + batch_size]
                 
@@ -1017,7 +1022,7 @@ async def copy_directory_async(source: str, destination: str, add_log, batch_siz
                     shutil.copy2(src_file, dest_file)
                     file_count += 1
                 
-                # Yield control cada lote
+                
                 if len(files) > batch_size:
                     await asyncio.sleep(0.01)
         
@@ -1027,14 +1032,14 @@ async def copy_directory_async(source: str, destination: str, add_log, batch_siz
         add_log(f"❌ Error copying: {str(e)}")
         raise
 
-# ================================
-# ENDPOINT DE TEST
-# ================================
+
+
+
 
 
 @app.get("/test/create-structure-mdd-ddf")
 async def test_create_structure_with_mdd_ddf():
-    """Test endpoint para verificar soporte MDD+DDF"""
+
     
     return {
         "endpoint_available": True,
@@ -1047,8 +1052,8 @@ async def test_create_structure_with_mdd_ddf():
             "workspace_path": "str (required)",
             "mdd_file_content": "str (required, base64 encoded)",
             "mdd_filename": "str (required, must end with .mdd)",
-            "ddf_file_content": "str (required, base64 encoded)",  # ✅
-            "ddf_filename": "str (required, must end with .ddf)"     # ✅
+            "ddf_file_content": "str (required, base64 encoded)",  
+            "ddf_filename": "str (required, must end with .ddf)"     
         },
         "optional_fields": {
             "template_location": "str (optional)",
@@ -1093,7 +1098,7 @@ async def test_create_structure_with_mdd_ddf():
 
 @app.get("/test/create-structure")
 async def test_create_structure():
-    """Test endpoint para create structure"""
+
     
     return {
         "endpoint_available": True,
@@ -1124,12 +1129,12 @@ async def test_create_structure():
     }
 
 
-# ================================
-# MDD DUPLICATE OPERATIONS
-# ================================
-# backend/main.py - ENDPOINT ACTUALIZADO PARA DUPLICACIÓN REAL MDD ÚNICAMENTE
 
-# En main.py, reemplazar el endpoint duplicate_mdd_files:
+
+
+
+
+
 
 @app.post("/data/duplicate-mdd")
 async def duplicate_mdd_files(
@@ -1139,10 +1144,9 @@ async def duplicate_mdd_files(
     duplicate_count: int = Form(..., description="Number of times to duplicate"),
     workspace_path: str = Form(..., description="Target workspace directory")
 ):
-    """
-    🔥 ENDPOINT CORREGIDO - Duplicación de archivos MDD/DDF con datos REALES
-    ✅ CORRECCIÓN: Eliminada duplicación de llamadas al servicio
-    """
+
+    
+
     logger.info("=" * 50)
     logger.info("🚀 STARTING MDD DUPLICATION ENDPOINT - REAL DATA MODE")
     logger.info(f"📁 MDD File: {mdd_file.filename}")
@@ -1151,9 +1155,9 @@ async def duplicate_mdd_files(
     logger.info(f"📂 Workspace: {workspace_path}")
     logger.info("=" * 50)
     
-    # VALIDACIONES TEMPRANAS
+    
     try:
-        # Check services availability FIRST
+        
         if not mdd_service:
             logger.error("❌ MDD SERVICE NOT AVAILABLE")
             raise HTTPException(
@@ -1163,7 +1167,7 @@ async def duplicate_mdd_files(
         
         logger.info("✅ MDD service available, proceeding...")
         
-        # VALIDACIÓN DE ARCHIVOS
+        
         if not mdd_file or not mdd_file.filename:
             logger.error("❌ MDD file missing or invalid")
             raise HTTPException(
@@ -1178,7 +1182,7 @@ async def duplicate_mdd_files(
                 detail="DDF file is required and must have a valid filename"
             )
         
-        # VALIDACIÓN DE EXTENSIONES
+        
         if not mdd_file.filename.lower().endswith('.mdd'):
             logger.error(f"❌ Invalid MDD extension: {mdd_file.filename}")
             raise HTTPException(
@@ -1193,7 +1197,7 @@ async def duplicate_mdd_files(
                 detail=f"DDF file must have .ddf extension, got: {ddf_file.filename}"
             )
         
-        # VALIDACIÓN DE NOMBRES BASE
+        
         mdd_basename = os.path.splitext(mdd_file.filename)[0]
         ddf_basename = os.path.splitext(ddf_file.filename)[0]
         
@@ -1206,7 +1210,7 @@ async def duplicate_mdd_files(
         
         logger.info(f"✅ File names match: {mdd_basename}")
         
-        # VALIDACIÓN DE DUPLICATE COUNT
+        
         if not isinstance(duplicate_count, int) or duplicate_count < 1:
             logger.error(f"❌ Invalid duplicate count: {duplicate_count}")
             raise HTTPException(
@@ -1216,7 +1220,7 @@ async def duplicate_mdd_files(
         
         logger.info(f"✅ Duplicate count valid: {duplicate_count}")
         
-        # VALIDACIÓN DE WORKSPACE
+        
         if not workspace_path or not workspace_path.strip():
             logger.error("❌ Workspace path empty")
             raise HTTPException(
@@ -1249,7 +1253,7 @@ async def duplicate_mdd_files(
         
         logger.info(f"✅ Workspace valid and writable: {workspace_path}")
         
-        # CREAR ARCHIVOS TEMPORALES
+        
         temp_mdd_path = None
         temp_ddf_path = None
         original_mdd_filename = mdd_file.filename
@@ -1257,19 +1261,19 @@ async def duplicate_mdd_files(
         logger.info("💾 Creating temporary files...")
         
         try:
-            # GUARDAR MDD TEMPORAL
+            
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mdd') as temp_mdd:
                 logger.info(f"📝 Writing MDD content to temporary file...")
-                await mdd_file.seek(0)  # Ensure we're at the beginning
+                await mdd_file.seek(0)  
                 content = await mdd_file.read()
                 temp_mdd.write(content)
                 temp_mdd_path = temp_mdd.name
                 logger.info(f"💾 MDD saved to: {temp_mdd_path}")
             
-            # GUARDAR DDF TEMPORAL  
+            
             with tempfile.NamedTemporaryFile(delete=False, suffix='.ddf') as temp_ddf:
                 logger.info(f"📝 Writing DDF content to temporary file...")
-                await ddf_file.seek(0)  # Ensure we're at the beginning
+                await ddf_file.seek(0)  
                 content = await ddf_file.read()
                 temp_ddf.write(content)
                 temp_ddf_path = temp_ddf.name
@@ -1277,27 +1281,27 @@ async def duplicate_mdd_files(
             
             logger.info("✅ Temporary files created successfully")
             
-            # VALIDAR ARCHIVOS CON DATOS REALES ANTES DE PROCESAR
+            
             logger.info("🔍 Validating files with real data reader...")
             
-            # Crear archivos temporales con nombres correctos para validación
+            
             temp_dir_for_validation = tempfile.mkdtemp()
             try:
-                # Copiar con nombres originales para validación
+                
                 validation_mdd_path = os.path.join(temp_dir_for_validation, mdd_file.filename)
                 validation_ddf_path = os.path.join(temp_dir_for_validation, ddf_file.filename)
 
                 shutil.copy2(temp_mdd_path, validation_mdd_path)
                 shutil.copy2(temp_ddf_path, validation_ddf_path)
 
-                # Importar la función de validación actualizada
+                
                 from mdd_real_service import validate_mdd_ddf_files
 
-                # Validar con nombres originales para obtener conteo real
+                
                 validation = validate_mdd_ddf_files(validation_mdd_path, validation_ddf_path)
 
             finally:
-                # Limpiar directorio temporal de validación
+                
                 shutil.rmtree(temp_dir_for_validation, ignore_errors=True)
             
             if not validation['valid']:
@@ -1312,12 +1316,12 @@ async def duplicate_mdd_files(
             logger.info(f"📁 MDD size: {validation['mdd_size']:,} bytes")
             logger.info(f"📁 DDF size: {validation['ddf_size']:,} bytes")
             
-            # VERIFICAR QUE EL SERVICIO MDD EXISTE
+            
             logger.info("🔍 Checking MDD service methods...")
             available_methods = [method for method in dir(mdd_service) if not method.startswith('_')]
             logger.info(f"📋 Available methods: {available_methods}")
             
-            # Verificar métodos disponibles
+            
             if hasattr(mdd_service, 'process_duplicate_mdd_real'):
                 logger.info("✅ Found process_duplicate_mdd_real method")
             elif hasattr(mdd_service, 'duplicate_mdd_real_fallback'):
@@ -1329,7 +1333,7 @@ async def duplicate_mdd_files(
                     detail=f"MDD service methods not available. Available: {available_methods}"
                 )
             
-            # 🔥 UNA SOLA LLAMADA AL SERVICIO MDD (SIN DUPLICACIÓN)
+            
             logger.info("🔄 Calling MDD service with REAL data...")
             
             try:
@@ -1355,7 +1359,7 @@ async def duplicate_mdd_files(
                 logger.error(f"💥 MDD Service Error: {str(service_error)}")
                 logger.error(f"💥 Service Error Type: {type(service_error)}")
                 
-                # Crear resultado de error detallado
+                
                 result = {
                     "success": False,
                     "error": f"Service processing failed: {str(service_error)}",
@@ -1369,7 +1373,7 @@ async def duplicate_mdd_files(
                     "mode": "SERVICE_ERROR"
                 }
             
-            # PROGRAMAR LIMPIEZA EN BACKGROUND
+            
             background_tasks.add_task(cleanup_temp_files_mdd, temp_mdd_path, temp_ddf_path)
             
             if result["success"]:
@@ -1412,7 +1416,7 @@ async def duplicate_mdd_files(
                 )
         
         except HTTPException:
-            # Re-raise HTTP exceptions as-is
+            
             cleanup_temp_files_mdd(temp_mdd_path, temp_ddf_path)
             raise
 
@@ -1422,7 +1426,7 @@ async def duplicate_mdd_files(
             import traceback
             logger.error(f"💥 FULL TRACEBACK: {traceback.format_exc()}")
             
-            # Limpiar archivos temporales
+            
             cleanup_temp_files_mdd(temp_mdd_path, temp_ddf_path)
             
             raise HTTPException(
@@ -1431,7 +1435,7 @@ async def duplicate_mdd_files(
             )
 
     except HTTPException:
-        # Re-raise HTTP exceptions as-is
+        
         raise
 
     except Exception as e:
@@ -1447,9 +1451,6 @@ async def duplicate_mdd_files(
 
 @app.get("/data/duplicate-mdd/status")
 async def get_mdd_duplication_status():
-    """
-    🔥 ENDPOINT ACTUALIZADO - Estado del servicio de duplicación REAL MDD
-    """
     if not mdd_service:
         raise HTTPException(
             status_code=503, 
@@ -1488,9 +1489,6 @@ async def get_mdd_duplication_status():
 
 
 def cleanup_temp_files_mdd(mdd_path: str, ddf_path: str):
-    """
-    🧹 FUNCIÓN HELPER ACTUALIZADA - Limpieza de archivos temporales
-    """
     logger.info("🧹 Starting cleanup of temporary files...")
     
     try:
@@ -1514,11 +1512,11 @@ def cleanup_temp_files_mdd(mdd_path: str, ddf_path: str):
     logger.info("🧹 Cleanup completed")
 
 
-# 🔥 ENDPOINTS DE TEST ACTUALIZADOS
+
 
 @app.get("/test/mdd")
 async def test_mdd_service():
-    """Test MDD service availability - SOLO DUPLICACIÓN REAL"""
+
     if not mdd_service:
         raise HTTPException(status_code=503, detail="MDD service not available")
         
@@ -1543,7 +1541,7 @@ async def test_mdd_service():
 
 @app.get("/test/mdd-capabilities")  
 async def test_mdd_capabilities():
-    """Test endpoint para verificar capacidades de duplicación REAL"""
+
     
     if not mdd_service:
         return {
@@ -1586,13 +1584,13 @@ async def test_mdd_capabilities():
             "timestamp": datetime.now().isoformat()
         }
 
-# ================================
-# PRODUCT OPERATIONS
-# ================================
+
+
+
 
 @app.post("/product/get-data")
 async def get_product_data(request: dict):
-    """Get product data from KAP API"""
+
     if not product_service:
         raise HTTPException(status_code=503, detail="Product service not available")
     
@@ -1609,7 +1607,7 @@ async def get_product_data(request: dict):
 
 @app.get("/product/servers")
 async def get_available_product_servers():
-    """Get list of available servers for product data"""
+
     if not product_service:
         raise HTTPException(status_code=503, detail="Product service not available")
     
@@ -1619,20 +1617,20 @@ async def get_available_product_servers():
 
 @app.post("/product/validate-kapid")
 async def validate_kapid(request: dict):
-    """Validate KapID format"""
+
     if not product_service:
         raise HTTPException(status_code=503, detail="Product service not available")
     
     kapid = request.get("kapid", "")
     return product_service.validate_kapid(kapid)
 
-# ================================
-# SERVICES STATUS
-# ================================
+
+
+
 
 @app.get("/services/status")
 async def get_services_status():
-    """Verificar el estado de todos los servicios"""
+
     services_status = {
         "product_service": {
             "available": product_service is not None,
@@ -1661,13 +1659,13 @@ async def get_services_status():
         "all_services_available": SERVICES_AVAILABLE
     }
 
-# ================================
-# TEST ENDPOINTS
-# ================================
+
+
+
 
 @app.get("/test")
 async def test_endpoint():
-    """Simple test endpoint"""
+
     return {
         "message": "Test successful! 🧪",
         "timestamp": datetime.now().isoformat(),
@@ -1700,7 +1698,7 @@ async def test_endpoint():
 
 @app.get("/test/mdd")
 async def test_mdd_service():
-    """Test MDD service availability"""
+
     if not mdd_service:
         raise HTTPException(status_code=503, detail="MDD service not available")
         
@@ -1721,7 +1719,7 @@ async def test_mdd_service():
 
 @app.get("/test/review-branches")
 async def test_review_branches():
-    """Test específico para Review Branches"""
+
     try:
         test_result = {
             "services_available": SERVICES_AVAILABLE,
@@ -1731,7 +1729,7 @@ async def test_review_branches():
         }
         
         if SERVICES_AVAILABLE and git_service:
-            # Verificar métodos requeridos
+            
             required_methods = [
                 'validate_repositories_for_branches',
                 'get_recent_branches', 
@@ -1752,10 +1750,10 @@ async def test_review_branches():
             "timestamp": datetime.now().isoformat()
         }
 
-# 🔥 TEST ENDPOINT CORREGIDO PARA CREATE STRUCTURE
+
 @app.get("/test/create-structure")
 async def test_create_structure():
-    """Test endpoint"""
+
     
     try:
         return {
@@ -1780,7 +1778,7 @@ async def debug_form_data(
     project_name: str = Form(...),
     workspace_path: str = Form(...)
 ):
-    """Debug FormData reception"""
+
     
     return {
         "success": True,
@@ -1797,17 +1795,17 @@ async def debug_form_data(
     }
 
 
-# ================================
-# ODIN CHUNKS PROCESSOR - BACKEND FINAL SIN ERRORES
-# COPIA TODO ESTO AL FINAL DE main.py
-# ================================
+
+
+
+
 
 def read_file_with_encoding_simple(file_path):
-    """Lee archivo detectando UTF-16 o UTF-8"""
+
     with open(file_path, 'rb') as f:
         content = f.read()
     
-    # Detectar UTF-16 por BOM
+    
     if content.startswith(b'\xff\xfe'):
         return content.decode('utf-16-le').replace('\ufeff', '')
     elif content.startswith(b'\xfe\xff'):
@@ -1816,7 +1814,7 @@ def read_file_with_encoding_simple(file_path):
         return content.decode('utf-8', errors='ignore')
 
 def find_chunks_simple(template_chunks_path, variable_name):
-    """Encuentra chunks - VERSIÓN SIMPLE"""
+
     excluded_folders = {
         'Banners_Include_Set1', 'Banners_Include_Set2', 'CM_Edits', 'CM_Manipulation', 
         'CM_Metadata', 'ES_Metadata', 'ES_OnNextCase', 'IA_Lists', 'IA_Metadata', 
@@ -1846,7 +1844,7 @@ def find_chunks_simple(template_chunks_path, variable_name):
                         file_path = os.path.join(folder_path, filename)
                         
                         try:
-                            # Leer con encoding correcto
+                            
                             real_content = read_file_with_encoding_simple(file_path)
                             
                             if real_content.strip():
@@ -1876,14 +1874,14 @@ def find_chunks_simple(template_chunks_path, variable_name):
         return []
 
 def find_next_question_simple(lines, start_index):
-    """Encuentra la siguiente línea *QUESTION"""
+
     for i in range(start_index + 1, len(lines)):
         if lines[i].strip().startswith('*QUESTION'):
             return i
     return -1
 
 def generate_structure_simple(existing_chunks, variable_name):
-    """Genera estructura para chunks"""
+
     if not existing_chunks:
         return ""
     
@@ -1896,7 +1894,7 @@ def generate_structure_simple(existing_chunks, variable_name):
         structure += f"\n**\t                    fileExt:{chunk['fileExt']}"
         structure += "\n**\t                    'content:David"
         
-        # Mantener saltos de línea exactos
+        
         content_lines = chunk['content'].split('\n')
         for content_line in content_lines:
             structure += f"\n**\t                    {content_line}"
@@ -1911,7 +1909,7 @@ async def process_odin_simple(
     odin_file: UploadFile = File(..., description="ODIN file to process"),
     workspace_path: str = Form(..., description="Workspace path")
 ):
-    """Procesa archivo ODIN"""
+
     try:
         logger.info(f"🚀 Processing ODIN file: {odin_file.filename}")
         
@@ -1921,10 +1919,10 @@ async def process_odin_simple(
         if not workspace_path or not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail="Invalid workspace path")
         
-        # Leer archivo ODIN
+        
         content_bytes = await odin_file.read()
         
-        # Detectar encoding
+        
         if content_bytes.startswith(b'\xff\xfe'):
             file_content = content_bytes.decode('utf-16-le').replace('\ufeff', '')
             original_was_utf16 = True
@@ -1937,7 +1935,7 @@ async def process_odin_simple(
         
         lines = file_content.split('\n')
         
-        # Encontrar DIMVAR entries
+        
         dimvar_entries = []
         for i, line in enumerate(lines):
             dimvar_match = re.search(r'DIMVAR=([^;"\s]+)', line)
@@ -1956,13 +1954,13 @@ async def process_odin_simple(
         
         logger.info(f"🔍 Found {len(dimvar_entries)} DIMVAR entries")
         
-        # Verificar Template_Chunks
+        
         template_chunks_path = os.path.join(workspace_path, "outputs-dimensions-content", "Template_Chunks")
         
         if not os.path.exists(template_chunks_path):
             raise HTTPException(status_code=404, detail="Template_Chunks folder not found")
         
-        # Procesar variables
+        
         processed_lines = lines.copy()
         total_insertions = 0
         processing_results = []
@@ -2011,13 +2009,13 @@ async def process_odin_simple(
                 })
                 logger.warning(f"❌ No files found for {variable_name}")
         
-        # Reconstruir archivo
+        
         processed_content = '\n'.join(processed_lines)
         
-        # Preparar respuesta según encoding original
+        
         if original_was_utf16:
             try:
-                # Convertir de vuelta a UTF-16 LE
+                
                 processed_content_bytes = processed_content.encode('utf-16-le')
                 processed_content_utf16 = b'\xff\xfe' + processed_content_bytes
                 processed_content_final = processed_content_utf16.decode('utf-16-le')
@@ -2047,7 +2045,7 @@ async def process_odin_simple(
             except Exception as e:
                 logger.warning(f"⚠️ Could not convert back to UTF-16: {str(e)}")
         
-        # UTF-8 o fallback
+        
         return {
             "success": True,
             "message": f"✅ Processed {len(dimvar_entries)} DIMVAR entries, inserted {total_insertions} chunks",
@@ -2076,7 +2074,7 @@ async def process_odin_simple(
 
 @app.get("/odin-chunks/scan-chunks")
 async def scan_chunks_simple(workspace_path: str, variable_name: str):
-    """Escanea chunks para una variable"""
+
     try:
         if not workspace_path or not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail="Invalid workspace path")
@@ -2104,7 +2102,7 @@ async def scan_chunks_simple(workspace_path: str, variable_name: str):
 
 @app.get("/odin-chunks/debug-variable")
 async def debug_variable_simple(workspace_path: str, variable_name: str):
-    """Debug para una variable específica"""
+
     try:
         template_chunks_path = os.path.join(workspace_path, "outputs-dimensions-content", "Template_Chunks")
         
@@ -2135,7 +2133,7 @@ async def debug_variable_simple(workspace_path: str, variable_name: str):
 
 @app.get("/odin-chunks/test")
 async def test_odin_simple():
-    """Test endpoint"""
+
     return {
         "service": "ODIN Chunks Processor",
         "version": "FINAL-1.0",
@@ -2150,209 +2148,8 @@ async def test_odin_simple():
         "timestamp": datetime.now().isoformat()
     }
 
-# ================================
-# FIN - BACKEND FINAL COMPLETO
-# ================================
 
 
-@app.get("/test/mdd-service-version")
-async def test_mdd_service_version():
-    """Test para verificar qué versión del servicio se está usando"""
-    try:
-        if not mdd_service:
-            return {"error": "MDD service not available"}
-        
-        # Verificar si tiene el método nuevo
-        has_real_reader = hasattr(mdd_service, '_count_records_in_mdd')
-        
-        # Verificar si la función validate está disponible
-        has_validate_function = False
-        try:
-            from services.mdd_service import validate_mdd_ddf_files
-            has_validate_function = True
-        except ImportError:
-            has_validate_function = False
-        
-        # Verificar versión del servicio
-        status = mdd_service.get_service_status()
-        
-        return {
-            "service_loaded": True,
-            "has_real_reader": has_real_reader,
-            "has_validate_function": has_validate_function,
-            "service_status": status,
-            "version": status.get("version", "unknown"),
-            "mode": status.get("mode", "unknown"),
-            "original_mdd_reader_available": hasattr(mdd_service, '_count_records_in_mdd'),
-            "mdd_record_reader_class_available": 'MDDRecordReader' in str(type(mdd_service)),
-            "timestamp": datetime.now().isoformat()
-        }
-        
-    except Exception as e:
-        return {
-            "error": f"Service test failed: {str(e)}",
-            "timestamp": datetime.now().isoformat()
-        }
-
-@app.get("/debug/mdd-reader-test")
-async def debug_mdd_reader_test():
-    """Debug específico para el MDDRecordReader"""
-    try:
-        # Verificar qué versión del servicio está activa
-        from services.mdd_service import MDDRecordReader, validate_mdd_ddf_files
-        
-        debug_info = {
-            "mdd_service_available": mdd_service is not None,
-            "mdd_record_reader_available": True,
-            "validate_function_available": True,
-            "service_status": None,
-            "reader_test": None
-        }
-        
-        if mdd_service:
-            debug_info["service_status"] = mdd_service.get_service_status()
-        
-        # Test con archivos temporales vacíos para ver qué pasa
-        with tempfile.NamedTemporaryFile(suffix='.mdd', delete=False) as temp_mdd:
-            temp_mdd.write(b"fake mdd content with 5 records")
-            temp_mdd_path = temp_mdd.name
-        
-        with tempfile.NamedTemporaryFile(suffix='.ddf', delete=False) as temp_ddf:
-            temp_ddf.write(b"fake ddf content")
-            temp_ddf_path = temp_ddf.name
-        
-        try:
-            reader = MDDRecordReader()
-            
-            # Test individual de métodos
-            debug_info["reader_test"] = {
-                "ddf_read_attempt": None,
-                "mdd_parse_attempt": None,
-                "adodb_attempt": None,
-                "final_count": None,
-                "error": None
-            }
-            
-            try:
-                ddf_count = reader._read_ddf_record_count(temp_ddf_path)
-                debug_info["reader_test"]["ddf_read_attempt"] = ddf_count
-            except Exception as e:
-                debug_info["reader_test"]["ddf_read_attempt"] = f"Error: {str(e)}"
-            
-            try:
-                mdd_count = reader._parse_mdd_metadata(temp_mdd_path)
-                debug_info["reader_test"]["mdd_parse_attempt"] = mdd_count
-            except Exception as e:
-                debug_info["reader_test"]["mdd_parse_attempt"] = f"Error: {str(e)}"
-            
-            try:
-                adodb_count = reader._count_via_adodb(temp_mdd_path, temp_ddf_path)
-                debug_info["reader_test"]["adodb_attempt"] = adodb_count
-            except Exception as e:
-                debug_info["reader_test"]["adodb_attempt"] = f"Error: {str(e)}"
-            
-            try:
-                final_count = reader.get_real_record_count(temp_mdd_path, temp_ddf_path)
-                debug_info["reader_test"]["final_count"] = final_count
-            except Exception as e:
-                debug_info["reader_test"]["error"] = str(e)
-            
-        finally:
-            # Limpiar archivos temporales
-            os.unlink(temp_mdd_path)
-            os.unlink(temp_ddf_path)
-        
-        return debug_info
-        
-    except Exception as e:
-        return {
-            "error": f"Debug test failed: {str(e)}",
-            "traceback": str(e)
-        }
-
-
-@app.get("/debug/mdd-file-path-trace")
-async def debug_mdd_file_path_trace():
-    """Debuggear exactamente qué archivos está leyendo el sistema"""
-    import tempfile
-    import shutil
-    
-    # Crear archivo de prueba con exactamente 5 registros
-    with tempfile.NamedTemporaryFile(suffix='.mdd', delete=False) as temp_mdd:
-        mdd_content = b"""<?xml version="1.0" encoding="utf-8"?>
-<metadata>
-<datasources>
-<connection>
-<filename>test.ddf</filename>
-<recordcount>5</recordcount>
-</connection>
-</datasources>
-</metadata>"""
-        temp_mdd.write(mdd_content)
-        temp_mdd_path = temp_mdd.name
-    
-    with tempfile.NamedTemporaryFile(suffix='.ddf', delete=False) as temp_ddf:
-        # Exactamente 5 líneas de datos
-        ddf_content = b"record1_data_here____\nrecord2_data_here____\nrecord3_data_here____\nrecord4_data_here____\nrecord5_data_here____\n"
-        temp_ddf.write(ddf_content)
-        temp_ddf_path = temp_ddf.name
-    
-    try:
-        from services.mdd_service import MDDRecordReader
-        
-        reader = MDDRecordReader()
-        
-        # Test cada método individual
-        debug_result = {
-            "file_paths": {
-                "mdd_path": temp_mdd_path,
-                "ddf_path": temp_ddf_path,
-                "mdd_size": os.path.getsize(temp_mdd_path),
-                "ddf_size": os.path.getsize(temp_ddf_path)
-            },
-            "method_results": {}
-        }
-        
-        # Test método 1: DDF
-        try:
-            ddf_result = reader._read_ddf_record_count(temp_ddf_path)
-            debug_result["method_results"]["ddf_method"] = ddf_result
-        except Exception as e:
-            debug_result["method_results"]["ddf_method"] = f"ERROR: {str(e)}"
-        
-        # Test método 2: MDD metadata
-        try:
-            mdd_result = reader._parse_mdd_metadata(temp_mdd_path)
-            debug_result["method_results"]["mdd_method"] = mdd_result
-        except Exception as e:
-            debug_result["method_results"]["mdd_method"] = f"ERROR: {str(e)}"
-        
-        # Test método 3: ADODB
-        try:
-            adodb_result = reader._count_via_adodb(temp_mdd_path, temp_ddf_path)
-            debug_result["method_results"]["adodb_method"] = adodb_result
-        except Exception as e:
-            debug_result["method_results"]["adodb_method"] = f"ERROR: {str(e)}"
-        
-        # Test método final
-        try:
-            final_result = reader.get_real_record_count(temp_mdd_path, temp_ddf_path)
-            debug_result["method_results"]["final_result"] = final_result
-        except Exception as e:
-            debug_result["method_results"]["final_result"] = f"ERROR: {str(e)}"
-        
-        return debug_result
-        
-    finally:
-        # Limpiar
-        os.unlink(temp_mdd_path)
-        os.unlink(temp_ddf_path)
-
-
-
-# ================================
-# 1. MODELOS DE DATOS
-# ================================
 
 class ProductChunksResponse(BaseModel):
     success: bool
@@ -2371,16 +2168,16 @@ class ExclusionsResponse(BaseModel):
     exclusions: List[str]
     total_exclusions: int
 
-# ================================
-# 2. GESTIÓN DE EXCLUSIONES
-# ================================
+
+
+
 
 def get_exclusions_file_path(workspace_path: str) -> str:
-    """Obtiene la ruta del archivo de exclusiones"""
+
     return os.path.join(workspace_path, "product_chunks_exclusions.json")
 
 def load_default_exclusions() -> List[str]:
-    """Carga exclusiones por defecto"""
+
     return [
         "PANELDETAILS_ENDTEXT", "ACTIVEINVOLVEMENT_TEXTS", "SEEVIDEO", "HEARVIDEO", 
         "STANDARDTEXTS_ERRORS", "FACEBOOKMOBILE_OPTINB", "FACEBOOKMOBILE_OPTINA", 
@@ -2432,7 +2229,7 @@ def load_default_exclusions() -> List[str]:
     ]
 
 def load_exclusions_from_workspace(workspace_path: str) -> List[str]:
-    """Carga exclusiones desde archivo del workspace o usa defaults"""
+
     exclusions_file = get_exclusions_file_path(workspace_path)
     
     if os.path.exists(exclusions_file):
@@ -2444,13 +2241,13 @@ def load_exclusions_from_workspace(workspace_path: str) -> List[str]:
             print(f"Error loading exclusions file: {str(e)}")
             return load_default_exclusions()
     else:
-        # Crear archivo con defaults
+        
         default_exclusions = load_default_exclusions()
         save_exclusions_to_workspace(workspace_path, default_exclusions)
         return default_exclusions
 
 def save_exclusions_to_workspace(workspace_path: str, exclusions: List[str]) -> bool:
-    """Guarda exclusiones en archivo del workspace"""
+
     try:
         exclusions_file = get_exclusions_file_path(workspace_path)
         
@@ -2468,12 +2265,12 @@ def save_exclusions_to_workspace(workspace_path: str, exclusions: List[str]) -> 
         print(f"Error saving exclusions: {str(e)}")
         return False
 
-# ================================
-# 3. LECTURA DE ARCHIVOS XML
-# ================================
+
+
+
 
 def read_chunk_db_xml(workspace_path: str) -> List[str]:
-    """Lee el CHUNK_DB.XML exactamente como la app original"""
+
     xml_path = os.path.join(workspace_path, "outputs-dimensions-content", 
                            "Template_Configuration", "CHUNK_DB.XML")
     
@@ -2483,7 +2280,7 @@ def read_chunk_db_xml(workspace_path: str) -> List[str]:
     tree = ET.parse(xml_path)
     root = tree.getroot()
     
-    # Exactamente como la app original
+    
     data = []
     for namechunk in root.iter("NAME"):
         data.append(namechunk.text)
@@ -2494,12 +2291,12 @@ def read_chunk_db_xml(workspace_path: str) -> List[str]:
     
     return my_new_array
 
-# ================================
-# 4. DESCARGA DE PRODUCTOS DESDE AZURE
-# ================================
+
+
+
 
 def download_product_json(token: str, product_name: str, workspace_path: str) -> Dict[str, Any]:
-    """Descarga el JSON del producto exactamente como la app original"""
+
     product_name = product_name.strip().capitalize()
     url = (f"https://sandbox3-kap-product-template.azurewebsites.net/api/producttemplate/product/"
            f"{product_name}?languages=en-gb&refreshCache=true&version=")
@@ -2514,9 +2311,9 @@ def download_product_json(token: str, product_name: str, workspace_path: str) ->
     
     if response.status_code == 200:
         json_data = response.json()
-        # Guardar JSON como la app original
+        
         json_path = os.path.join(workspace_path, f"{product_name}.json")
-        with open(json_path, "w") as file:
+        with open(json_path, "w", encoding='utf-8') as file:
             json.dump(json_data, file, indent=4)
         print(f"\n                JSON file success save.                \n")
         return json_data
@@ -2524,16 +2321,16 @@ def download_product_json(token: str, product_name: str, workspace_path: str) ->
         error_msg = f"Failed to download Postman Collection (Verify Product Name Exists). HTTP status code: {response.status_code}"
         raise HTTPException(status_code=response.status_code, detail=error_msg)
 
-# ================================
-# 5. EXTRACCIÓN DE VARIABLES
-# ================================
+
+
+
 
 def extract_variables_from_modules(json_data: Dict[str, Any], items_to_exclude: List[str]) -> Tuple[List[str], str]:
-    """Extrae variables exactamente como la app original desde modules->questions->groupName"""
+
     variable_found = ""
     
     try:
-        # Lógica exacta de la app original
+        
         variable = ""
         for link in json_data["modules"]:
             for links in link["questions"]:
@@ -2544,12 +2341,12 @@ def extract_variables_from_modules(json_data: Dict[str, Any], items_to_exclude: 
                             if group_name:
                                 variable += group_name + ","
         
-        # Procesar como la app original
-        variable = variable[:-1]  # Quitar última coma
+        
+        variable = variable[:-1]  
         array = variable.split(",")
         array = list(map(str.upper, array))
         
-        # Aplicar exclusiones como la app original
+        
         array = [items for items in array if items not in items_to_exclude]
         
         return array, variable_found
@@ -2558,13 +2355,13 @@ def extract_variables_from_modules(json_data: Dict[str, Any], items_to_exclude: 
         print(f"Warning: Expected structure not found: {str(e)}")
         return [], ""
 
-# ================================
-# 6. CREACIÓN DE ARCHIVOS MRS
-# ================================
+
+
+
 
 def create_mrs_files_with_labels(new_variables: List[str], workspace_path: str, json_data: Dict[str, Any]) -> int:
-    """Crea archivos .mrs con labels extraídos del JSON exactamente como la app original"""
-    # Crear carpeta MDD_Manipulation_Include como la app original
+
+    
     project_folder = os.path.join(workspace_path, "MDD_Manipulation_Include")
     
     if os.path.exists(project_folder):
@@ -2575,20 +2372,20 @@ def create_mrs_files_with_labels(new_variables: List[str], workspace_path: str, 
     chunks_created = 0
     
     for element in new_variables:
-        if not element:  # Skip empty elements
+        if not element:  
             continue
         
-        # Capitalizar como la app original
+        
         element_cap = element.capitalize()
         
-        # Crear archivo .mrs como la app original
+        
         file_name = f"{element_cap}.mrs"
         file_path = os.path.join(project_folder, file_name)
         
-        # Generar Labels exactamente como la app original
+        
         labels = generate_labels_for_variable(element_cap, json_data)
         
-        # Escribir archivo .mrs
+        
         try:
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(labels)
@@ -2598,7 +2395,7 @@ def create_mrs_files_with_labels(new_variables: List[str], workspace_path: str, 
             
         except Exception as e:
             print(f"Error creating file {file_name}: {str(e)}")
-            # Si hay error, crear archivo básico
+            
             try:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(f"' Error generating labels for: {element}\n' Basic content fallback\n{element}.Response.Value")
@@ -2609,11 +2406,11 @@ def create_mrs_files_with_labels(new_variables: List[str], workspace_path: str, 
     return chunks_created
 
 def generate_labels_for_variable(element_cap: str, json_data: Dict[str, Any]) -> str:
-    """Genera labels para una variable específica"""
+
     labels = ""
     
     try:
-        # Buscar en modules->questions como la app original
+        
         for link in json_data["modules"]:
             for links in link["questions"]:
                 if links.get("contentType") != "Script":
@@ -2621,12 +2418,12 @@ def generate_labels_for_variable(element_cap: str, json_data: Dict[str, Any]) ->
                         if links.get("contentType") != "LeftRightSliderQuestion":
                             if links.get("groupName") == element_cap:
                                 
-                                # Procesar respuestas (answers)
+                                
                                 if links.get("answers"):
                                     labels += generate_title_text(links.get("groupName"))
                                     labels += generate_answer_labels(links, "answers")
                                 
-                                # Procesar columnas (columns) - para grids
+                                
                                 elif links.get("columns"):
                                     labels += generate_title_text(links.get("groupName"))
                                     labels += generate_column_labels(links)
@@ -2638,7 +2435,7 @@ def generate_labels_for_variable(element_cap: str, json_data: Dict[str, Any]) ->
         return f"' Error generating labels for: {element_cap}\n' Basic content fallback\n{element_cap}.Response.Value"
 
 def generate_title_text(group_name: str) -> str:
-    """Genera el texto del título"""
+
     return (
         'sbSetTitleText(MDM,"'
         + group_name
@@ -2652,7 +2449,7 @@ def generate_title_text(group_name: str) -> str:
     )
 
 def generate_answer_labels(links: Dict[str, Any], field_type: str) -> str:
-    """Genera labels para respuestas"""
+
     labels = ""
     
     for answ in links[field_type]:
@@ -2671,11 +2468,11 @@ def generate_answer_labels(links: Dict[str, Any], field_type: str) -> str:
                     + "\n"
                 )
     
-    # Aplicar reemplazos especiales como la app original
+    
     return labels.replace("_997", "NA").replace("_998", "REF").replace("_999", "DK")
 
 def generate_column_labels(links: Dict[str, Any]) -> str:
-    """Genera labels para columnas (grids)"""
+
     labels = ""
     
     for answ in links["columns"]:
@@ -2698,7 +2495,7 @@ def generate_column_labels(links: Dict[str, Any]) -> str:
     return labels
 
 def clean_label_text(text: str) -> str:
-    """Limpia el texto de los labels como la app original"""
+
     return (
         text.replace("\u039d", "")
         .replace("[b]", "")
@@ -2714,17 +2511,17 @@ def clean_label_text(text: str) -> str:
         .replace("&#39;", "'")
     )
 
-# ================================
-# 7. PROCESAMIENTO PRINCIPAL
-# ================================
+
+
+
 
 def process_variables_and_create_chunks(json_data: Dict[str, Any], existing_chunks: List[str], 
                                       workspace_path: str, items_to_exclude: List[str]) -> Dict[str, Any]:
-    """Procesa variables y crea chunks exactamente como la app original"""
-    # Extraer variables del JSON
+
+    
     variables_array, variable_found = extract_variables_from_modules(json_data, items_to_exclude)
     
-    # Comparar con chunks existentes como la app original
+    
     new_elements = ""
     variables_found_existing = ""
     
@@ -2740,14 +2537,14 @@ def process_variables_and_create_chunks(json_data: Dict[str, Any], existing_chun
         else:
             new_elements += num + ","
     
-    # Procesar nuevos elementos
-    new_elements = new_elements[:-1]  # Quitar última coma
+    
+    new_elements = new_elements[:-1]  
     new_variables = new_elements.split(",") if new_elements else []
     
-    # Crear archivos .mrs para variables nuevas con labels del JSON
+    
     chunks_created = create_mrs_files_with_labels(new_variables, workspace_path, json_data)
     
-    # Análisis de resultados
+    
     analysis_results = {
         "variables_processed": variables_array,
         "existing_variables": variables_found_existing.split('\n') if variables_found_existing else [],
@@ -2766,13 +2563,13 @@ def process_variables_and_create_chunks(json_data: Dict[str, Any], existing_chun
     
     return analysis_results
 
-# ================================
-# 8. GENERACIÓN DE REPORTES
-# ================================
+
+
+
 
 def generate_original_style_report(product_name: str, analysis_results: Dict[str, Any], 
                                  items_to_exclude: List[str]) -> str:
-    """Genera reporte en el estilo de la app original"""
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     report_lines = [
@@ -2790,7 +2587,7 @@ def generate_original_style_report(product_name: str, analysis_results: Dict[str
         "-" * 20
     ]
     
-    # Mostrar exclusiones aplicadas (primeras 10)
+    
     for exclusion in items_to_exclude[:10]:
         report_lines.append(f"- {exclusion}")
     
@@ -2803,7 +2600,7 @@ def generate_original_style_report(product_name: str, analysis_results: Dict[str
         "-" * 45
     ])
     
-    # Variables existentes
+    
     for existing in analysis_results['existing_variables']:
         if existing.strip():
             report_lines.append(f"✓ {existing}")
@@ -2814,7 +2611,7 @@ def generate_original_style_report(product_name: str, analysis_results: Dict[str
         "-" * 35
     ])
     
-    # Variables nuevas con archivos creados
+    
     for new_var in analysis_results['new_variables']:
         if new_var.strip():
             report_lines.append(f"+ {new_var}.mrs → Created in MDD_Manipulation_Include/")
@@ -2838,9 +2635,9 @@ def generate_original_style_report(product_name: str, analysis_results: Dict[str
     
     return "\n".join(report_lines)
 
-# ================================
-# 9. ENDPOINTS API
-# ================================
+
+
+
 
 @app.post("/product-chunks/process")
 async def process_product_chunks_exact_original(
@@ -2848,9 +2645,9 @@ async def process_product_chunks_exact_original(
     product_name: str = Form(..., description="Product name"),
     workspace_path: str = Form(..., description="Workspace path")
 ) -> ProductChunksResponse:
-    """Procesa chunks de producto con la lógica EXACTA de la aplicación original"""
+
     try:
-        # 1. Validaciones iniciales
+        
         if not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail="Workspace path does not exist")
         
@@ -2861,27 +2658,27 @@ async def process_product_chunks_exact_original(
         print(f"🔍 Processing product: {product_name}")
         print(f"📂 Workspace: {workspace_path}")
         
-        # 2. Cargar exclusiones (del workspace específico)
+        
         items_to_exclude = load_exclusions_from_workspace(workspace_path)
         print(f"📋 Loaded {len(items_to_exclude)} exclusion items from workspace")
         
-        # 3. Leer CHUNK_DB.XML (exactamente como la app original)
+        
         existing_chunks = read_chunk_db_xml(workspace_path)
         print(f"📋 Found {len(existing_chunks)} existing chunks in CHUNK_DB.XML")
         
-        # 4. Descargar JSON del producto (exactamente como la app original)
+        
         print(f"⬇️ Downloading JSON for product: {product_name}")
         json_data = download_product_json(token, product_name, workspace_path)
         
-        # 5. Procesar variables y crear chunks (lógica exacta original)
+        
         analysis_results = process_variables_and_create_chunks(
             json_data, existing_chunks, workspace_path, items_to_exclude
         )
         
-        # 6. Generar reporte
+        
         report_content = generate_original_style_report(product_name, analysis_results, items_to_exclude)
         
-        # 7. Guardar reporte
+        
         report_filename = f"{product_name.capitalize()}_chunks_report.txt"
         report_path = os.path.join(workspace_path, report_filename)
         with open(report_path, 'w', encoding='utf-8') as f:
@@ -2911,7 +2708,7 @@ async def process_product_chunks_exact_original(
 
 @app.get("/product-chunks/exclusions")
 async def get_exclusions(workspace_path: str) -> ExclusionsResponse:
-    """Obtiene la lista actual de exclusiones para un workspace"""
+
     try:
         if not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail="Workspace path does not exist")
@@ -2936,12 +2733,12 @@ async def update_exclusions(
     exclusions_text: str = Form(...),
     action: str = Form(default="replace")
 ) -> ExclusionsResponse:
-    """Actualiza las exclusiones del workspace"""
+
     try:
         if not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail="Workspace path does not exist")
         
-        # Parsear exclusiones del texto
+        
         if ',' in exclusions_text:
             new_exclusions = [item.strip().upper() for item in exclusions_text.split(',')]
         else:
@@ -2949,10 +2746,10 @@ async def update_exclusions(
         
         new_exclusions = [item for item in new_exclusions if item]
         
-        # Cargar exclusiones actuales
+        
         current_exclusions = load_exclusions_from_workspace(workspace_path)
         
-        # Aplicar acción
+        
         if action == "add":
             updated_exclusions = list(set(current_exclusions + new_exclusions))
             message = f"Added {len(new_exclusions)} new exclusions"
@@ -2960,11 +2757,11 @@ async def update_exclusions(
             updated_exclusions = [item for item in current_exclusions if item not in new_exclusions]
             removed_count = len(current_exclusions) - len(updated_exclusions)
             message = f"Removed {removed_count} exclusions"
-        else:  # replace
+        else:  
             updated_exclusions = new_exclusions
             message = f"Replaced exclusions list with {len(new_exclusions)} items"
         
-        # Guardar exclusiones actualizadas
+        
         if save_exclusions_to_workspace(workspace_path, updated_exclusions):
             return ExclusionsResponse(
                 success=True,
@@ -2982,7 +2779,7 @@ async def update_exclusions(
 
 @app.post("/product-chunks/exclusions/reset")
 async def reset_exclusions_to_default(workspace_path: str = Form(...)) -> ExclusionsResponse:
-    """Resetea las exclusiones a los valores por defecto"""
+
     try:
         if not os.path.exists(workspace_path):
             raise HTTPException(status_code=400, detail="Workspace path does not exist")
@@ -3006,7 +2803,7 @@ async def reset_exclusions_to_default(workspace_path: str = Form(...)) -> Exclus
 
 @app.get("/product-chunks/test")
 async def test_product_chunks_exact_original():
-    """Test endpoint para verificar que el servicio funciona"""
+
     return {
         "service": "Product Chunks Processor (Exact Original Logic)",
         "version": "2.0",
@@ -3030,9 +2827,133 @@ async def test_product_chunks_exact_original():
         "timestamp": datetime.now().isoformat()
     }
 
-# ================================
-# FIN DEL MÓDULO PRODUCT CHUNKS PROCESSOR
-# ================================
+
+
+
+# Agrega este endpoint al final de backend/main.py antes de if __name__ == "__main__":
+
+@app.post("/debug/test-git-clone")
+async def debug_test_git_clone(request: dict):
+    """Test específico para debug del método clone_microservices"""
+    try:
+        project_path = request.get("project_path", "")
+        branch = request.get("branch", "develop")
+        
+        debug_info = {
+            "timestamp": datetime.now().isoformat(),
+            "request_data": {
+                "project_path": project_path,
+                "branch": branch
+            },
+            "service_status": {
+                "git_service_loaded": git_service is not None,
+                "services_available": SERVICES_AVAILABLE
+            },
+            "method_check": None,
+            "execution_result": None,
+            "error_details": None
+        }
+        
+        # Verificar si el servicio está disponible
+        if not git_service:
+            debug_info["error_details"] = "Git service not available"
+            return {"success": False, "debug": debug_info}
+        
+        # Verificar si el método existe
+        if not hasattr(git_service, 'clone_microservices'):
+            debug_info["error_details"] = "clone_microservices method not found"
+            return {"success": False, "debug": debug_info}
+        
+        method = getattr(git_service, 'clone_microservices')
+        debug_info["method_check"] = {
+            "method_exists": True,
+            "is_callable": callable(method),
+            "is_async": asyncio.iscoroutinefunction(method)
+        }
+        
+        # Crear directorio si no existe
+        if project_path and not os.path.exists(project_path):
+            try:
+                os.makedirs(project_path, exist_ok=True)
+                debug_info["directory_created"] = True
+            except Exception as dir_error:
+                debug_info["error_details"] = f"Failed to create directory: {str(dir_error)}"
+                return {"success": False, "debug": debug_info}
+        
+        # Intentar ejecutar el método
+        try:
+            if asyncio.iscoroutinefunction(method):
+                result = await method(project_path=project_path, branch=branch)
+            else:
+                result = method(project_path=project_path, branch=branch)
+                
+            debug_info["execution_result"] = {
+                "success": True,
+                "result": result
+            }
+            
+            return {"success": True, "debug": debug_info}
+            
+        except Exception as exec_error:
+            import traceback
+            debug_info["execution_result"] = {
+                "success": False,
+                "error": str(exec_error),
+                "error_type": type(exec_error).__name__,
+                "traceback": traceback.format_exc()
+            }
+            
+            return {"success": False, "debug": debug_info}
+        
+    except Exception as e:
+        import traceback
+        return {
+            "success": False,
+            "error": f"Debug test failed: {str(e)}",
+            "error_type": type(e).__name__,
+            "traceback": traceback.format_exc(),
+            "timestamp": datetime.now().isoformat()
+        }
+
+@app.get("/debug/git-method-info")
+async def debug_git_method_info():
+    """Información detallada sobre los métodos del servicio Git"""
+    try:
+        if not git_service:
+            return {"error": "Git service not available"}
+        
+        methods_info = {}
+        
+        # Obtener todos los métodos
+        for attr_name in dir(git_service):
+            if not attr_name.startswith('_'):
+                attr = getattr(git_service, attr_name)
+                if callable(attr):
+                    methods_info[attr_name] = {
+                        "is_async": asyncio.iscoroutinefunction(attr),
+                        "is_method": hasattr(attr, '__self__'),
+                        "doc": getattr(attr, '__doc__', None)
+                    }
+        
+        return {
+            "success": True,
+            "git_service_type": str(type(git_service)),
+            "methods": methods_info,
+            "total_methods": len(methods_info),
+            "has_clone_microservices": "clone_microservices" in methods_info,
+            "clone_method_is_async": methods_info.get("clone_microservices", {}).get("is_async", False),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+
+
 
 if __name__ == "__main__":
     print("🚀 Starting KapTools Nexus API...")
@@ -3047,7 +2968,9 @@ if __name__ == "__main__":
         app, 
         host="127.0.0.1", 
         port=8000,
-        log_level="info"
+        log_level="error",
+        access_log=False,
+        use_colors=False
     )
 
 

@@ -1,5 +1,3 @@
-// src/components/DuplicateMDD.tsx - SOLO BACKEND PYTHON + IBM SPSS CON PROGRESS CIRCULAR Y SVG NEON
-
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import './DuplicateMDD.css';
@@ -22,7 +20,7 @@ interface BackendResponse {
 
 type ProcessingStep = 'idle' | 'file-selected' | 'processing' | 'completed' | 'error';
 
-// 🔥 COMPONENTES SVG NEON
+
 const NeonSVGs = {
     Fire: ({ className = "neon-svg large neon-fire pulse" }) => (
         <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -148,7 +146,7 @@ const NeonSVGs = {
 
 
 const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspacePath }) => {
-    // Estados principales
+    
     const [currentStep, setCurrentStep] = useState<ProcessingStep>('idle');
     const [selectedMddFile, setSelectedMddFile] = useState<string>('');
     const [selectedDdfFile, setSelectedDdfFile] = useState<string>('');
@@ -159,7 +157,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
     const [processingLogs, setProcessingLogs] = useState<string[]>([]);
     const [showProgress, setShowProgress] = useState(false);
 
-    // Reset states when modal closes
+    
     useEffect(() => {
         if (!isOpen) {
             resetStates();
@@ -178,7 +176,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         setShowProgress(false);
     };
 
-    // Función para agregar logs
+    
     const addLog = (message: string) => {
         const timestamp = new Date().toLocaleTimeString();
         const logEntry = `[${timestamp}] ${message}`;
@@ -204,7 +202,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         return '0s';
     };
 
-    // Componente Progress Circular
+    
     const CircularProgress = () => (
         <div className={`circular-progress ${!showProgress ? 'hide' : ''}`}>
             <svg className="progress-ring" viewBox="0 0 120 120">
@@ -214,7 +212,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         </div>
     );
 
-    // Seleccionar archivo MDD usando Tauri
+    
     const handleMddFileSelect = async () => {
         try {
             setLoading(true);
@@ -227,12 +225,12 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                 setSelectedMddFile(selected);
                 addLog(`📁 MDD file selected: ${selected}`);
 
-                // Auto-detectar archivo DDF correspondiente
+    
                 const ddfPath = selected.replace(/\.mdd$/i, '.ddf');
                 setSelectedDdfFile(ddfPath);
                 addLog(`🔍 Looking for corresponding DDF: ${ddfPath}`);
 
-                // Verificar que existe el DDF
+    
                 await checkDdfExists(ddfPath);
 
                 setCurrentStep('file-selected');
@@ -248,7 +246,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         }
     };
 
-    // Verificar que existe el archivo DDF
+    
     const checkDdfExists = async (ddfPath: string) => {
         try {
             const response = await fetch('http://127.0.0.1:8000/test', {
@@ -267,7 +265,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         }
     };
 
-    // Iniciar procesamiento usando Backend Python + IBM SPSS
+    
     const startProcessing = async () => {
         if (!selectedMddFile || !selectedDdfFile) {
             setError('Both MDD and DDF files are required');
@@ -281,7 +279,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
 
         try {
             setCurrentStep('processing');
-            setShowProgress(true); // 🔥 Mostrar progress circular
+            setShowProgress(true);
             setError('');
             setProcessingLogs([]);
             addLog('🚀 Starting  MDD duplication with IBM SPSS Data Collection...');
@@ -290,12 +288,12 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
             addLog(`🔢 Duplicate Count: ${duplicateCount}x`);
             addLog(`📂 Workspace: ${workspacePath}`);
 
-            // Crear FormData para enviar archivos al backend
+            
             const formData = new FormData();
 
-            // Leer archivos como Blob para enviar al backend
+            
             try {
-                // Obtener contenido de archivos usando Tauri
+                
                 const mddContent = await readFileAsBase64(selectedMddFile);
                 const ddfContent = await readFileAsBase64(selectedDdfFile);
 
@@ -314,7 +312,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
                 throw new Error(`Could not read files: ${fileError}`);
             }
 
-            // Enviar al backend Python con IBM SPSS
+            
             const response = await fetch('http://127.0.0.1:8000/data/duplicate-mdd', {
                 method: 'POST',
                 body: formData
@@ -326,15 +324,15 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
             if (response.ok && responseData.success) {
                 setResult(responseData);
 
-                // 🔥 Ocultar progress antes de mostrar completado
+                
                 setShowProgress(false);
 
-                // Pequeño delay para la animación de ocultación
+                
                 setTimeout(() => {
                     setCurrentStep('completed');
                 }, 500);
 
-                // Agregar logs del backend
+                
                 if (responseData.processing_logs) {
                     responseData.processing_logs.forEach((log: string) => addLog(log));
                 }
@@ -345,11 +343,11 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
             } else {
                 const errorMessage = responseData.error || responseData.message || 'Unknown error occurred';
                 setError(errorMessage);
-                setShowProgress(false); // 🔥 Ocultar progress en error
+                setShowProgress(false); 
                 setCurrentStep('error');
                 addLog(`❌ Backend error: ${errorMessage}`);
 
-                // Agregar logs de error del backend
+                
                 if (responseData.logs) {
                     responseData.logs.forEach((log: string) => addLog(log));
                 }
@@ -358,13 +356,13 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         } catch (err) {
             const errorMsg = `Processing failed: ${err}`;
             setError(errorMsg);
-            setShowProgress(false); // 🔥 Ocultar progress en error
+            setShowProgress(false); 
             setCurrentStep('error');
             addLog(`💥 ${errorMsg}`);
         }
     };
 
-    // Helper function para leer archivos como base64 usando comando de Tauri
+    
     const readFileAsBase64 = async (filePath: string): Promise<string> => {
         try {
             addLog(`📖 Reading file: ${getFileName(filePath)}`);
@@ -377,7 +375,7 @@ const DuplicateMDD: React.FC<DuplicateMDDProps> = ({ isOpen, onClose, workspaceP
         }
     };
 
-    // Helper para obtener nombre de archivo
+    
     const getFileName = (fullPath: string): string => {
         return fullPath.split('\\').pop() || fullPath.split('/').pop() || 'unknown';
     };

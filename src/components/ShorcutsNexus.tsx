@@ -18,7 +18,7 @@ interface ShortcutsNexusProps {
     onClose: () => void;
 }
 
-// 🎨 NEON SVG ICONS COLLECTION
+
 const NeonIcons = {
     sandbox: (color: string) => (
         <svg viewBox="0 0 24 24" fill="none" className="shortcuts-neon-svg">
@@ -234,9 +234,9 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // 🔥 SHORTCUTS DATA
+
     const shortcuts: ShortcutItem[] = [
-        // SANDBOX ENVIRONMENTS
+
         {
             id: 's3',
             label: 'Sandbox 3',
@@ -271,7 +271,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             color: '#ff6b9d'
         },
 
-        // MISSION CONTROL
+
         {
             id: 'm3',
             label: 'Mission Control 3',
@@ -306,7 +306,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             color: '#e17055'
         },
 
-        // AFFECTIVA AI
+
         {
             id: 'afeprod',
             label: 'Affectiva Production',
@@ -330,7 +330,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             color: '#fd79a8'
         },
 
-        // DATA SYSTEMS
+
         {
             id: 'linkprod',
             label: 'LinkDB Production',
@@ -354,7 +354,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             color: '#74b9ff'
         },
 
-        // SURVEY MANAGEMENT
+
         {
             id: 'nfiledu',
             label: 'Nfield Manager EU',
@@ -556,10 +556,10 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-    // Handle shortcut click
+
     const handleShortcutClick = async (shortcut: ShortcutItem) => {
         try {
-            // Método 1: Tauri invoke (funciona out-of-the-box)
+
             try {
                 const { invoke } = await import('@tauri-apps/api/core');
                 await invoke('plugin:shell|open', {
@@ -571,7 +571,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                 console.log('Tauri not available, using web fallback...');
             }
 
-            // Método 2: Web fallback (desarrollo y web builds)
+
             const opened = window.open(shortcut.url, '_blank', 'noopener,noreferrer');
 
             if (opened) {
@@ -579,7 +579,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                 return;
             }
 
-            // Método 3: Fallback final con notificación bonita
+
             await copyUrlWithNotification(shortcut);
 
         } catch (error) {
@@ -588,12 +588,12 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
         }
     };
 
-    // Función helper para copiar URL con notificación épica
+
     const copyUrlWithNotification = async (shortcut: ShortcutItem) => {
         try {
             await navigator.clipboard.writeText(shortcut.url);
 
-            // Crear notificación súper estilizada
+
             const notification = document.createElement('div');
             notification.innerHTML = `
         <div style="
@@ -648,7 +648,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
         </div>
       `;
 
-            // Agregar estilos de animación
+
             if (!document.getElementById('notification-styles')) {
                 const styles = document.createElement('style');
                 styles.id = 'notification-styles';
@@ -680,7 +680,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
 
             document.body.appendChild(notification);
 
-            // Remover con animación después de 4 segundos
+
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.style.animation = 'slideOutRight 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
@@ -694,7 +694,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
 
         } catch (clipboardError) {
             console.error('Clipboard failed:', clipboardError);
-            // Alert básico como último recurso
+
             alert(`Please open manually:\n\n${shortcut.label}\n${shortcut.url}`);
         }
     };
@@ -820,7 +820,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
                             onMouseLeave={() => setHoveredItem('')}
                             onClick={() => handleShortcutClick(shortcut)}
                         >
-                            
+
 
                             {/* Priority Badge */}
                             {shortcut.priority === 'high' && (

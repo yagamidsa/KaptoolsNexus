@@ -1,6 +1,3 @@
-# backend/mdd_real_service.py - VERSIÓN FINAL SIMPLIFICADA
-# 🚀 SOLO EL MÉTODO INTELIGENTE (SIN DUPLICACIONES INNECESARIAS)
-
 import os
 import subprocess
 import tempfile
@@ -16,12 +13,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-class IBMSPSSDataCollectionService:
-    """
-    🚀 SERVICIO MDD OPTIMIZADO - SOLO MÉTODO INTELIGENTE
-    Sin archivos temporales, sin copias innecesarias
-    """
-    
+class IBMSPSSDataCollectionService:    
     def __init__(self):
         self.service_name = "MDD Intelligent Service"
         self.version = "8.0-FINAL_OPTIMIZED"
@@ -31,7 +23,7 @@ class IBMSPSSDataCollectionService:
         logger.info(f"🔧 Using single intelligent method only")
     
     def get_service_status(self) -> Dict[str, Any]:
-        """Estado del servicio"""
+        
         return {
             "service_name": self.service_name,
             "version": self.version,
@@ -47,10 +39,7 @@ class IBMSPSSDataCollectionService:
         workspace_path: str, 
         original_mdd_filename: str
     ) -> Dict[str, Any]:
-        """
-        🎯 MÉTODO INTELIGENTE CON CONTEO EXACTO DESDE LOG DMS
-        Versión final corregida que extrae valores reales del registro 'Records transferred'
-        """
+        
         start_time = datetime.now()
         logs = []
         
@@ -60,14 +49,14 @@ class IBMSPSSDataCollectionService:
             logger.info(message)
 
         try:
-            # PASO 1: Configuración inicial
+        
             add_log("🔍 Iniciando duplicación con conteo exacto desde log DMS...")
             base_name = os.path.splitext(original_mdd_filename)[0]
             
             add_log(f"📋 Base name: {base_name}")
             add_log(f"🔢 Duplicate count: {duplicate_count}")
 
-            # PASO 2: Copiar archivos al workspace
+        
             workspace_mdd = os.path.join(workspace_path, f"{base_name}.mdd")
             workspace_ddf = os.path.join(workspace_path, f"{base_name}.ddf")
             
@@ -79,7 +68,7 @@ class IBMSPSSDataCollectionService:
                 shutil.copy2(ddf_file_path, workspace_ddf)
                 add_log("💾 DDF copiado al workspace")
 
-            # PASO 3: Generar script DMS
+        
             dms_script_path = os.path.join(workspace_path, "intelligent_duplicate.dms")
             output_ddf_name = f"{base_name}_Completes_All.ddf"
             output_mdd_name = f"{base_name}_Completes_All.mdd"
@@ -94,7 +83,7 @@ class IBMSPSSDataCollectionService:
                 
                 add_log(f"🔧 Generando script con lotes de {batch_size} InputDatasources")
                 
-                # Generar InputDatasources en lotes optimizados
+        
                 for i in range(1, duplicate_count + 1):
                     dms_file.write(f"InputDatasource(Input{i})\n")
                     dms_file.write(f'    ConnectionString = "Provider=mrOleDB.Provider.2;Data Source=mrDataFileDsc;Location=.\\{base_name}.ddf;Initial Catalog=.\\{base_name}.mdd;Pooling=true;Max Pool Size=10;Connection Timeout=300"\n')
@@ -113,7 +102,7 @@ class IBMSPSSDataCollectionService:
             
             add_log("📜 Script DMS generado correctamente")
 
-            # PASO 4: Ejecutar DMS y capturar log completo
+        
             add_log("⚡ Ejecutando DMS con captura detallada del log...")
             
             result = subprocess.run(
@@ -129,7 +118,7 @@ class IBMSPSSDataCollectionService:
             dms_log = result.stdout + result.stderr
             add_log(f"📝 Log DMS capturado ({len(dms_log)} caracteres)")
 
-            # PASO 5: Extraer valores exactos del log
+        
             final_count = self._extract_final_record_count(dms_log)
             if final_count is None:
                 raise ValueError("No se encontró 'Records transferred' en el log DMS")
@@ -142,14 +131,14 @@ class IBMSPSSDataCollectionService:
             add_log(f"   Registros base calculados: {original_count}")
             add_log(f"   Diferencia: {discrepancy}")
 
-            # PASO 6: Verificar archivos de salida
+        
             output_mdd_path = os.path.join(workspace_path, output_mdd_name)
             output_ddf_path = os.path.join(workspace_path, output_ddf_name)
             
             if not os.path.exists(output_mdd_path) or not os.path.exists(output_ddf_path):
                 raise Exception("Archivos de salida no generados correctamente")
 
-            # PASO 7: Crear ZIP final (versión corregida)
+        
             zip_path = await self._create_output_zip(
                 workspace_path, 
                 base_name, 
@@ -160,7 +149,7 @@ class IBMSPSSDataCollectionService:
                 add_log
             )
             
-            # PASO 8: Limpieza
+        
             os.remove(dms_script_path)
             os.remove(output_mdd_path)
             os.remove(output_ddf_path)
@@ -202,36 +191,36 @@ class IBMSPSSDataCollectionService:
     
 
     def _extract_final_record_count(self, dms_log: str) -> Optional[int]:
-        """Extrae específicamente el valor de 'Records transferred' del log"""
+        
         match = re.search(r"Records transferred\s*:\s*(\d+)", dms_log)
         return int(match.group(1)) if match else None
     
     def _extract_records_per_second(self, dms_log: str) -> Optional[float]:
-        """Extrae el valor de records/segundo para diagnóstico"""
+        
         match = re.search(r"Records per second\s*:\s*([\d.]+)", dms_log)
         return float(match.group(1)) if match else None
     
     def _extract_time_elapsed(self, dms_log: str) -> Optional[str]:
-        """Extrae el tiempo transcurrido para diagnóstico"""
+        
         match = re.search(r"Time elapsed\s*:\s*([^\n]+)", dms_log)
         return match.group(1).strip() if match else None
     
     async def _create_output_zip(self, workspace, base_name, mdd_file, ddf_file, count, final_count, add_log):
-        """Versión corregida del método para crear ZIP"""
+        
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         zip_name = f"{base_name}_Completes_All.zip"
         zip_path = os.path.join(workspace, zip_name)
         
         try:
             with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                # Directorio /mdd/ con archivo limpio
+                
                 zipf.write(mdd_file, f"mdd/{base_name}.mdd")
                 
-                # Directorio /export/ con ambos archivos
+                
                 zipf.write(mdd_file, f"export/{base_name}_Completes_All.mdd")
                 zipf.write(ddf_file, f"export/{base_name}_Completes_All.ddf")
                 
-                # Archivo de información (versión corregida)
+                
                 info_content = f"""EXACT MDD DUPLICATION REPORT
 Generated: {datetime.now().isoformat()}
 Method: Exact Count from DMS Log
@@ -261,54 +250,47 @@ STRUCTURE:
 
 
     def _get_relevant_log_part(self, full_log: str) -> str:
-        """Extrae la parte relevante del log para diagnóstico"""
+        
         lines = full_log.splitlines()
         relevant = []
-        # Buscar líneas con información clave
-        for line in lines[-20:]:  # Últimas 20 líneas
+        
+        for line in lines[-20:]:  
             if any(keyword in line for keyword in ["Records transferred", "Time elapsed", "Job has completed"]):
                 relevant.append(line)
         return "\n".join(relevant[-5:]) or "No relevant log found"
 
-    # Mantenemos los demás métodos igual pero los marcamos como obsoletos
+    
     def _count_records_in_ddf(self, ddf_path: str) -> int:
-        """Método obsoleto (se mantiene por compatibilidad)"""
+    
         return -1
 
     async def _count_records_in_output_ddf(self, ddf_path, add_log):
-        """Método obsoleto (se mantiene por compatibilidad)"""
+    
         return -1
 
 
 
     def _count_valid_records(self, ddf_path: str, log_func=None) -> int:
-        """
-        CONTEO EXACTO DE REGISTROS VÁLIDOS
-        Versión mejorada que:
-        1. Detecta automáticamente la codificación
-        2. Valida la estructura de cada registro
-        3. Descarta líneas malformadas
-        """
         ENCODINGS = ['utf-16-le', 'utf-8', 'latin-1', 'cp1252']
-        MIN_COLS = 3  # Número mínimo de columnas esperadas
+        MIN_COLS = 3  
         for encoding in ENCODINGS:
             try:
                 record_count = 0
                 sample_records = []
                 with open(ddf_path, 'r', encoding=encoding, errors='strict') as f:
-                    # Validar encabezado
+                    
                     try:
                         header = next(f)
                         if not header.strip() or header.count('\t') < MIN_COLS - 1:
                             continue
                     except StopIteration:
                         return 0
-                    # Contar registros válidos
+                    
                     for line in f:
                         line = line.strip()
                         if line and line.count('\t') >= MIN_COLS - 1:
                             record_count += 1
-                            if record_count <= 3:  # Guardar muestra
+                            if record_count <= 3:
                                 sample_records.append(line[:100])
                 if log_func:
                     log_func(f"Codificación detectada: {encoding}")
@@ -326,21 +308,21 @@ STRUCTURE:
         raise ValueError("No se pudo determinar la codificación del archivo")
 
     async def _count_records_in_output_ddf(self, ddf_path, add_log):
-        """Método obsoleto (se mantiene por compatibilidad)"""
+        
         return -1
     
 
     def _count_records_in_ddf(self, ddf_path: str) -> int:
-        """Alias para mantener compatibilidad"""
+        
         return self._count_valid_records(ddf_path)
 
     async def _create_intelligent_zip(self, workspace, base_name, mdd_file, ddf_file, count, add_log):
-        """Crear ZIP optimizado"""
+        
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         zip_name = f"{base_name}_INTELLIGENT_x{count}_{timestamp}.zip"
         zip_path = os.path.join(workspace, zip_name)
         
-        # Crear directorios temporales
+        
         mdd_dir = os.path.join(workspace, "mdd")
         export_dir = os.path.join(workspace, "export")
         
@@ -350,31 +332,31 @@ STRUCTURE:
             os.makedirs(temp_dir)
         
         try:
-            # MDD limpio para Survey Reporter
+        
             clean_mdd_name = f"{base_name}.mdd"
             shutil.copy2(mdd_file, os.path.join(mdd_dir, clean_mdd_name))
             
-            # Export completo
+        
             shutil.copy2(mdd_file, export_dir)
             shutil.copy2(ddf_file, export_dir)
             
-            # Crear ZIP
+        
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zip_file:
-                # /mdd/
+        
                 for root, dirs, files in os.walk(mdd_dir):
                     for file in files:
                         file_path = os.path.join(root, file)
                         arcname = os.path.join("mdd", os.path.relpath(file_path, mdd_dir))
                         zip_file.write(file_path, arcname=arcname)
                 
-                # /export/
+        
                 for root, dirs, files in os.walk(export_dir):
                     for file in files:
                         file_path = os.path.join(root, file)
                         arcname = os.path.join("export", os.path.relpath(file_path, export_dir))
                         zip_file.write(file_path, arcname=arcname)
                 
-                # Info del método
+        
                 info_content = f"""INTELLIGENT MDD DUPLICATION REPORT
 Method: Single File, Multiple DMS Reads
 No Temporary Files Created
@@ -407,7 +389,7 @@ maintaining full compatibility with IBM SPSS Data Collection.
             add_log(f"📦 Created intelligent ZIP: {zip_name}")
             
         finally:
-            # Limpiar directorios temporales
+        
             for temp_dir in [mdd_dir, export_dir]:
                 if os.path.exists(temp_dir):
                     shutil.rmtree(temp_dir)
@@ -415,24 +397,24 @@ maintaining full compatibility with IBM SPSS Data Collection.
         return zip_path
 
     def _count_records_in_ddf(self, ddf_path: str) -> int:
-        """Conteo EXACTO de registros sin dependencias externas"""
+        
         ENCODINGS = ['utf-16-le', 'utf-8', 'latin-1', 'cp1252']
 
         for encoding in ENCODINGS:
             try:
                 with open(ddf_path, 'r', encoding=encoding, errors='strict') as f:
-                    # Leer header y validar
+        
                     try:
                         header = next(f)
                         if not header.strip() or len(header) > 1000:
-                            continue  # Probamos siguiente codificación
+                            continue  
                     except StopIteration:
                         continue
                     
-                    # Conteo preciso
+                    
                     record_count = 0
                     for line in f:
-                        if line.strip():  # Ignorar líneas vacías
+                        if line.strip():
                             record_count += 1
 
                     logger.info(f"Conteo EXACTO con {encoding}: {record_count} registros")
@@ -448,7 +430,7 @@ maintaining full compatibility with IBM SPSS Data Collection.
 
 
     async def _count_records_in_output_ddf(self, ddf_path, add_log):
-        """Conteo EXACTO para archivos de salida (versión optimizada)"""
+        
         ENCODINGS = [
             'utf-16-le', 'utf-16', 
             'utf-8-sig', 'latin-1',
@@ -459,13 +441,13 @@ maintaining full compatibility with IBM SPSS Data Collection.
             try:
                 add_log(f"Probando codificación: {encoding}")
                 with open(ddf_path, 'r', encoding=encoding, errors='strict') as f:
-                    # Validar header
+        
                     header = next(f)
                     if not header.strip():
                         add_log("Encabezado vacío, probando siguiente codificación")
                         continue
                     
-                    # Conteo eficiente
+        
                     record_count = sum(1 for line in f if line.strip())
 
                     add_log(f"✓ Conteo exitoso con {encoding}: {record_count} registros")
@@ -477,12 +459,12 @@ maintaining full compatibility with IBM SPSS Data Collection.
                 add_log(f"Error con {encoding}: {str(e)}")
                 continue
             
-        # Si todas fallan, intentar método binario de último recurso
+        
         try:
             add_log("⚠️ Probando método binario de último recurso")
             with open(ddf_path, 'rb') as f:
-                # Contar saltos de línea (método aproximado)
-                record_count = sum(1 for _ in f) - 1  # Restar header
+        
+                record_count = sum(1 for _ in f) - 1  
                 add_log(f"✓ Conteo binario aproximado: {record_count}")
                 return record_count
         except Exception as e:
@@ -492,10 +474,10 @@ maintaining full compatibility with IBM SPSS Data Collection.
 
 
 
-    # ✅ MÉTODOS DE COMPATIBILIDAD
+    
     def duplicate_mdd_real_fallback(self, mdd_path, ddf_path, duplicate_count, 
                                    workspace_path, original_filename):
-        """Método síncrono para compatibilidad"""
+    
         import asyncio
         
         try:
@@ -525,7 +507,7 @@ maintaining full compatibility with IBM SPSS Data Collection.
             }
 
     def _validate_mdd_ddf_files(self, mdd_path: str, ddf_path: str) -> Dict[str, Any]:
-        """Validación de archivos"""
+    
         if not os.path.exists(mdd_path):
             return {"valid": False, "error": f"MDD not found: {mdd_path}"}
         
@@ -545,10 +527,10 @@ maintaining full compatibility with IBM SPSS Data Collection.
             return {"valid": False, "error": f"Validation error: {str(e)}"}
 
 
-# Función standalone
+
 def validate_mdd_ddf_files(mdd_path: str, ddf_path: str) -> Dict[str, Any]:
     service = IBMSPSSDataCollectionService()
     return service._validate_mdd_ddf_files(mdd_path, ddf_path)
 
-# Instancia del servicio
+
 mdd_real_service = IBMSPSSDataCollectionService()

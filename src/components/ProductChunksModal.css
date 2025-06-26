@@ -81,13 +81,11 @@
     }
 }
 
-/* ================================
-   🧛‍♂️ PRODUCT CHUNKS MODAL - DRACULA THEME
-   ================================ */
 
-/* Variables consistentes con la aplicación principal */
+
+
 :root {
-    /* Dracula Core Colors */
+    
     --dracula-background: #282a36;
     --dracula-current-line: #44475a;
     --dracula-foreground: #f8f8f2;
@@ -101,7 +99,7 @@
     --dracula-yellow: #f1fa8c;
     --dracula-darker: #1e1f29;
 
-    /* Aplicación específica */
+    
     --primary-purple: var(--dracula-purple);
     --primary-pink: var(--dracula-pink);
     --success-green: var(--dracula-green);
@@ -113,16 +111,14 @@
     --bg-secondary: #252a4a;
     --bg-card: rgba(37, 42, 74, 0.6);
 
-    /* Sombras y efectos */
+    
     --shadow-primary: 0 8px 32px rgba(0, 0, 0, 0.3);
     --shadow-glow: 0 0 20px rgba(189, 147, 249, 0.3);
     --shadow-pink-glow: 0 0 20px rgba(255, 121, 198, 0.3);
     --shadow-green-glow: 0 0 20px rgba(80, 250, 123, 0.3);
 }
 
-/* ================================
-   🎭 MODAL BACKDROP
-   ================================ */
+
 .product-chunks-modal {
     position: fixed;
     top: 0;
@@ -155,9 +151,7 @@
     }
 }
 
-/* ================================
-   🏠 CONTENEDOR PRINCIPAL
-   ================================ */
+
 .product-chunks-modal-container {
     background:
         radial-gradient(circle at 20% 80%, rgba(189, 147, 249, 0.02) 0%, transparent 50%),
@@ -180,7 +174,7 @@
     position: relative;
 }
 
-/* Efecto de brillo superior */
+
 .product-chunks-modal-container::before {
     content: '';
     position: absolute;
@@ -204,9 +198,7 @@
     }
 }
 
-/* ================================
-   🎯 HEADER SECTION
-   ================================ */
+
 .product-chunks-header {
     background:
         linear-gradient(135deg, rgba(189, 147, 249, 0.1) 0%, rgba(255, 121, 198, 0.1) 100%);
@@ -301,9 +293,7 @@
     box-shadow: 0 0 15px rgba(255, 85, 85, 0.3);
 }
 
-/* ================================
-   📋 CONTENT AREA
-   ================================ */
+
 .product-chunks-content {
     flex: 1;
     overflow-y: auto;
@@ -313,18 +303,14 @@
         radial-gradient(circle at 80% 20%, rgba(255, 121, 198, 0.01) 0%, transparent 50%);
 }
 
-/* ================================
-   📝 FORM CONTAINER
-   ================================ */
+
 .form-container {
     display: flex;
     flex-direction: column;
     gap: 28px;
 }
 
-/* ================================
-   🎛️ EXCLUSIONS SECTION
-   ================================ */
+
 .exclusions-toggle {
     display: flex;
     justify-content: center;
@@ -594,9 +580,7 @@
     transform: translateY(-1px) scale(1.02);
 }
 
-/* ================================
-   📊 FORM GROUPS
-   ================================ */
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -675,9 +659,7 @@
     opacity: 0.8;
 }
 
-/* ================================
-   🎯 PRIMARY BUTTON
-   ================================ */
+
 .primary-button {
     background: linear-gradient(135deg, var(--dracula-pink) 0%, #380596 100%);
     border: none;
@@ -766,9 +748,7 @@
     display: none;
 }
 
-/* ================================
-   ⚠️ ERROR MESSAGE
-   ================================ */
+
 .error-message {
     background:
         linear-gradient(135deg, var(--dracula-red) 0%, #dc2626 50%, var(--primary-pink) 100%);
@@ -846,9 +826,7 @@
     }
 }
 
-/* ================================
-   📈 RESULTS CONTAINER
-   ================================ */
+
 .results-container {
     display: flex;
     flex-direction: column;
@@ -903,9 +881,7 @@
     line-height: 1.5;
 }
 
-/* ================================
-   📊 STATS GRID
-   ================================ */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1005,9 +981,7 @@
     z-index: 2;
 }
 
-/* ================================
-   📄 REPORT CONTENT
-   ================================ */
+
 .report-content {
     background:
         linear-gradient(135deg, rgba(68, 71, 90, 0.4) 0%, rgba(40, 42, 54, 0.6) 100%);
@@ -1059,9 +1033,7 @@
     opacity: 0.95;
 }
 
-/* ================================
-   🎬 ACTION BUTTONS - SOLO RESET
-   ================================ */
+
 .action-buttons {
     display: flex;
     gap: 20px;
@@ -1124,9 +1096,7 @@
     transform: translateY(-2px) scale(1.02);
 }
 
-/* ================================
-   ✨ ANIMACIÓN PULSE MEJORADA
-   ================================ */
+
 .animate-pulse {
     animation: advancedPulse 2.5s ease-in-out infinite;
 }
@@ -1159,11 +1129,9 @@
     }
 }
 
-/* ================================
-   🌟 EFECTOS ADICIONALES PARA ELEMENTOS ESPECIALES
-   ================================ */
 
-/* Efecto de respiración para contenedores importantes */
+
+
 .breathing-effect {
     animation: breathe 4s ease-in-out infinite;
 }
@@ -1182,7 +1150,7 @@
     }
 }
 
-/* Efecto de ondas para elementos interactivos */
+
 .ripple-effect {
     position: relative;
     overflow: hidden;
@@ -1207,7 +1175,7 @@
     height: 300px;
 }
 
-/* Efecto de partículas para elementos de éxito */
+
 .particle-effect {
     position: relative;
 }
@@ -1236,7 +1204,7 @@
     }
 }
 
-/* Efecto de carga para elementos procesando */
+
 .loading-effect {
     position: relative;
 }
@@ -1263,9 +1231,7 @@
     }
 }
 
-/* ================================
-   📱 RESPONSIVE DESIGN
-   ================================ */
+
 @media (max-width: 768px) {
     .product-chunks-modal-container {
         width: 95%;
@@ -1328,9 +1294,7 @@
     }
 }
 
-/* ================================
-   🎛️ SCROLLBAR STYLING
-   ================================ */
+
 .product-chunks-content::-webkit-scrollbar,
 .report-content::-webkit-scrollbar,
 .exclusions-textarea::-webkit-scrollbar {

@@ -1,12 +1,5 @@
-/* ================================
-   🔥 DUPLICATE MDD - CSS OPTIMIZADO Y PROPORCIONAL - PARTE 1/3
-   ================================ */
-
-/* ================================
-   VARIABLES CSS OPTIMIZADAS
-   ================================ */
 :root {
-    /* 🎨 COLORES BASE DRACULA */
+
     --dracula-background: #282a36;
     --dracula-current-line: #44475a;
     --dracula-foreground: #f8f8f2;
@@ -21,7 +14,7 @@
     --dracula-darker: #1e1f29;
     --dracula-lightest: #44475a;
 
-    /* 🌟 EFECTOS NEON */
+
     --neon-purple: #bd93f9;
     --neon-cyan: #8be9fd;
     --neon-green: #50fa7b;
@@ -30,12 +23,12 @@
     --neon-yellow: #f1fa8c;
     --neon-orange: #ffb86c;
 
-    /* 🔄 TRANSICIONES */
+
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* 📏 ESPACIADO PROPORCIONAL */
+
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 12px;
@@ -43,14 +36,14 @@
     --spacing-xl: 20px;
     --spacing-2xl: 24px;
 
-    /* 🔤 TIPOGRAFÍA ESCALABLE */
+
     --font-xs: clamp(10px, 2vw, 12px);
     --font-sm: clamp(12px, 2.5vw, 14px);
     --font-md: clamp(14px, 3vw, 16px);
     --font-lg: clamp(16px, 3.5vw, 18px);
     --font-xl: clamp(18px, 4vw, 20px);
 
-    /* 🌈 SHADOWS Y GLOWS */
+
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
     --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
     --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.25);
@@ -60,9 +53,7 @@
     --glow-red: 0 0 15px rgba(255, 85, 85, 0.4);
 }
 
-/* ================================
-   🎯 OVERLAY Y MODAL BASE
-   ================================ */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -94,9 +85,7 @@
     flex-direction: column;
 }
 
-/* ================================
-   📋 HEADER COMPACTO
-   ================================ */
+
 .dup-modal-header {
     display: flex;
     align-items: center;
@@ -147,9 +136,7 @@
     transform: scale(1.1);
 }
 
-/* ================================
-   📝 MODAL BODY OPTIMIZADO
-   ================================ */
+
 .modal-body {
     padding: var(--spacing-lg);
     flex: 1;
@@ -174,9 +161,7 @@
     border-radius: 3px;
 }
 
-/* ================================
-   📦 SECCIONES COMPACTAS
-   ================================ */
+
 .section {
     background: var(--dracula-current-line);
     border: 1px solid var(--dracula-lightest);
@@ -207,9 +192,7 @@
     justify-content: center;
 }
 
-/* ================================
-   📁 FILE SELECTION PROPORCIONAL
-   ================================ */
+
 .file-input-container {
     display: flex;
     flex-direction: column;
@@ -281,9 +264,7 @@
     transform: none;
 }
 
-/* ================================
-   ⚙️ SETTINGS COMPACTOS
-   ================================ */
+
 .settings-grid {
     display: flex;
     flex-direction: column;
@@ -338,13 +319,9 @@
     align-items: center;
 }
 
-/* ================================
-   🔥 DUPLICATE MDD - CSS OPTIMIZADO Y PROPORCIONAL - PARTE 2/3
-   ================================ */
 
-/* ================================
-   📊 FILE INFO COMPACTA
-   ================================ */
+
+
 .file-info {
     background: var(--dracula-darker);
     border: 1px solid var(--dracula-lightest);
@@ -381,9 +358,7 @@
     text-align: right;
 }
 
-/* ================================
-   🏢 IBM SPSS INFO OPTIMIZADA
-   ================================ */
+
 .ibm-spss-info {
     background: var(--dracula-darker);
     border: 1px solid var(--neon-cyan);
@@ -417,9 +392,7 @@
     text-shadow: 0 0 4px rgba(139, 233, 253, 0.3);
 }
 
-/* ================================
-   🔄 PROGRESS CIRCULAR PROPORCIONAL
-   ================================ */
+
 .circular-progress {
     display: flex;
     justify-content: center;
@@ -465,9 +438,7 @@
     animation: progressSpin 2s linear infinite;
 }
 
-/* ================================
-   📊 PROCESSING INFO COMPACTA
-   ================================ */
+
 .processing-info {
     text-align: center;
     margin: var(--spacing-md) 0;
@@ -511,9 +482,7 @@
     text-shadow: 0 0 4px rgba(139, 233, 253, 0.4);
 }
 
-/* ================================
-   📝 LOGS COMPACTOS
-   ================================ */
+
 .processing-logs,
 .error-logs {
     margin-top: var(--spacing-md);
@@ -556,9 +525,7 @@
     text-shadow: 0 0 4px rgba(80, 250, 123, 0.4);
 }
 
-/* ================================
-   ✅ COMPLETION STATUS COMPACTA
-   ================================ */
+
 .completion-message {
     color: var(--neon-green);
     font-size: var(--font-lg);
@@ -607,9 +574,7 @@
     text-shadow: 0 0 4px rgba(139, 233, 253, 0.4);
 }
 
-/* ================================
-   📍 OUTPUT LOCATION COMPACTA
-   ================================ */
+
 .output-location {
     background: var(--dracula-darker);
     border: 1px solid var(--neon-green);
@@ -640,9 +605,7 @@
     font-size: var(--font-xs);
 }
 
-/* ================================
-   📋 RECORD SUMMARY COMPACTA
-   ================================ */
+
 .record-summary {
     background: var(--dracula-darker);
     border: 1px solid var(--neon-purple);
@@ -669,9 +632,7 @@
     line-height: 1.4;
 }
 
-/* ================================
-   ❌ ERROR MESSAGES COMPACTAS
-   ================================ */
+
 .dup-error-message {
     background: var(--dracula-darker);
     border: 1px solid var(--neon-red);
@@ -687,9 +648,7 @@
     animation: errorShake 0.5s ease-in-out;
 }
 
-/* ================================
-   🔘 FOOTER BUTTONS PROPORCIONADOS
-   ================================ */
+
 .modal-footer {
     padding: var(--spacing-lg);
     background: var(--dracula-current-line);
@@ -747,9 +706,7 @@
     transform: none;
 }
 
-/* ================================
-   🎨 SVG NEON STYLES PROPORCIONADOS
-   ================================ */
+
 .dup-neon-svg {
     width: 20px;
     height: 20px;
@@ -768,7 +725,7 @@
     transform: scale(1.1);
 }
 
-/* Colores específicos para cada tipo de SVG */
+
 .neon-fire {
     color: var(--neon-red);
 }
@@ -821,13 +778,9 @@
     color: var(--neon-purple);
 }
 
-/* ================================
-   🔥 DUPLICATE MDD - CSS OPTIMIZADO Y PROPORCIONAL - PARTE 3/3
-   ================================ */
 
-/* ================================
-   🌟 ANIMACIONES OPTIMIZADAS
-   ================================ */
+
+
 @keyframes overlayFadeIn {
     from {
         opacity: 0;
@@ -964,11 +917,9 @@
     animation: neonRotate 3s linear infinite;
 }
 
-/* ================================
-   📱 RESPONSIVE DESIGN OPTIMIZADO Y PROPORCIONAL
-   ================================ */
 
-/* 📱 MÓVIL (max-width: 480px) */
+
+
 @media (max-width: 480px) {
     .modal-overlay {
         padding: var(--spacing-sm);
@@ -1069,7 +1020,7 @@
     }
 }
 
-/* 📱 MÓVIL GRANDE (481px - 768px) */
+
 @media (min-width: 481px) and (max-width: 768px) {
     .duplicate-mdd-modal {
         max-width: 90vw;
@@ -1121,7 +1072,7 @@
     }
 }
 
-/* 💻 TABLET (769px - 1024px) */
+
 @media (min-width: 769px) and (max-width: 1024px) {
     .duplicate-mdd-modal {
         max-width: 85vw;
@@ -1137,7 +1088,7 @@
     }
 }
 
-/* 🖥️ DESKTOP (1025px+) */
+
 @media (min-width: 1025px) {
     .duplicate-mdd-modal {
         max-width: min(600px, 90vw);
@@ -1153,17 +1104,15 @@
     }
 }
 
-/* ================================
-   🎪 EFECTOS ESPECIALES Y ESTADOS
-   ================================ */
 
-/* Efecto de resplandor al hacer hover en secciones importantes */
+
+
 .processing-status:hover,
 .completion-status:hover {
     box-shadow: var(--shadow-md), 0 0 20px rgba(189, 147, 249, 0.3);
 }
 
-/* Efecto de typing para los logs */
+
 .log-entry:last-child::after {
     content: '█';
     animation: blink 1s infinite;
@@ -1183,22 +1132,20 @@
     }
 }
 
-/* Efecto de brillo para elementos activos */
+
 .section.active {
     border-color: var(--neon-purple);
     box-shadow: 0 0 15px rgba(189, 147, 249, 0.4);
 }
 
-/* Mejora de focus para accesibilidad */
+
 button:focus,
 input:focus {
     outline: 2px solid var(--neon-purple);
     outline-offset: 2px;
 }
 
-/* ================================
-   🔧 UTILITIES COMPACTAS
-   ================================ */
+
 .text-center {
     text-align: center;
 }
@@ -1256,9 +1203,7 @@ input:focus {
     box-shadow: var(--glow-green);
 }
 
-/* ================================
-   🎯 ESTADOS ESPECÍFICOS DEL MODAL OPTIMIZADOS
-   ================================ */
+
 .duplicate-mdd-modal[data-step="idle"] .file-selection {
     border-color: var(--neon-cyan);
     box-shadow: 0 0 12px rgba(139, 233, 253, 0.2);
@@ -1284,23 +1229,21 @@ input:focus {
     box-shadow: 0 0 12px rgba(255, 85, 85, 0.2);
 }
 
-/* ================================
-   ⚡ OPTIMIZACIONES DE PERFORMANCE
-   ================================ */
 
-/* Usar will-change para animaciones que se sabe que van a cambiar */
+
+
 .circular-progress,
 .dup-modal-button,
 .file-browse-btn {
     will-change: transform;
 }
 
-/* Usar transform3d para activar aceleración de hardware */
+
 .duplicate-mdd-modal {
     transform: translate3d(0, 0, 0);
 }
 
-/* Optimizar transiciones para mejor performance */
+
 .section,
 .result-item,
 .dup-modal-button {
@@ -1308,45 +1251,41 @@ input:focus {
     transform: translateZ(0);
 }
 
-/* ================================
-   🎨 TEMA NOCTURNO MEJORADO
-   ================================ */
 
-/* Asegurar que todos los elementos mantengan consistencia visual */
+
+
 * {
     box-sizing: border-box;
 }
 
-/* Mejorar la legibilidad en fondos oscuros */
+
 .duplicate-mdd-modal {
     color: var(--dracula-foreground);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-/* Asegurar contraste adecuado */
+
 .dup-error-message,
 .completion-message,
 .processing-message {
     filter: contrast(1.1);
 }
 
-/* ================================
-   📐 AJUSTES FINALES DE PROPORCIÓN
-   ================================ */
 
-/* Asegurar que el modal nunca sea más alto que la pantalla */
+
+
 .duplicate-mdd-modal {
     min-height: min-content;
     max-height: min(85vh, 700px);
 }
 
-/* Asegurar que el contenido se ajuste apropiadamente */
+
 .modal-body {
     overflow-x: hidden;
     overflow-y: auto;
 }
 
-/* Limitar el ancho de elementos de texto largos */
+
 .location-path,
 .summary-content,
 .dup-file-path {
@@ -1354,14 +1293,14 @@ input:focus {
     overflow-wrap: break-word;
 }
 
-/* Asegurar que los botones tengan un tamaño mínimo adecuado */
+
 .file-browse-btn,
 .dup-modal-button {
     min-height: 40px;
     white-space: nowrap;
 }
 
-/* Ajustar el espaciado del progress ring según el tamaño de pantalla */
+
 @media (max-width: 480px) {
     .progress-ring-fill {
         stroke-dasharray: 157;
@@ -1376,9 +1315,7 @@ input:focus {
     }
 }
 
-/* ================================
-   🔄 ANIMACIONES ADICIONALES PARA ESTADOS
-   ================================ */
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1415,9 +1352,7 @@ input:focus {
     }
 }
 
-/* ================================
-   🎨 CLASES DE ANIMACIÓN PARA TRANSICIONES
-   ================================ */
+
 .fade-in-up {
     animation: fadeInUp 0.4s ease-out;
 }
@@ -1430,33 +1365,29 @@ input:focus {
     animation: slideLeft 0.3s ease-out;
 }
 
-/* ================================
-   🔧 ESTILOS ADICIONALES PARA ESTADOS ESPECÍFICOS
-   ================================ */
 
-/* Cuando el modal está en modo procesamiento */
+
+
 .duplicate-mdd-modal.processing {
     border-color: var(--neon-yellow);
     box-shadow: var(--shadow-lg), 0 0 25px rgba(241, 250, 140, 0.4);
 }
 
-/* Cuando el modal está completado */
+
 .duplicate-mdd-modal.completed {
     border-color: var(--neon-green);
     box-shadow: var(--shadow-lg), 0 0 25px rgba(80, 250, 123, 0.4);
 }
 
-/* Cuando hay error */
+
 .duplicate-mdd-modal.error {
     border-color: var(--neon-red);
     box-shadow: var(--shadow-lg), 0 0 25px rgba(255, 85, 85, 0.4);
 }
 
-/* ================================
-   🎯 ÚLTIMOS AJUSTES DE ACCESIBILIDAD
-   ================================ */
 
-/* Mejorar contraste para usuarios con dificultades visuales */
+
+
 @media (prefers-contrast: high) {
     :root {
         --dracula-background: #1a1a1a;
@@ -1467,7 +1398,7 @@ input:focus {
     }
 }
 
-/* Reducir animaciones para usuarios sensibles al movimiento */
+
 @media (prefers-reduced-motion: reduce) {
 
     *,
@@ -1484,11 +1415,9 @@ input:focus {
     }
 }
 
-/* ================================
-   📱 AJUSTES FINALES PARA DISPOSITIVOS PEQUEÑOS
-   ================================ */
 
-/* Para pantallas muy pequeñas (320px) */
+
+
 @media (max-width: 320px) {
     .duplicate-mdd-modal {
         border-radius: 6px;
@@ -1515,9 +1444,7 @@ input:focus {
     }
 }
 
-/* ================================
-   ✨ EFECTOS DE HOVER MEJORADOS PARA DESKTOP
-   ================================ */
+
 @media (hover: hover) and (pointer: fine) {
     .section:hover {
         transform: translateY(-1px);
@@ -1533,9 +1460,7 @@ input:focus {
     }
 }
 
-/* ================================
-   🔒 ESTILOS PARA ELEMENTOS DESHABILITADOS
-   ================================ */
+
 .file-browse-btn:disabled,
 .dup-modal-button:disabled {
     filter: grayscale(50%);
@@ -1550,17 +1475,15 @@ input:focus {
     background: var(--dracula-current-line);
 }
 
-/* ================================
-   🎪 MICRO-INTERACCIONES FINALES
-   ================================ */
 
-/* Efecto sutil en hover de logs */
+
+
 .log-entry:hover {
     background: rgba(189, 147, 249, 0.05);
     border-radius: 3px;
 }
 
-/* Efecto de selección de texto */
+
 ::selection {
     background: var(--neon-purple);
     color: var(--dracula-darker);
@@ -1571,7 +1494,7 @@ input:focus {
     color: var(--dracula-darker);
 }
 
-/* Efecto de focus visible mejorado */
+
 .file-browse-btn:focus-visible,
 .dup-modal-button:focus-visible {
     outline: 2px solid var(--neon-cyan);
@@ -1579,11 +1502,9 @@ input:focus {
     box-shadow: 0 0 0 4px rgba(139, 233, 253, 0.2);
 }
 
-/* ================================
-   🎯 ÚLTIMOS DETALLES DE PULIMIENTO
-   ================================ */
 
-/* Asegurar que el texto no se desborde */
+
+
 .dup-file-path,
 .info-value,
 .location-path {
@@ -1592,7 +1513,7 @@ input:focus {
     white-space: nowrap;
 }
 
-/* Solo en móvil, permitir que el texto se corte en múltiples líneas */
+
 @media (max-width: 768px) {
 
     .dup-file-path,
@@ -1603,12 +1524,12 @@ input:focus {
     }
 }
 
-/* Asegurar que los iconos mantengan su proporción */
+
 .dup-neon-svg {
     flex-shrink: 0;
 }
 
-/* Últimos ajustes de z-index */
+
 .modal-overlay {
     z-index: 9999;
 }
@@ -1617,16 +1538,14 @@ input:focus {
     z-index: 10000;
 }
 
-/* ================================
-   🎨 FINALIZACIÓN DEL TEMA
-   ================================ */
 
-/* Asegurar consistencia visual final */
+
+
 .duplicate-mdd-modal * {
     box-sizing: border-box;
 }
 
-/* Ocultar scrollbars en webkit cuando no son necesarios */
+
 .modal-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -1644,7 +1563,7 @@ input:focus {
     background: var(--neon-purple);
 }
 
-/* Estilos finales para modo de alto contraste */
+
 @media (prefers-contrast: high) {
     .duplicate-mdd-modal {
         border-width: 3px;
@@ -1659,17 +1578,11 @@ input:focus {
     }
 }
 
-/* ================================
-   🔚 FIN DEL CSS OPTIMIZADO COMPLETO
-   ================================ */
 
-/* ================================
-   🔧 CORRECCIONES ESPECÍFICAS PARA BUGS VISUALES
-   ================================ */
 
-/* ================================
-   📦 CORRECCIÓN DEL OUTPUT FILE QUE SE SALE
-   ================================ */
+
+
+
 .result-item {
     background: var(--dracula-darker);
     border: 1px solid var(--dracula-lightest);
@@ -1677,12 +1590,12 @@ input:focus {
     padding: var(--spacing-md);
     text-align: center;
     transition: all var(--transition-normal);
-    /* 🔥 ASEGURAR QUE NO SE SALGA DEL CONTENEDOR */
+
     overflow: hidden;
     word-wrap: break-word;
     word-break: break-all;
     min-width: 0;
-    /* Importante para flexbox */
+
 }
 
 .result-value {
@@ -1690,7 +1603,7 @@ input:focus {
     font-weight: 600;
     font-size: var(--font-sm);
     text-shadow: 0 0 4px rgba(139, 233, 253, 0.4);
-    /* 🔥 CONTROLAR DESBORDAMIENTO DE TEXTO LARGO */
+
     display: block;
     overflow-wrap: break-word;
     word-break: break-all;
@@ -1700,7 +1613,7 @@ input:focus {
     line-height: 1.3;
 }
 
-/* Específicamente para el output file que es muy largo */
+
 .result-item .result-value {
     font-family: 'Courier New', monospace;
     font-size: var(--font-xs);
@@ -1715,9 +1628,7 @@ input:focus {
     overflow-y: auto;
 }
 
-/* ================================
-   🎯 CIRCULAR PROGRESS MEJORADO CON MÁS ESTILO
-   ================================ */
+
 .circular-progress {
     display: flex;
     justify-content: center;
@@ -1735,7 +1646,7 @@ input:focus {
     pointer-events: none;
 }
 
-/* Container para el efecto de brillo */
+
 .circular-progress::before {
     content: '';
     position: absolute;
@@ -1780,7 +1691,7 @@ input:focus {
     filter: drop-shadow(0 0 10px currentColor);
 }
 
-/* Añadir un círculo interior para más efecto */
+
 .circular-progress::after {
     content: '';
     position: absolute;
@@ -1793,9 +1704,7 @@ input:focus {
     z-index: 2;
 }
 
-/* ================================
-   🌟 ANIMACIONES MEJORADAS PARA EL PROGRESS
-   ================================ */
+
 @keyframes progressGlow {
 
     0%,
@@ -1854,9 +1763,7 @@ input:focus {
     }
 }
 
-/* ================================
-   🎯 ICONOS SVG MEJORADOS
-   ================================ */
+
 .dup-neon-svg {
     width: 20px;
     height: 20px;
@@ -1864,7 +1771,7 @@ input:focus {
     filter: drop-shadow(0 0 8px currentColor);
     transition: all var(--transition-normal);
     flex-shrink: 0;
-    /* 🔥 ASEGURAR QUE LOS ICONOS SIEMPRE SE VEAN */
+
     min-width: 20px;
     min-height: 20px;
 }
@@ -1884,9 +1791,7 @@ input:focus {
     filter: drop-shadow(0 0 12px currentColor);
 }
 
-/* ================================
-   📁 CORRECCIÓN ESPECÍFICA PARA LABELS CON ICONOS
-   ================================ */
+
 .result-label {
     display: flex;
     align-items: center;
@@ -1895,14 +1800,12 @@ input:focus {
     color: var(--dracula-comment);
     font-size: var(--font-xs);
     margin-bottom: var(--spacing-xs);
-    /* 🔥 ASEGURAR QUE EL ICONO NO SE PIERDA */
+
     min-height: 20px;
     white-space: nowrap;
 }
 
-/* ================================
-   📊 GRID DE RESULTADOS MEJORADO
-   ================================ */
+
 .dup-results-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1910,7 +1813,7 @@ input:focus {
     margin: var(--spacing-md) 0;
 }
 
-/* Para asegurar que en móvil el grid funcione bien */
+
 @media (max-width: 480px) {
     .dup-results-grid {
         grid-template-columns: 1fr;
@@ -1929,9 +1832,7 @@ input:focus {
     }
 }
 
-/* ================================
-   📦 OUTPUT LOCATION MEJORADA
-   ================================ */
+
 .output-location {
     background: var(--dracula-darker);
     border: 1px solid var(--neon-green);
@@ -1939,7 +1840,7 @@ input:focus {
     padding: var(--spacing-md);
     margin: var(--spacing-md) 0;
     box-shadow: var(--glow-green);
-    /* 🔥 EVITAR DESBORDAMIENTO */
+
     overflow: hidden;
 }
 
@@ -1950,7 +1851,7 @@ input:focus {
     padding: var(--spacing-sm);
     border-radius: 4px;
     font-size: var(--font-xs);
-    /* 🔥 CONTROL TOTAL DEL TEXTO LARGO */
+
     word-break: break-all;
     overflow-wrap: break-word;
     max-height: 60px;
@@ -1958,9 +1859,7 @@ input:focus {
     line-height: 1.2;
 }
 
-/* ================================
-   🔧 AJUSTES ESPECÍFICOS PARA RESPONSIVE
-   ================================ */
+
 @media (max-width: 768px) {
     .progress-ring {
         width: 80px;
@@ -2011,9 +1910,7 @@ input:focus {
     }
 }
 
-/* ================================
-   🎨 EFECTOS ADICIONALES PARA EL PROGRESS
-   ================================ */
+
 .circular-progress:hover::before {
     animation-duration: 1s;
 }
@@ -2022,11 +1919,9 @@ input:focus {
     filter: drop-shadow(0 0 30px rgba(189, 147, 249, 1));
 }
 
-/* ================================
-   🔚 AJUSTES FINALES ESPECÍFICOS
-   ================================ */
 
-/* Asegurar que todos los textos largos se controlen */
+
+
 .summary-content,
 .dup-file-path,
 .info-value {
@@ -2035,7 +1930,7 @@ input:focus {
     hyphens: auto;
 }
 
-/* Mejorar la visualización de elementos con scroll interno */
+
 .result-value::-webkit-scrollbar,
 .location-path::-webkit-scrollbar {
     width: 4px;
@@ -2059,13 +1954,9 @@ input:focus {
 }
 
 
-/* ================================
-   🎨 REDISEÑO COMPLETO DE FILE SELECTION - MÁS ELEGANTE Y PROPORCIONAL
-   ================================ */
 
-/* ================================
-   📁 NUEVA FILE SELECTION AREA - DISEÑO CARD ELEGANTE
-   ================================ */
+
+
 .file-selection {
     background: var(--dracula-current-line);
     border: 1px solid var(--dracula-lightest);
@@ -2092,9 +1983,7 @@ input:focus {
     opacity: 1;
 }
 
-/* ================================
-   📋 TÍTULO DE SECCIÓN MEJORADO
-   ================================ */
+
 .section-title {
     display: flex;
     align-items: center;
@@ -2118,18 +2007,14 @@ input:focus {
     box-shadow: 0 0 10px rgba(139, 233, 253, 0.4);
 }
 
-/* ================================
-   🎯 NUEVA FILE INPUT CONTAINER - DISEÑO MODERNO
-   ================================ */
+
 .file-input-container {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
 }
 
-/* ================================
-   📄 FILE DISPLAY AREA REDISEÑADA
-   ================================ */
+
 .file-display {
     background: linear-gradient(135deg, var(--dracula-darker), var(--dracula-current-line));
     border: 2px solid var(--dracula-lightest);
@@ -2166,9 +2051,7 @@ input:focus {
     transform: translateY(-2px);
 }
 
-/* ================================
-   📝 FILE STATUS DISPLAY
-   ================================ */
+
 .file-status {
     display: flex;
     flex-direction: column;
@@ -2209,9 +2092,7 @@ input:focus {
     text-shadow: 0 0 5px rgba(80, 250, 123, 0.5);
 }
 
-/* ================================
-   📁 FILES LIST CUANDO HAY ARCHIVOS SELECCIONADOS
-   ================================ */
+
 .selected-files-list {
     display: flex;
     flex-direction: column;
@@ -2284,9 +2165,7 @@ input:focus {
     box-shadow: 0 0 8px rgba(80, 250, 123, 0.5);
 }
 
-/* ================================
-   🎯 BOTÓN DE SELECCIÓN REDISEÑADO - MÁS PROPORCIONAL
-   ================================ */
+
 .file-browse-btn {
     background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
     border: none;
@@ -2353,9 +2232,7 @@ input:focus {
     font-weight: 600;
 }
 
-/* ================================
-   ⚡ ESTADOS DE LOADING Y SUCCESS
-   ================================ */
+
 .file-browse-btn.loading {
     background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
     animation: loadingPulse 1.5s ease-in-out infinite;
@@ -2366,9 +2243,7 @@ input:focus {
     box-shadow: 0 0 20px rgba(80, 250, 123, 0.6);
 }
 
-/* ================================
-   📊 PROGRESS INDICATOR PARA FILE SELECTION
-   ================================ */
+
 .file-selection-progress {
     display: flex;
     align-items: center;
@@ -2410,9 +2285,7 @@ input:focus {
     font-weight: 500;
 }
 
-/* ================================
-   🎨 ANIMACIONES ESPECÍFICAS
-   ================================ */
+
 @keyframes loadingPulse {
 
     0%,
@@ -2451,9 +2324,7 @@ input:focus {
     }
 }
 
-/* ================================
-   📱 RESPONSIVE PARA FILE SELECTION
-   ================================ */
+
 @media (max-width: 768px) {
     .file-selection {
         padding: var(--spacing-lg);
@@ -2521,11 +2392,9 @@ input:focus {
     }
 }
 
-/* ================================
-   🎯 ESTADOS ESPECIALES
-   ================================ */
 
-/* Cuando hay archivos seleccionados */
+
+
 .file-selection.has-files {
     border-color: var(--neon-green);
     box-shadow: 0 0 15px rgba(80, 250, 123, 0.2);
@@ -2536,7 +2405,7 @@ input:focus {
     opacity: 1;
 }
 
-/* Cuando está en estado de loading */
+
 .file-selection.loading {
     border-color: var(--neon-yellow);
     box-shadow: 0 0 15px rgba(241, 250, 140, 0.2);
@@ -2558,17 +2427,11 @@ input:focus {
     }
 }
 
-/* ================================
-   🔚 FIN DEL REDISEÑO DE FILE SELECTION
-   ================================ */
 
-/* ================================
-   🔧 FIX ESPECÍFICO PARA SVG ICONS EN BOTONES
-   ================================ */
 
-/* ================================
-   📁 SVG ICONS EN FILE BROWSE BUTTON
-   ================================ */
+
+
+
 .file-browse-btn svg,
 .file-browse-btn .dup-neon-svg,
 .file-browse-btn .neon-svg {
@@ -2581,13 +2444,13 @@ input:focus {
     flex-shrink: 0;
     display: inline-block;
     vertical-align: middle;
-    /* 🔥 FORZAR VISIBILIDAD DEL SVG */
+
     opacity: 1 !important;
     filter: none !important;
     transform: none !important;
 }
 
-/* Específicamente para el botón de browse */
+
 .file-browse-btn .file-browse-btn-icon svg,
 .file-browse-btn .file-browse-btn-icon .dup-neon-svg,
 .file-browse-btn .file-browse-btn-icon .neon-svg {
@@ -2600,9 +2463,7 @@ input:focus {
     stroke: white !important;
 }
 
-/* ================================
-   🎯 CONTAINER DEL ICONO EN EL BOTÓN
-   ================================ */
+
 .file-browse-btn-icon {
     width: 20px !important;
     height: 20px !important;
@@ -2613,9 +2474,7 @@ input:focus {
     overflow: visible !important;
 }
 
-/* ================================
-   📂 SVG ESPECÍFICOS PARA FOLDER ICONS
-   ================================ */
+
 .file-browse-btn .neon-folder svg,
 .file-browse-btn svg[class*="folder"],
 .file-browse-btn svg[viewBox*="24"] {
@@ -2628,9 +2487,7 @@ input:focus {
     stroke-linejoin: round !important;
 }
 
-/* ================================
-   🔥 SVG PATHS ESPECÍFICOS
-   ================================ */
+
 .file-browse-btn svg path,
 .file-browse-btn svg circle,
 .file-browse-btn svg line,
@@ -2644,25 +2501,23 @@ input:focus {
     opacity: 1 !important;
 }
 
-/* Para SVGs que necesitan fill en lugar de stroke */
+
 .file-browse-btn svg[fill*="currentColor"] path,
 .file-browse-btn svg[fill*="white"] path {
     fill: white !important;
     stroke: none !important;
 }
 
-/* ================================
-   🎨 ESTILOS PARA DIFERENTES ESTADOS DEL BOTÓN
-   ================================ */
 
-/* Estado normal */
+
+
 .file-browse-btn:not(.loading):not(.success) svg,
 .file-browse-btn:not(.loading):not(.success) .dup-neon-svg {
     color: white !important;
     filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3)) !important;
 }
 
-/* Estado loading */
+
 .file-browse-btn.loading svg,
 .file-browse-btn.loading .dup-neon-svg {
     color: var(--dracula-darker) !important;
@@ -2671,7 +2526,7 @@ input:focus {
     animation: iconSpin 1s linear infinite !important;
 }
 
-/* Estado success */
+
 .file-browse-btn.success svg,
 .file-browse-btn.success .dup-neon-svg {
     color: var(--dracula-darker) !important;
@@ -2680,7 +2535,7 @@ input:focus {
     filter: drop-shadow(0 0 4px rgba(30, 31, 41, 0.3)) !important;
 }
 
-/* Estado disabled */
+
 .file-browse-btn:disabled svg,
 .file-browse-btn:disabled .dup-neon-svg {
     color: rgba(255, 255, 255, 0.5) !important;
@@ -2689,9 +2544,7 @@ input:focus {
     filter: none !important;
 }
 
-/* ================================
-   🔄 ANIMACIÓN PARA ESTADO LOADING
-   ================================ */
+
 @keyframes iconSpin {
     from {
         transform: rotate(0deg);
@@ -2702,9 +2555,7 @@ input:focus {
     }
 }
 
-/* ================================
-   📱 RESPONSIVE PARA SVG EN BOTONES
-   ================================ */
+
 @media (max-width: 768px) {
 
     .file-browse-btn svg,
@@ -2735,11 +2586,9 @@ input:focus {
     }
 }
 
-/* ================================
-   🎯 OTROS BOTONES CON ICONOS SVG
-   ================================ */
 
-/* Botones del modal footer */
+
+
 .dup-modal-button svg,
 .dup-modal-button .dup-neon-svg,
 .dup-modal-button .neon-svg {
@@ -2751,7 +2600,7 @@ input:focus {
     flex-shrink: 0 !important;
 }
 
-/* Botones primarios */
+
 .dup-modal-button.dup-primary svg,
 .dup-modal-button.dup-primary .dup-neon-svg {
     color: white !important;
@@ -2759,7 +2608,7 @@ input:focus {
     stroke: white !important;
 }
 
-/* Botones secundarios */
+
 .dup-modal-button.dup-secondary svg,
 .dup-modal-button.dup-secondary .dup-neon-svg {
     color: var(--dracula-foreground) !important;
@@ -2774,9 +2623,7 @@ input:focus {
     stroke: var(--neon-purple) !important;
 }
 
-/* ================================
-   🔧 BOTÓN CLOSE EN HEADER
-   ================================ */
+
 .dup-close-button svg,
 .dup-close-button .dup-neon-svg,
 .dup-close-button .neon-svg {
@@ -2796,9 +2643,7 @@ input:focus {
     filter: drop-shadow(0 0 8px var(--neon-pink)) !important;
 }
 
-/* ================================
-   🎨 ICONOS EN SECTION TITLES
-   ================================ */
+
 .section-icon svg,
 .section-icon .dup-neon-svg,
 .section-icon .neon-svg {
@@ -2810,22 +2655,18 @@ input:focus {
     stroke-width: 2 !important;
 }
 
-/* ================================
-   🔥 FORZAR VISIBILIDAD GENERAL DE SVG
-   ================================ */
+
 svg {
     display: inline-block !important;
     vertical-align: middle !important;
 }
 
-/* Asegurar que todos los SVG tengan viewBox apropiado */
+
 svg:not([viewBox]) {
     viewBox: 0 0 24 24;
 }
 
-/* ================================
-   🎯 FIX ESPECÍFICO PARA SVG QUE NO SE VEN
-   ================================ */
+
 .file-browse-btn *[data-icon],
 .file-browse-btn *[class*="icon"] {
     display: inline-flex !important;
@@ -2833,7 +2674,7 @@ svg:not([viewBox]) {
     justify-content: center !important;
 }
 
-/* Forzar que cualquier elemento con SVG sea visible */
+
 .file-browse-btn>*:first-child {
     display: inline-flex !important;
     align-items: center !important;
@@ -2841,7 +2682,3 @@ svg:not([viewBox]) {
     width: 20px !important;
     height: 20px !important;
 }
-
-/* ================================
-   🔚 FIN DEL FIX PARA SVG ICONS
-   ================================ */
