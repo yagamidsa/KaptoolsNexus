@@ -112,8 +112,10 @@ function App() {
       id: 'product-chunks',
       label: 'Product Chunks',
       desc: 'Download JSON and Chunks Manipulation',
-      icon: '📊',
-      category: 'AZURE TOOLS'
+      icon: '🔬',
+      category: 'AZURE TOOLS',
+      requiresWorkspace: true,
+      requiresMicroservices: true
     },
 
 
@@ -140,7 +142,7 @@ function App() {
       id: 'post-it-notes',
       label: 'Post-it Notes',
       desc: 'Digital sticky notes',
-      icon: '📝',
+      icon: '📌',
       category: 'UTILITIES'
     },
     {

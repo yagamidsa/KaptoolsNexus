@@ -78,14 +78,31 @@ const NeonDock: React.FC = () => {
             name: 'KAP Data Processing',
             icon: 'folder',
             color: '#ffa500',
-            action: () => openLocalApp('\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS\\KAPDataProcessing')
+            action: async () => {
+                try {
+                    const { invoke } = await import('@tauri-apps/api/core');
+                    await invoke('open_kap_data_processing');
+                } catch (error) {
+                    console.error('Error opening KAP Data Processing:', error);
+                    // Fallback: abrir en navegador si hay web interface
+                    // window.open('https://kap-data-processing-web-url', '_blank');
+                }
+            }
         },
         {
             id: 'sd',
             name: 'SA Distribution',
             icon: 'distribution',
             color: '#28a745',
-            action: () => openLocalApp('\\\\mbaw1fs.grpit.local\\SA_Distribution\\KAP')
+            action: async () => {
+                try {
+                    const { invoke } = await import('@tauri-apps/api/core');
+                    await invoke('open_sa_distribution');
+                } catch (error) {
+                    console.error('Error opening SA Distribution:', error);
+                    // Fallback si es necesario
+                }
+            }
         },
         {
             id: 'ab',

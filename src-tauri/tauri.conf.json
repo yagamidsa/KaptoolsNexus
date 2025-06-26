@@ -23,7 +23,12 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://sandbox3-kap-product-template.azurewebsites.net https://img.icons8.com 'unsafe-inline'; img-src 'self' data: https: http:; style-src 'self' 'unsafe-inline'"
+      "csp": {
+        "default-src": "'self' data: https:",
+        "connect-src": "'self' http://localhost:8000 http://127.0.0.1:8000 https://open.er-api.com https://api.exchangerate-api.com https://sandbox3-kap-product-template.azurewebsites.net https://img.icons8.com 'unsafe-inline'",
+        "img-src": "'self' data: https: http:",
+        "style-src": "'self' 'unsafe-inline'"
+      }
     },
     "withGlobalTauri": false
   },
@@ -35,7 +40,9 @@
       "../backend/config/**/*"
     ],
     "active": true,
-    "targets": ["msi"],
+    "targets": [
+      "msi"
+    ],
     "icon": [
       "icons/16x16.png",
       "icons/32x32.png",

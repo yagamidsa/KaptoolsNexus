@@ -123,23 +123,23 @@ const useDebounce = <T,>(value: T, delay: number): T => {
 
 
 const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose }) => {
-    
+
     const [branches, setBranches] = useState<BranchInfo[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
 
-    
-    
-    
+
+
+
     const [repositoryFilter, setRepositoryFilter] = useState<'both' | 'content' | 'dimensions'>('content');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [sortBy, setSortBy] = useState<'date' | 'author' | 'name' | 'behind'>('date');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-    
-    
-    
+
+
+
     const [selectedBranch, setSelectedBranch] = useState<BranchInfo | null>(null);
     const [comparison, setComparison] = useState<BranchComparison | null>(null);
     const [showComparison, setShowComparison] = useState<boolean>(false);
@@ -148,30 +148,30 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
     const [showFileDiff, setShowFileDiff] = useState<boolean>(false);
     const [loadingFileDiff, setLoadingFileDiff] = useState<boolean>(false);
 
-    
-    
-    
+
+
+
     const [availableRepos, setAvailableRepos] = useState<RepositoryAvailability>({
         content: false,
         dimensions: false
     });
 
-    
-    
-    
+
+
+
     const screenSize = useScreenSize();
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-    
-    
-    
+
+
+
     const leftPanelRef = useRef<HTMLDivElement>(null);
     const rightPanelRef = useRef<HTMLDivElement>(null);
     const unifiedViewRef = useRef<HTMLDivElement>(null);
 
-    
-    
-    
+
+
+
     const generateDevOpsUrl = useCallback((branch: BranchInfo): string => {
         const repoName = DEVOPS_CONFIG.repositories[branch.repository];
         const branchName = encodeURIComponent(branch.display_name);
@@ -218,9 +218,9 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         }
     }, []);
 
-    
-    
-    
+
+
+
     const validateAndLoadBranches = useCallback(async () => {
         if (!workspacePath || workspacePath === 'Path of your workspace') {
             setError('Please select a valid workspace first');
@@ -460,12 +460,12 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
         </div>
     ));
 
-    
-    
-    
+
+
+
     return (
         <div className="review-branches-container">
-            
+
             <div className="branches-header">
                 <div className="rb-header-left">
                     <div className="rb-header-icon">🌿</div>
@@ -495,7 +495,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 </div>
             </div>
 
-            
+
             <div className="branches-controls">
                 <div className="controls-left">
                     <div className="filter-group">
@@ -520,13 +520,14 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 <div className="controls-center">
                     <div className="search-group">
                         <div className="rb-search-input-container">
-                            <span className="rb-search-icon">🔍</span>
+                            
                             <input
                                 type="text"
                                 placeholder={screenSize.isMobile ? "Search..." : "Search branches, authors, or commits..."}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="rb-search-input"
+                                style={{ paddingLeft: '50px' }} // FORZAR con style inline
                                 aria-label="Search branches"
                             />
                         </div>
@@ -560,11 +561,11 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 </div>
             </div>
 
-            
+
             {error && <StatusMessage type="error" message={error} />}
             {success && <StatusMessage type="success" message={success} />}
 
-            
+
             <div className="repo-status">
                 <div className="status-item">
                     <div className={`status-indicator ${availableRepos.content ? 'active' : 'inactive'}`} />
@@ -579,7 +580,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 </div>
             </div>
 
-            
+
             <div className="branches-table-container">
                 {loading ? (
                     <LoadingSpinner />
@@ -601,7 +602,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                         <div className="table-body">
                             {filteredAndSortedBranches.map((branch, index) => (
                                 <div key={`${branch.repository}-${branch.name}`} className="table-row">
-                                    
+
                                     <div className="table-cell branch-cell">
                                         <div className="branch-info">
                                             <div className="branch-main">
@@ -615,7 +616,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
-                                    
+
                                     <div className="table-cell author-cell">
                                         <div className="author-info">
                                             <span className="author-icon">👨‍💻</span>
@@ -623,7 +624,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
-                                    
+
                                     <div className="table-cell commit-cell">
                                         <div className="commit-info">
                                             <span className="commit-icon">💻</span>
@@ -636,7 +637,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
-                                    
+
                                     <div className="table-cell date-cell">
                                         <div className="date-info">
                                             <span className="date-icon">🕒</span>
@@ -644,7 +645,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
-                                    
+
                                     <div className="table-cell behind-cell">
                                         <div className="behind-info">
                                             {branch.commits_behind > 0 ? (
@@ -657,7 +658,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                                         </div>
                                     </div>
 
-                                    
+
                                     <div className="table-cell actions-cell">
                                         <div className="action-buttons">
                                             <button
@@ -686,7 +687,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 )}
             </div>
 
-            
+
             {showComparison && comparison && selectedBranch && (
                 <div className="rb-comparison-modal-overlay" onClick={(e) => {
                     if (e.target === e.currentTarget) setShowComparison(false);
@@ -766,7 +767,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 </div>
             )}
 
-            
+
             {showFileDiff && fileDiff && selectedFile && (
                 <FileDiffViewer
                     fileDiff={fileDiff}
@@ -777,7 +778,7 @@ const ReviewBranches: React.FC<ReviewBranchesProps> = ({ workspacePath, onClose 
                 />
             )}
 
-            
+
             {loadingFileDiff && (
                 <div className="rb-loading-overlay">
                     <div className="rb-loading-spinner">
@@ -813,20 +814,20 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
     const rightPanelRef = useRef<HTMLDivElement>(null);
     const unifiedViewRef = useRef<HTMLDivElement>(null);
 
-    
+
     const isAddedOnly = selectedFile.change_type === 'added';
     const isDeletedOnly = selectedFile.change_type === 'deleted';
     const hasComparison = !isAddedOnly && !isDeletedOnly;
 
-    
+
     const isScrollingLeft = useRef(false);
     const isScrollingRight = useRef(false);
 
-    
+
     const handleScrollSync = useCallback((source: 'left' | 'right', element: HTMLDivElement) => {
         if (viewMode !== 'side-by-side') return;
 
-        
+
         if (source === 'left' && isScrollingLeft.current) return;
         if (source === 'right' && isScrollingRight.current) return;
 
@@ -837,7 +838,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
             rightPanelRef.current.scrollLeft = scrollLeft;
             rightPanelRef.current.scrollTop = scrollTop;
 
-            
+
             requestAnimationFrame(() => {
                 isScrollingRight.current = false;
             });
@@ -846,7 +847,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
             leftPanelRef.current.scrollLeft = scrollLeft;
             leftPanelRef.current.scrollTop = scrollTop;
 
-            
+
             requestAnimationFrame(() => {
                 isScrollingLeft.current = false;
             });
@@ -910,7 +911,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
             return renderUnifiedView();
         }
 
-        
+
         const oldLines: DiffLine[] = [];
         const newLines: DiffLine[] = [];
 
@@ -931,7 +932,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
 
         return (
             <div className="diff-viewer side-by-side">
-                
+
                 <div className="diff-panel">
                     <div className="diff-panel-header old">
                         <span className="header-label">Original (master)</span>
@@ -982,7 +983,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
                     </div>
                 </div>
 
-                
+
                 <div className="diff-panel">
                     <div className="diff-panel-header new">
                         <span className="header-label">Modified ({selectedBranch?.display_name})</span>
@@ -1041,7 +1042,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
             if (e.target === e.currentTarget) onClose();
         }}>
             <div className="file-diff-modal">
-                
+
                 <div className="file-diff-header">
                     <div className="file-diff-header-top">
                         <div className="file-diff-title">
@@ -1073,7 +1074,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
                     </div>
                 </div>
 
-                
+
                 {hasComparison && !screenSize.isMobile && (
                     <div className="diff-mode-toggle">
                         <div>
@@ -1098,7 +1099,7 @@ const FileDiffViewer: React.FC<FileDiffViewerProps> = React.memo(({
                     </div>
                 )}
 
-                
+
                 <div className="file-diff-content">
                     {viewMode === 'unified' || !hasComparison || screenSize.isMobile ?
                         renderUnifiedView() :

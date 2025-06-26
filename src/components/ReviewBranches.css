@@ -1282,30 +1282,6 @@
     color: var(--dracula-foreground);
 }
 
-.rb-search-input {
-    background: var(--dracula-background);
-    border: 1px solid var(--dracula-current-line);
-    border-radius: 8px;
-    padding: 10px 19px 10px 50px;
-    color: var(--dracula-foreground);
-    font-size: 14px;
-    width: 100%;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.rb-search-input:focus {
-    outline: none;
-    border-color: var(--dracula-cyan);
-    box-shadow: 0 0 0 2px rgba(139, 233, 253, 0.3);
-    background: var(--dracula-current-line);
-}
-
-.rb-search-input::placeholder {
-    color: var(--dracula-purple);
-    opacity: 0.8;
-}
 
 .rb-search-icon {
     position: absolute;
@@ -1693,19 +1669,6 @@
 }
 
 
-.rb-search-input {
-    padding: 8px 16px 8px 40px;
-
-    font-size: 13px;
-
-}
-
-.rb-search-icon {
-    left: 14px;
-
-    font-size: 14px;
-
-}
 
 
 .filter-select {
@@ -2229,37 +2192,7 @@
     max-width: 400px !important;
 }
 
-.rb-search-input-container {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: 400px !important;
 
-}
-
-.rb-search-input {
-    background: var(--dracula-background) !important;
-    border: 1px solid var(--dracula-current-line) !important;
-    border-radius: 6px !important;
-    padding: 8px 6px 8px 35px !important;
-
-    color: var(--dracula-foreground) !important;
-    font-size: 13px !important;
-    width: 100% !important;
-    transition: all 0.3s ease !important;
-    backdrop-filter: blur(10px) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-}
-
-.rb-search-icon {
-    position: absolute !important;
-    left: 12px !important;
-    color: var(--dracula-cyan) !important;
-    z-index: 1 !important;
-    font-size: 14px !important;
-    filter: drop-shadow(0 0 4px rgba(139, 233, 253, 0.4)) !important;
-}
 
 
 .controls-right {
@@ -2324,11 +2257,7 @@
         font-size: 10px !important;
     }
 
-    .rb-search-input-container {
-        max-width: 500px !important;
-
-    }
-
+    
     .filter-select {
         min-width: 200px !important;
         width: 200px !important;
@@ -2378,10 +2307,7 @@
         justify-content: center !important;
     }
 
-    .rb-search-input-container {
-        max-width: 100% !important;
-    }
-
+    
     .filter-select {
         min-width: 150px !important;
         width: 150px !important;
@@ -2450,12 +2376,6 @@
 }
 
 
-.rb-search-input:focus {
-    outline: none !important;
-    border-color: var(--dracula-cyan) !important;
-    box-shadow: 0 0 0 2px rgba(139, 233, 253, 0.3) !important;
-    background: var(--dracula-current-line) !important;
-}
 
 .filter-select:focus {
     outline: none !important;
@@ -7313,5 +7233,93 @@
         max-height: 18px !important;
         font-size: 7px !important;
         border-radius: 3px !important;
+    }
+}
+
+
+/* Arreglo AGRESIVO para el input de búsqueda en ReviewBranches */
+
+.rb-search-input-container {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 400px !important;
+}
+
+/* FORZAR el padding del input con máxima especificidad */
+.review-branches-container .rb-search-input,
+.branches-controls .rb-search-input,
+input.rb-search-input {
+    background: var(--dracula-background) !important;
+    border: 1px solid var(--dracula-current-line) !important;
+    border-radius: 6px !important;
+    /* FORZAR padding izquierdo mayor */
+    padding: 8px 16px 8px 50px !important;
+    padding-left: 50px !important; /* Doble especificación */
+    color: var(--dracula-foreground) !important;
+    font-size: 13px !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    text-indent: 0 !important;
+}
+
+/* FORZAR placeholder */
+.review-branches-container .rb-search-input::placeholder,
+.branches-controls .rb-search-input::placeholder,
+input.rb-search-input::placeholder {
+    color: var(--dracula-purple) !important;
+    opacity: 0.7 !important;
+    text-indent: 0 !important;
+    padding-left: 0 !important;
+}
+
+/* FORZAR posición del icono */
+.review-branches-container .rb-search-icon,
+.branches-controls .rb-search-icon,
+.rb-search-input-container .rb-search-icon {
+    position: absolute !important;
+    left: 18px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: var(--dracula-cyan) !important;
+    z-index: 10 !important;
+    font-size: 14px !important;
+    filter: drop-shadow(0 0 4px rgba(139, 233, 253, 0.4)) !important;
+    pointer-events: none !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.rb-search-input:focus {
+    outline: none !important;
+    border-color: var(--dracula-cyan) !important;
+    box-shadow: 0 0 0 2px rgba(139, 233, 253, 0.3) !important;
+    background: var(--dracula-current-line) !important;
+    padding-left: 50px !important; /* Mantener padding en focus */
+}
+
+/* Override cualquier estilo conflictivo */
+.rb-search-input[style*="padding-left"] {
+    padding-left: 50px !important;
+}
+
+/* Para pantallas más pequeñas */
+@media (max-width: 768px) {
+    .review-branches-container .rb-search-input,
+    .branches-controls .rb-search-input,
+    input.rb-search-input {
+        padding: 8px 12px 8px 45px !important;
+        padding-left: 45px !important;
+        font-size: 12px !important;
+    }
+    
+    .review-branches-container .rb-search-icon,
+    .branches-controls .rb-search-icon,
+    .rb-search-input-container .rb-search-icon {
+        left: 16px !important;
+        font-size: 13px !important;
     }
 }

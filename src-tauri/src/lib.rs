@@ -232,36 +232,193 @@ async fn read_file_as_base64(file_path: String) -> Result<String, String> {
     }
 }
 
+// REEMPLAZA esta función en tu lib.rs para COPILOT 365 específicamente:
+
 #[tauri::command]
 fn open_copilot_365() -> Result<String, String> {
-    // Abrir Microsoft Office Hub donde está integrado Copilot 365
-    let result = Command::new("powershell")
-        .args(&[
-            "-Command",
-            "Start-Process \"shell:AppsFolder\\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe!Microsoft.MicrosoftOfficeHub\""
-        ])
+    println!("🤖 Opening Microsoft Copilot 365 (Office integration)...");
+    
+    // Método 1: Abrir Office Hub directamente (donde está Copilot 365)
+    let office_hub_result = Command::new("explorer")
+        .args(&["shell:AppsFolder\\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe!Microsoft.MicrosoftOfficeHub"])
         .output();
     
-    match result {
-        Ok(output) => {
-            if output.status.success() {
-                Ok("Microsoft Office Hub (365 Copilot) opened successfully".to_string())
-            } else {
-                let stderr = String::from_utf8_lossy(&output.stderr);
-                Err(format!("Failed to open Office Hub: {}", stderr))
-            }
-        },
+    match office_hub_result {
+        Ok(output) if output.status.success() => {
+            println!("✅ Office Hub (Copilot 365) opened successfully");
+            return Ok("📋 Microsoft Office Hub opened - Copilot 365 available inside!".to_string());
+        }
+        Ok(_) => println!("⚠️ Office Hub failed, trying Word with Copilot..."),
+        Err(e) => println!("⚠️ Office Hub error: {}, trying Word...", e)
+    }
+    
+    // Método 2: Abrir Word con Copilot (si está instalado)
+    let word_result = Command::new("cmd")
+        .args(&["/C", "start", "", "winword:"])
+        .output();
+    
+    match word_result {
+        Ok(output) if output.status.success() => {
+            println!("✅ Word opened (Copilot 365 available inside)");
+            return Ok("📝 Microsoft Word opened - Access Copilot 365 from the Home tab!".to_string());
+        }
+        Ok(_) => println!("⚠️ Word failed, trying PowerPoint..."),
+        Err(e) => println!("⚠️ Word error: {}, trying PowerPoint...", e)
+    }
+    
+    // Método 3: Abrir PowerPoint con Copilot
+    let powerpoint_result = Command::new("cmd")
+        .args(&["/C", "start", "", "msppt:"])
+        .output();
+    
+    match powerpoint_result {
+        Ok(output) if output.status.success() => {
+            println!("✅ PowerPoint opened (Copilot 365 available inside)");
+            return Ok("🎯 Microsoft PowerPoint opened - Access Copilot 365 from the Home tab!".to_string());
+        }
+        Ok(_) => println!("⚠️ PowerPoint failed, trying Office web..."),
+        Err(e) => println!("⚠️ PowerPoint error: {}, trying web version...", e)
+    }
+    
+    // Método 4: Abrir Office 365 web (donde también está Copilot 365)
+    let web_office_result = Command::new("cmd")
+        .args(&["/C", "start", "", "https://www.office.com/?auth=2"])
+        .output();
+    
+    match web_office_result {
+        Ok(_) => {
+            println!("✅ Office 365 web opened");
+            Ok("🌐 Microsoft Office 365 opened in browser - Copilot 365 available in apps!".to_string())
+        }
         Err(e) => {
-            // Método de respaldo usando explorer
-            let backup_result = Command::new("explorer")
-                .args(&["shell:AppsFolder\\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe!Microsoft.MicrosoftOfficeHub"])
+            println!("❌ All Office methods failed, trying standalone Copilot");
+            
+            // Método 5: Fallback a Copilot standalone como último recurso
+            let copilot_fallback = Command::new("cmd")
+                .args(&["/C", "start", "", "ms-copilot:"])
                 .output();
             
-            match backup_result {
-                Ok(_) => Ok("Office Hub opened via explorer".to_string()),
-                Err(backup_e) => Err(format!("Both methods failed. PowerShell: {}, Explorer: {}", e, backup_e)),
+            match copilot_fallback {
+                Ok(_) => Ok("🤖 Opened standalone Copilot as fallback (not 365 integrated)".to_string()),
+                Err(fallback_e) => Err(format!("❌ Failed to open any Copilot version. Office error: {}, Copilot error: {}", e, fallback_e))
             }
         }
+    }
+}
+
+
+// Agregar estas funciones optimizadas a tu lib.rs
+
+#[tauri::command]
+fn open_network_path_fast(path: String) -> Result<String, String> {
+    println!("🚀 Opening network path (optimized): {}", path);
+    
+    // Método 1: Usar cmd con start (MÁS RÁPIDO para rutas UNC)
+    let cmd_result = Command::new("cmd")
+        .args(&["/C", "start", "", &path])
+        .output();
+    
+    match cmd_result {
+        Ok(output) if output.status.success() => {
+            println!("✅ Network path opened via CMD");
+            return Ok(format!("📂 Network location opened: {}", path));
+        }
+        Ok(_) => println!("⚠️ CMD method failed, trying explorer..."),
+        Err(e) => println!("⚠️ CMD error: {}, trying explorer...", e)
+    }
+    
+    // Método 2: Explorer directo como fallback
+    let explorer_result = Command::new("explorer")
+        .args(&[&path])
+        .output();
+    
+    match explorer_result {
+        Ok(output) if output.status.success() => {
+            println!("✅ Network path opened via Explorer");
+            Ok(format!("📂 Network location opened via Explorer: {}", path))
+        }
+        Ok(_) => {
+            println!("❌ Explorer failed, trying mapped drive...");
+            // Método 3: Intentar con drive letter como último recurso
+            let drive_path = path.replace("\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS", "K:");
+            let drive_path = drive_path.replace("\\\\mbaw1fs.grpit.local\\SA_Distribution", "S:");
+            
+            let drive_result = Command::new("cmd")
+                .args(&["/C", "start", "", &drive_path])
+                .output();
+            
+            match drive_result {
+                Ok(_) => Ok(format!("📂 Opened via mapped drive: {}", drive_path)),
+                Err(e) => Err(format!("❌ All methods failed. Last error: {}", e))
+            }
+        }
+        Err(e) => Err(format!("❌ Failed to open network path: {}", e))
+    }
+}
+
+#[tauri::command]
+fn open_kap_data_processing() -> Result<String, String> {
+    println!("📊 Opening KAP Data Processing (optimized)...");
+    
+    let path = "\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS\\KAPDataProcessing";
+    
+    // Método 1: CMD con start (más rápido que explorer para UNC)
+    match Command::new("cmd")
+        .args(&["/C", "start", "", path])
+        .output()
+    {
+        Ok(output) if output.status.success() => {
+            println!("✅ KAP Data Processing opened via CMD");
+            return Ok(format!("📊 KAP Data Processing opened successfully"));
+        }
+        Ok(_) => println!("⚠️ CMD failed, trying explorer..."),
+        Err(e) => println!("⚠️ CMD error: {}, trying explorer...", e)
+    }
+    
+    // Método 2: Explorer como fallback
+    match Command::new("explorer")
+        .args(&[path])
+        .output()
+    {
+        Ok(output) if output.status.success() => {
+            println!("✅ KAP Data Processing opened via Explorer");
+            Ok(format!("📊 KAP Data Processing opened via Explorer"))
+        }
+        Ok(_) => Err("❌ Could not open KAP Data Processing".to_string()),
+        Err(e) => Err(format!("❌ Failed to open KAP Data Processing: {}", e))
+    }
+}
+
+#[tauri::command]  
+fn open_sa_distribution() -> Result<String, String> {
+    println!("📦 Opening SA Distribution (optimized)...");
+    
+    let path = "\\\\mbaw1fs.grpit.local\\SA_Distribution\\KAP";
+    
+    // Método 1: CMD con start (más rápido que explorer para UNC)
+    match Command::new("cmd")
+        .args(&["/C", "start", "", path])
+        .output()
+    {
+        Ok(output) if output.status.success() => {
+            println!("✅ SA Distribution opened via CMD");
+            return Ok(format!("📦 SA Distribution opened successfully"));
+        }
+        Ok(_) => println!("⚠️ CMD failed, trying explorer..."),
+        Err(e) => println!("⚠️ CMD error: {}, trying explorer...", e)
+    }
+    
+    // Método 2: Explorer como fallback
+    match Command::new("explorer")
+        .args(&[path])
+        .output()
+    {
+        Ok(output) if output.status.success() => {
+            println!("✅ SA Distribution opened via Explorer");
+            Ok(format!("📦 SA Distribution opened via Explorer"))
+        }
+        Ok(_) => Err("❌ Could not open SA Distribution".to_string()),
+        Err(e) => Err(format!("❌ Failed to open SA Distribution: {}", e))
     }
 }
 
@@ -523,7 +680,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_shell::init())  // ← NUEVA LÍNEA AGREGADA
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_http::init())
         .invoke_handler(tauri::generate_handler![
             greet, 
             open_folder, 
@@ -547,7 +705,10 @@ pub fn run() {
             get_json_processing_strategy,
             format_json,
             test_api_connectivity,
-            test_commands
+            test_commands,
+            open_network_path_fast,
+            open_kap_data_processing,
+            open_sa_distribution
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
