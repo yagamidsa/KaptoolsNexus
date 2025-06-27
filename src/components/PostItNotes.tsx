@@ -24,7 +24,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
     const [draggedNote, setDraggedNote] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
 
-    
+
     useEffect(() => {
         const savedNotes = localStorage.getItem('postit-notes');
         if (savedNotes) {
@@ -37,37 +37,37 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     }, []);
 
-    
+
     const saveNotes = (notesToSave: Note[]) => {
         localStorage.setItem('postit-notes', JSON.stringify(notesToSave));
         setNotes(notesToSave);
     };
 
-    
+
     const getRandomPosition = (): { x: number; y: number } => {
         const noteWidth = window.innerWidth <= 768 ? 200 : window.innerWidth <= 1024 ? 220 : 280;
         const noteHeight = window.innerWidth <= 768 ? 140 : window.innerWidth <= 1024 ? 160 : 200;
-        
-    
+
+
         if (window.innerWidth <= 768) {
-            return { x: 0, y: 0 }; 
+            return { x: 0, y: 0 };
         }
-        
+
         const boardWidth = window.innerWidth - 100;
         const boardHeight = window.innerHeight - 200;
-        
-        
+
+
         const padding = window.innerWidth <= 1024 ? 10 : 20;
         const maxX = Math.max(boardWidth - noteWidth - (padding * 2), 0);
         const maxY = Math.max(boardHeight - noteHeight - (padding * 2), 0);
-        
+
         return {
             x: Math.random() * maxX + padding,
             y: Math.random() * maxY + padding
         };
     };
 
-    
+
     const addNote = () => {
         const newNote: Note = {
             id: Date.now(),
@@ -87,8 +87,8 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
 
         const updatedNotes = [newNote, ...notes];
         saveNotes(updatedNotes);
-        
-    
+
+
         setTimeout(() => {
             const titleElement = document.querySelector(`[data-note-id="${newNote.id}"] .note-title`) as HTMLTextAreaElement;
             if (titleElement) {
@@ -97,9 +97,9 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }, 100);
     };
 
-    
+
     const showNotification = (message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
-        
+
         const existingNotification = document.querySelector('.copy-notification');
         if (existingNotification) {
             existingNotification.remove();
@@ -108,8 +108,8 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         const notification = document.createElement('div');
         notification.className = `copy-notification copy-notification-${type}`;
         notification.textContent = message;
-        
-        
+
+
         let baseStyles = `
             position: fixed;
             top: 20px;
@@ -129,7 +129,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             text-align: center;
         `;
 
-        
+
         if (type === 'success') {
             baseStyles += 'border-color: rgba(76, 175, 80, 0.5); background: rgba(76, 175, 80, 0.15);';
         } else if (type === 'warning') {
@@ -141,7 +141,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         notification.style.cssText = baseStyles;
         document.body.appendChild(notification);
 
-        
+
         setTimeout(() => {
             notification.style.animation = 'slideOutNotification 0.3s ease-in';
             setTimeout(() => {
@@ -152,15 +152,15 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }, 3000);
     };
 
-    
+
     const showConfirmation = (title: string, message: string, onConfirm: () => void) => {
-        
+
         const existingConfirmation = document.querySelector('.custom-confirmation');
         if (existingConfirmation) {
             existingConfirmation.remove();
         }
 
-        
+
         const confirmationHTML = `
             <div class="custom-confirmation" style="
                 position: fixed;
@@ -239,7 +239,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             </div>
         `;
 
-        
+
         const style = document.createElement('style');
         style.textContent = `
             @keyframes confirmationFadeIn {
@@ -269,7 +269,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             style.remove();
         };
 
-        
+
         const cancelBtn = confirmation.querySelector('.cancel-btn');
         const confirmBtn = confirmation.querySelector('.confirm-btn');
 
@@ -283,14 +283,14 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             onConfirm();
         });
 
-        
+
         confirmation.querySelector('.confirmation-backdrop')?.addEventListener('click', () => {
             closeConfirmation();
             showNotification('✖️ Deletion cancelled', 'info');
         });
     };
 
-    
+
     const deleteNote = (id: number) => {
         showConfirmation(
             '🗑️ Delete this note?',
@@ -303,7 +303,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         );
     };
 
-    
+
     const duplicateNote = (id: number) => {
         const originalNote = notes.find(note => note.id === id);
         if (originalNote) {
@@ -329,15 +329,15 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    
+
     const updateNote = (id: number, field: keyof Note, value: string) => {
-        const updatedNotes = notes.map(note => 
+        const updatedNotes = notes.map(note =>
             note.id === id ? { ...note, [field]: value } : note
         );
         saveNotes(updatedNotes);
     };
 
-    
+
     const changeNoteColor = (id: number) => {
         const colors: NoteColor[] = ['yellow', 'pink', 'blue', 'green', 'purple', 'orange'];
         const note = notes.find(note => note.id === id);
@@ -348,22 +348,22 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    
+
     const copyNoteContent = async (id: number) => {
         const note = notes.find(note => note.id === id);
         if (note) {
             const textToCopy = note.content.trim();
-            
+
             if (!textToCopy) {
                 showNotification('⚠️ No content to copy', 'warning');
                 return;
             }
-            
+
             try {
                 await navigator.clipboard.writeText(textToCopy);
                 showNotification('📋 Content copied to clipboard', 'success');
             } catch {
-                
+
                 try {
                     const textArea = document.createElement('textarea');
                     textArea.value = textToCopy;
@@ -379,16 +379,16 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
         }
     };
 
-    
+
     const handleMouseDown = (e: React.MouseEvent, note: Note) => {
         const target = e.target as HTMLElement;
-        if (target.classList.contains('note-content') || 
+        if (target.classList.contains('note-content') ||
             target.classList.contains('note-title') ||
             target.classList.contains('postit-note-action')) {
-            return; 
+            return;
         }
 
-        
+
         if (window.innerWidth <= 768) {
             return;
         }
@@ -404,7 +404,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
             const boardRect = document.querySelector('.notes-board')?.getBoundingClientRect();
             if (!boardRect) return;
 
-            
+
             const noteWidth = window.innerWidth <= 1024 ? 220 : 280;
             const noteHeight = window.innerWidth <= 1024 ? 160 : 200;
 
@@ -424,8 +424,8 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
                 if (noteElement && window.innerWidth > 768) {
                     const newX = parseInt(noteElement.style.left);
                     const newY = parseInt(noteElement.style.top);
-                    
-                    const updatedNotes = notes.map(n => 
+
+                    const updatedNotes = notes.map(n =>
                         n.id === note.id ? { ...n, position: { x: newX, y: newY } } : n
                     );
                     saveNotes(updatedNotes);
@@ -454,7 +454,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
                         <div className="postit-app-icon">📝</div>
                         <h1 className="postit-app-title">Post-it Notes</h1>
                     </div>
-                    
+
                     <div className="postit-header-controls">
                         <div className="postit-color-palette">
                             {(['yellow', 'pink', 'blue', 'green', 'purple', 'orange'] as NoteColor[]).map(color => (
@@ -466,7 +466,7 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
                                 />
                             ))}
                         </div>
-                        
+
                         <button className="postit-add-note-btn" onClick={addNote}>
                             <span>➕</span>
                             New Note
@@ -517,18 +517,20 @@ const PostItNotes: React.FC<PostItNotesProps> = ({ isOpen, onClose, workspacePat
                                         </button>
                                     </div>
                                 </div>
-                                <textarea 
-                                    className="note-title" 
+                                <textarea
+                                    className="note-title"
                                     placeholder="Note title..."
                                     value={note.title}
                                     onChange={(e) => updateNote(note.id, 'title', e.target.value)}
                                     rows={1}
+                                    style={{ height: '25px', overflow: 'hidden' }}
                                 />
-                                <textarea 
-                                    className="note-content" 
+                                <textarea
+                                    className="note-content"
                                     placeholder="Write your note here..."
                                     value={note.content}
                                     onChange={(e) => updateNote(note.id, 'content', e.target.value)}
+                                    rows={6}
                                 />
                             </div>
                         ))

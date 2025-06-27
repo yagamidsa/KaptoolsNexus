@@ -248,29 +248,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             priority: 'high',
             color: '#00ff87'
         },
-        {
-            id: 's12',
-            label: 'Sandbox 12',
-            description: 'Development Environment Beta • Feature integration testing',
-            icon: 'sandbox',
-            category: 'sandbox',
-            url: 'https://sandbox12-kap-ui.azurewebsites.net/#/projects/dashboard',
-            status: 'online',
-            priority: 'medium',
-            color: '#6c5ce7'
-        },
-        {
-            id: 's13',
-            label: 'Sandbox 13',
-            description: 'Development Environment Gamma • Experimental features',
-            icon: 'sandbox',
-            category: 'sandbox',
-            url: 'https://sandbox13-kap-ui.azurewebsites.net/#/projects/dashboard',
-            status: 'online',
-            priority: 'medium',
-            color: '#ff6b9d'
-        },
-
+        
 
         {
             id: 'm3',
@@ -283,29 +261,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             priority: 'high',
             color: '#ff9f43'
         },
-        {
-            id: 'm12',
-            label: 'Mission Control 12',
-            description: 'Admin Panel Beta • User management and analytics',
-            icon: 'control',
-            category: 'control',
-            url: 'https://sandbox12-kap-admin-v2.azurewebsites.net/#/home',
-            status: 'online',
-            priority: 'medium',
-            color: '#fd79a8'
-        },
-        {
-            id: 'm13',
-            label: 'Mission Control 13',
-            description: 'Admin Panel Gamma • Advanced configuration tools',
-            icon: 'control',
-            category: 'control',
-            url: 'https://sandbox13-kap-admin-v2.azurewebsites.net/#/home',
-            status: 'online',
-            priority: 'medium',
-            color: '#e17055'
-        },
-
+        
 
         {
             id: 'afeprod',
@@ -372,7 +328,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             description: 'Survey Management China • Chinese market research platform',
             icon: 'survey',
             category: 'survey',
-            url: 'https://identitycn.nfieldcn.com/Account/Login',
+                url: 'https://online-managercn.nfieldcn.com/',
             status: 'online',
             priority: 'medium',
             color: '#ff7675'
@@ -506,7 +462,7 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
         },
         {
             id: 'gls',
-            label: 'GLS Platform',
+            label: 'GLS Platform Production',
             description: 'Global Logistics System • Content group management',
             icon: 'utilities',
             category: 'utilities',
@@ -514,6 +470,116 @@ const ShortcutsNexus: React.FC<ShortcutsNexusProps> = ({ isOpen, onClose }) => {
             status: 'online',
             priority: 'medium',
             color: '#e17055'
+        },
+        {
+            id: 'gls-integration',
+            label: 'GLS Integration Hub',
+            description: 'Global Logistics System • Content group management and integration',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://gls-integration.azurefd.net/ui/contentGroup',
+            status: 'online',
+            priority: 'high',
+            color: '#e17055'
+        },
+        {
+            id: 'extractor-stage',
+            label: 'Extractor Stage Portal',
+            description: 'Data Extraction Staging • Correlation events and support tools',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://extractor-client-stage.azurewebsites.net/support/correlation-events',
+            status: 'online',
+            priority: 'medium',
+            color: '#00cec9'
+        },
+        {
+            id: 'release-coordinator',
+            label: 'Release Coordinator Wiki',
+            description: 'Release Management • KAP deployment coordination and documentation',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://kantarware.visualstudio.com/Kantar%20Automation%20Platform/_wiki/wikis/Kantar%20Automation%20Platform.wiki/42825/Release-coordinator',
+            status: 'online',
+            priority: 'high',
+            color: '#6c5ce7'
+        },
+        {
+            id: 'outputs-signoff',
+            label: 'Outputs Sign-off Guide',
+            description: 'Output Management • Sign-off comments and metadata guidelines',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://kantarware.visualstudio.com/Kantar%20Automation%20Platform/_wiki/wikis/Kantar%20Automation%20Platform.wiki/60805/Outputs-Sign-off-comments?anchor=the-user-story-has-metadata-create-updates-only',
+            status: 'online',
+            priority: 'medium',
+            color: '#a29bfe'
+        },
+        {
+            id: 'content-smes',
+            label: 'KAP Content SMEs',
+            description: 'Subject Matter Experts • Content management specialist resources',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://kantarware.visualstudio.com/Kantar%20Automation%20Platform/_wiki/wikis/Kantar%20Automation%20Platform.wiki/63571/KAP-Content-SMEs',
+            status: 'online',
+            priority: 'medium',
+            color: '#ff6b9d'
+        },
+        {
+            id: 'sandbox4-oas',
+            label: 'Sandbox 4 OAS UI',
+            description: 'OpenAPI Specification • Sandbox 4 interface and testing environment',
+            icon: 'sandbox',
+            category: 'sandbox',
+            url: 'https://sandbox4-kap-oas-ui.azurewebsites.net/',
+            status: 'online',
+            priority: 'medium',
+            color: '#00ff87'
+        },
+        {
+            id: 'the-source',
+            label: 'The Source Portal',
+            description: 'Kantar Knowledge Hub • Internal resources and company information',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://thesource.kantar.com/',
+            status: 'online',
+            priority: 'high',
+            color: '#fd79a8'
+        },
+        {
+            id: 'yammer-feed',
+            label: 'Yammer Enterprise',
+            description: 'Corporate Social Network • Team collaboration and communication',
+            icon: 'support',
+            category: 'support',
+            url: 'https://web.yammer.com/main/feed',
+            status: 'online',
+            priority: 'medium',
+            color: '#ffeaa7'
+        },
+        {
+            id: 'appreciate-portal',
+            label: 'Appreciate Platform',
+            description: 'Employee Recognition • Kantar appreciation and rewards system',
+            icon: 'support',
+            category: 'support',
+            url: 'https://appreciate.kantar.com/',
+            status: 'online',
+            priority: 'medium',
+            color: '#55efc4'
+        },
+        {
+            id: 'workday-hr',
+            label: 'Workday HR Portal',
+            description: 'Human Resources • Employee self-service and HR management',
+            icon: 'utilities',
+            category: 'utilities',
+            url: 'https://wd3.myworkday.com/wday/authgwy/kantar/login.htmld',
+            status: 'online',
+            priority: 'high',
+            color: '#74b9ff'
         }
     ];
 

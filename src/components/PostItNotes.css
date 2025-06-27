@@ -487,9 +487,9 @@
 }
 
 .note-content {
-    font-size: 14px;
+    font-size: 25px;
     line-height: 1.6;
-    min-height: 90px;
+    min-height: 150px;
     outline: none;
     border: none;
     background: rgba(0, 0, 0, 0.15);
@@ -508,10 +508,10 @@
 }
 
 .note-title {
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.4;
-    min-height: 20px;
-    max-height: 40px;
+    min-height: 39px;
+    max-height: 18px;
     outline: none;
     border: none;
     background: rgba(0, 0, 0, 0.2);
@@ -721,7 +721,7 @@
     }
 
     .note-title {
-        font-size: 13px;
+        font-size: 113px;
     }
 
     .note-content {

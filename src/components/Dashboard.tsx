@@ -1,4 +1,4 @@
-// src/components/Dashboard.tsx - COPIA EXACTA de tu HTML funcional
+// src/components/Dashboard.tsx - CÓDIGO COMPLETO CORREGIDO
 import React, { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import './Dashboard.css';
@@ -32,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // EXACTO como tu HTML - función createProgressRing
+    // Función createProgressRing
     const createProgressRing = (percentage: number) => {
         const radius = 54;
         const circumference = 2 * Math.PI * radius;
@@ -63,7 +63,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
         );
     };
 
-    // EXACTO como tu HTML - función createMetricCard
+    // Función createMetricCard
     const createMetricCard = (data: UserData, index: number) => {
         const itemClass = `item-${(index % 4) + 1}`;
         return (
@@ -106,13 +106,6 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
         }
     }, []);
 
-    // Cargar datos cuando se abre
-    useEffect(() => {
-        if (isOpen) {
-            loadDashboardData();
-        }
-    }, [isOpen, loadDashboardData]);
-
     // Actualizar conexión del usuario
     const updateUserConnection = async () => {
         try {
@@ -127,12 +120,19 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
         }
     };
 
+    // Efecto para cargar datos cuando se abre el dashboard
     useEffect(() => {
         if (isOpen) {
             updateUserConnection();
+            loadDashboardData();
+            // ❌ REMOVIDO AUTO-REFRESH - Solo carga cuando se abre
         }
-    }, [isOpen]);
+    }, [isOpen, loadDashboardData]);
 
+    // ❌ REMOVIDO - App.tsx ya maneja F4 para evitar conflictos
+    // El manejo de F4 se hace en App.tsx centralizadamente
+
+    // Si no está abierto, no renderizar nada
     if (!isOpen) return null;
 
     return (
@@ -146,7 +146,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
                     ✕
                 </button>
 
-                {/* EXACTO como tu HTML - Header */}
+                {/* Header */}
                 <div className="dashboard-header">
                     <h1 className="dashboard-title">KAPTOOLS NEXUS Dashboard</h1>
                     <p className="dashboard-subtitle">Activity Monitoring System • Real-Time Analytics</p>
@@ -234,10 +234,10 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
                     </div>
                 )}
 
-                {/* EXACTO como tu HTML - Footer */}
+                {/* Footer */}
                 <div className="footer">
                     <p>KAPTools Nexus v2.0.0 • Advanced Usage Analytics</p>
-                    <p className="refresh-info">Press F4 to close • Data synchronized automatically</p>
+                    <p className="refresh-info">Press F4 to close</p>
                 </div>
             </div>
         </div>

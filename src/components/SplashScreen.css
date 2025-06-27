@@ -820,3 +820,19 @@ body:has(.splash-overlay) {
     margin: 0 auto !important;
     padding: 30px !important;
 }
+
+.system-count {
+    font-size: 10px;
+    color: #ff6b9d;
+    margin-left: 4px;
+    font-weight: 500;
+}
+
+/* Mensaje de bienvenida al usuario */
+.user-welcome {
+    color: #00ff87;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 8px;
+    text-shadow: 0 0 8px rgba(0, 255, 135, 0.4);
+}

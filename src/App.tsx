@@ -43,7 +43,10 @@ interface WorkspaceValidation {
 
 function App() {
 
-  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [isAppLoading, setIsAppLoading] = useState(() => {
+    // Solo mostrar splash en inicio real, no después de reposo
+    return !sessionStorage.getItem('app-initialized');
+  });
 
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
@@ -181,7 +184,11 @@ function App() {
     setResponse("🚀 KapTools Nexus successfully loaded!\n✨ All Command systems online and ready");
   };
 
-
+  useEffect(() => {
+    if (!isAppLoading) {
+      sessionStorage.setItem('app-initialized', 'true');
+    }
+  }, [isAppLoading]);
 
   const getTooltipContent = (item: MenuItem, enabled: boolean) => {
     if (enabled) {

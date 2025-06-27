@@ -806,3 +806,217 @@
         padding: 10px;
     }
 }
+
+/* Reemplaza los estilos existentes de error en Dashboard.css */
+
+/* Estados de carga/error mejorados */
+.loading-container,
+.error-container,
+.no-data-container {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+}
+
+/* Contenedor de error estilizado con blur y efectos */
+.error-container {
+    background: rgba(255, 107, 107, 0.08);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 107, 107, 0.4);
+    border-radius: 16px;
+    padding: 35px;
+    margin: 20px auto;
+    max-width: 450px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 8px 32px rgba(255, 107, 107, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 0 1px rgba(255, 107, 107, 0.1);
+    animation: errorGlow 2s ease-in-out infinite alternate;
+}
+
+/* Efecto de brillo que se mueve por el contenedor */
+.error-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 107, 107, 0.1), 
+        transparent
+    );
+    animation: shimmer 3s infinite;
+    z-index: 1;
+}
+
+/* Mensaje de error con mejor visibilidad */
+.error-message {
+    color: #ff9999;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-shadow: 
+        0 0 10px rgba(255, 107, 107, 0.6),
+        0 0 20px rgba(255, 107, 107, 0.3),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* Icono de error con glow */
+.error-message::before {
+    content: "⚠️";
+    font-size: 2rem;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.7));
+    animation: pulse 2s infinite;
+}
+
+/* Botón retry mejorado */
+.retry-button {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    border: 2px solid rgba(255, 107, 107, 0.6);
+    border-radius: 12px;
+    padding: 12px 30px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 
+        0 4px 15px rgba(255, 107, 107, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.retry-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 25px rgba(255, 107, 107, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #ff5252, #ff7979);
+    border-color: rgba(255, 107, 107, 0.8);
+}
+
+.retry-button:active {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 15px rgba(255, 107, 107, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Animaciones */
+@keyframes errorGlow {
+    0% {
+        box-shadow: 
+            0 8px 32px rgba(255, 107, 107, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 0 1px rgba(255, 107, 107, 0.1);
+    }
+    100% {
+        box-shadow: 
+            0 8px 32px rgba(255, 107, 107, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            0 0 0 1px rgba(255, 107, 107, 0.2);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Variante para loading spinner mejorado */
+.loading-spinner {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    border: 3px solid rgba(224, 224, 224, 0.2);
+    border-radius: 50%;
+    border-top-color: #e0e0e0;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 5px rgba(224, 224, 224, 0.3));
+}
+
+/* Loading container con mejor estilo */
+.loading-container {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 35px;
+    margin: 20px auto;
+    max-width: 300px;
+}
+
+.loading-container p {
+    color: #e0e0e0;
+    font-size: 1rem;
+    font-weight: 300;
+    text-shadow: 0 0 8px rgba(224, 224, 224, 0.3);
+    letter-spacing: 0.5px;
+}
+
+/* No data container */
+.no-data-container {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 35px;
+    margin: 20px auto;
+    max-width: 400px;
+    color: #c0c0d0;
+    font-size: 1.1rem;
+    font-weight: 300;
+    text-shadow: 0 0 8px rgba(192, 192, 208, 0.3);
+}
+
+/* Responsive para el error container */
+@media (max-width: 768px) {
+    .error-container {
+        padding: 25px;
+        margin: 15px;
+        max-width: calc(100% - 30px);
+    }
+    
+    .error-message {
+        font-size: 1.1rem;
+    }
+    
+    .retry-button {
+        padding: 10px 25px;
+        font-size: 0.9rem;
+    }
+}
+

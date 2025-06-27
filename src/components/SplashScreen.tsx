@@ -1,4 +1,3 @@
-// src/components/SplashScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { useDatabaseValidation } from '../hooks/useDatabaseValidation';
 import './SplashScreen.css';
@@ -14,23 +13,25 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
     const [systemsOnline, setSystemsOnline] = useState<Record<string, boolean>>({});
     const [showError, setShowError] = useState(false);
 
-    // Hook de validación de base de datos
-    const { isConnected, isLoading: dbLoading, error: dbError, userCount, retryConnection } = useDatabaseValidation();
+    
+    const { isConnected, isLoading: dbLoading, error: dbError, userCount, currentUser, retryConnection } = useDatabaseValidation();
 
+    
     const systems = [
-        { id: 'neural', name: 'Neural Networks', delay: 600 },
-        { id: 'quantum', name: 'Quantum Core', delay: 1100 },
-        { id: 'nexus', name: 'Nexus Matrix', delay: 1800 },
-        { id: 'database', name: 'SQLite Database', delay: 2400 },
-        { id: 'ai', name: 'AI Systems', delay: 3000 }
+        { id: 'neural', name: 'Start Git', delay: 600 },
+        { id: 'quantum', name: 'Verify Core', delay: 1100 },
+        { id: 'nexus', name: 'Nexus Components', delay: 1800 },
+        { id: 'database', name: 'Start Nexus', delay: 2400 },
+        { id: 'user_session', name: 'User Session', delay: 3200 },
+        { id: 'ai', name: 'Start Systems', delay: 3000 }
     ];
 
     useEffect(() => {
         setTimeout(() => setLogoVisible(true), 300);
 
-        // Activar sistemas gradualmente (excepto database que depende de la validación)
+        
         systems.forEach((system) => {
-            if (system.id !== 'database') {
+            if (system.id !== 'database' && system.id !== 'user_session') {
                 setTimeout(() => {
                     setSystemsOnline(prev => ({ ...prev, [system.id]: true }));
                 }, system.delay);
@@ -38,7 +39,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
         });
     }, []);
 
-    // Efecto para manejar el estado de la base de datos
+    
     useEffect(() => {
         if (!dbLoading) {
             setTimeout(() => {
@@ -48,13 +49,22 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                     setShowError(true);
                     setCurrentStep('❌ Database Connection Failed');
                 } else if (isConnected) {
-                    setCurrentStep(`✅ Database Connected (${userCount} users)`);
+                    setCurrentStep(`✅ Connected `);
+                    
+                    
+                    setTimeout(() => {
+                        setSystemsOnline(prev => ({ ...prev, user_session: true }));
+                        if (currentUser) {
+                            setCurrentStep(`👤 User Session: ${currentUser}`);
+                        }
+                    }, 800);
+                    
                     // Continuar con el proceso de carga normal
                     startNormalLoading();
                 }
             }, 2400);
         }
-    }, [dbLoading, isConnected, dbError, userCount]);
+    }, [dbLoading, isConnected, dbError, userCount, currentUser]);
 
     const startNormalLoading = () => {
         const loadingSteps = [
@@ -240,6 +250,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             letterSpacing: '0.5px'
         },
 
+
+        systemCount: {
+            fontSize: '10px',
+            color: '#ff6b9d',
+            marginLeft: '4px',
+            fontWeight: 500
+        },
+
         errorPanel: {
             background: 'rgba(231, 76, 60, 0.1)',
             border: '1px solid rgba(231, 76, 60, 0.3)',
@@ -278,10 +296,23 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
             transition: 'all 0.3s ease',
             textTransform: 'uppercase' as const,
             letterSpacing: '1px'
+        },
+
+
+        footer: {
+            marginTop: '20px',
+            textAlign: 'center' as const
+        },
+
+        userInfo: {
+            color: '#00ff87',
+            fontSize: '12px',
+            fontWeight: 500,
+            marginTop: '8px'
         }
     };
 
-    // Calcular el stroke-dasharray para el círculo de progreso
+
     const radius = 70;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = `${(progress / 100) * circumference} ${circumference}`;
@@ -339,10 +370,25 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                             >
                                 <div style={styles.systemIndicator(systemsOnline[system.id])}></div>
                                 <span style={styles.systemName}>{system.name}</span>
+                                {/* AGREGADO: Mostrar contador de usuarios en database */}
+                                {system.id === 'database' && isConnected && (
+                                    <span style={styles.systemCount}>({userCount})</span>
+                                )}
+                                {/* AGREGADO: Mostrar nombre de usuario en user_session */}
+                                {system.id === 'user_session' && currentUser && (
+                                    <span style={styles.systemCount}>({currentUser})</span>
+                                )}
                             </div>
                         ))}
                     </div>
                 </div>
+
+                {/* AGREGADO: Footer con mensaje de bienvenida */}
+                {currentUser && systemsOnline.user_session && (
+                    <div style={styles.footer}>
+                        <div style={styles.userInfo}>Welcome back, {currentUser}!</div>
+                    </div>
+                )}
 
                 {showError && dbError && (
                     <div style={styles.errorPanel}>

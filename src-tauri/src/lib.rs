@@ -7,6 +7,7 @@ mod database;
 // Re-exportar para facilitar el uso
 use jsonpath_commands::*;
 use std::process::Command;
+use std::os::windows::process::CommandExt;
 use database::*;
 
 #[tauri::command]
@@ -24,6 +25,7 @@ async fn open_folder(path: String) -> Result<String, String> {
     // Abrir la carpeta en el explorador de archivos de Windows
     match Command::new("explorer")
         .arg(&path)
+        .creation_flags(0x08000000)
         .spawn()
     {
         Ok(_) => Ok(format!("Successfully opened folder: {}", path)),
@@ -236,77 +238,39 @@ async fn read_file_as_base64(file_path: String) -> Result<String, String> {
 
 #[tauri::command]
 fn open_copilot_365() -> Result<String, String> {
-    println!("🤖 Opening Microsoft Copilot 365 (Office integration)...");
+    println!("🤖 Opening Microsoft 365 Copilot...");
     
-    // Método 1: Abrir Office Hub directamente (donde está Copilot 365)
-    let office_hub_result = Command::new("explorer")
-        .args(&["shell:AppsFolder\\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe!Microsoft.MicrosoftOfficeHub"])
-        .output();
-    
-    match office_hub_result {
-        Ok(output) if output.status.success() => {
-            println!("✅ Office Hub (Copilot 365) opened successfully");
-            return Ok("📋 Microsoft Office Hub opened - Copilot 365 available inside!".to_string());
-        }
-        Ok(_) => println!("⚠️ Office Hub failed, trying Word with Copilot..."),
-        Err(e) => println!("⚠️ Office Hub error: {}, trying Word...", e)
-    }
-    
-    // Método 2: Abrir Word con Copilot (si está instalado)
-    let word_result = Command::new("cmd")
-        .args(&["/C", "start", "", "winword:"])
-        .output();
-    
-    match word_result {
-        Ok(output) if output.status.success() => {
-            println!("✅ Word opened (Copilot 365 available inside)");
-            return Ok("📝 Microsoft Word opened - Access Copilot 365 from the Home tab!".to_string());
-        }
-        Ok(_) => println!("⚠️ Word failed, trying PowerPoint..."),
-        Err(e) => println!("⚠️ Word error: {}, trying PowerPoint...", e)
-    }
-    
-    // Método 3: Abrir PowerPoint con Copilot
-    let powerpoint_result = Command::new("cmd")
-        .args(&["/C", "start", "", "msppt:"])
-        .output();
-    
-    match powerpoint_result {
-        Ok(output) if output.status.success() => {
-            println!("✅ PowerPoint opened (Copilot 365 available inside)");
-            return Ok("🎯 Microsoft PowerPoint opened - Access Copilot 365 from the Home tab!".to_string());
-        }
-        Ok(_) => println!("⚠️ PowerPoint failed, trying Office web..."),
-        Err(e) => println!("⚠️ PowerPoint error: {}, trying web version...", e)
-    }
-    
-    // Método 4: Abrir Office 365 web (donde también está Copilot 365)
-    let web_office_result = Command::new("cmd")
-        .args(&["/C", "start", "", "https://www.office.com/?auth=2"])
-        .output();
-    
-    match web_office_result {
-        Ok(_) => {
-            println!("✅ Office 365 web opened");
-            Ok("🌐 Microsoft Office 365 opened in browser - Copilot 365 available in apps!".to_string())
-        }
-        Err(e) => {
-            println!("❌ All Office methods failed, trying standalone Copilot");
+    // Buscar el AppID exacto de Microsoft 365 Copilot
+    match Command::new("powershell")
+        .args(&["-Command", 
+            "Get-StartApps | Where-Object {$_.Name -like '*365*Copilot*' -or $_.Name -like '*Copilot*365*'} | Select-Object -First 1 -ExpandProperty AppID"
+        ])
+        .creation_flags(0x08000000)
+        .output()
+    {
+        Ok(output) => {
+            let app_id = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            println!("📱 Found AppID: {}", app_id);
             
-            // Método 5: Fallback a Copilot standalone como último recurso
-            let copilot_fallback = Command::new("cmd")
-                .args(&["/C", "start", "", "ms-copilot:"])
-                .output();
-            
-            match copilot_fallback {
-                Ok(_) => Ok("🤖 Opened standalone Copilot as fallback (not 365 integrated)".to_string()),
-                Err(fallback_e) => Err(format!("❌ Failed to open any Copilot version. Office error: {}, Copilot error: {}", e, fallback_e))
+            if !app_id.is_empty() {
+                match Command::new("cmd")
+                    .args(&["/C", "start", "", &format!("shell:AppsFolder\\{}", app_id)])
+                    .creation_flags(0x08000000)
+                    .output()
+                {
+                    Ok(_) => {
+                        println!("✅ Microsoft 365 Copilot opened");
+                        return Ok("🤖 Microsoft 365 Copilot opened".to_string());
+                    }
+                    Err(e) => println!("❌ Failed to open with AppID: {}", e)
+                }
             }
         }
+        Err(e) => println!("❌ PowerShell search failed: {}", e)
     }
+    
+    Err("❌ Microsoft 365 Copilot not found".to_string())
 }
-
-
 // Agregar estas funciones optimizadas a tu lib.rs
 
 #[tauri::command]
@@ -316,6 +280,7 @@ fn open_network_path_fast(path: String) -> Result<String, String> {
     // Método 1: Usar cmd con start (MÁS RÁPIDO para rutas UNC)
     let cmd_result = Command::new("cmd")
         .args(&["/C", "start", "", &path])
+        .creation_flags(0x08000000)
         .output();
     
     match cmd_result {
@@ -330,6 +295,7 @@ fn open_network_path_fast(path: String) -> Result<String, String> {
     // Método 2: Explorer directo como fallback
     let explorer_result = Command::new("explorer")
         .args(&[&path])
+        .creation_flags(0x08000000)
         .output();
     
     match explorer_result {
@@ -345,6 +311,7 @@ fn open_network_path_fast(path: String) -> Result<String, String> {
             
             let drive_result = Command::new("cmd")
                 .args(&["/C", "start", "", &drive_path])
+                .creation_flags(0x08000000)
                 .output();
             
             match drive_result {
@@ -365,6 +332,7 @@ fn open_kap_data_processing() -> Result<String, String> {
     // Método 1: CMD con start (más rápido que explorer para UNC)
     match Command::new("cmd")
         .args(&["/C", "start", "", path])
+        .creation_flags(0x08000000)
         .output()
     {
         Ok(output) if output.status.success() => {
@@ -378,6 +346,7 @@ fn open_kap_data_processing() -> Result<String, String> {
     // Método 2: Explorer como fallback
     match Command::new("explorer")
         .args(&[path])
+        .creation_flags(0x08000000)
         .output()
     {
         Ok(output) if output.status.success() => {
@@ -398,6 +367,7 @@ fn open_sa_distribution() -> Result<String, String> {
     // Método 1: CMD con start (más rápido que explorer para UNC)
     match Command::new("cmd")
         .args(&["/C", "start", "", path])
+        .creation_flags(0x08000000)
         .output()
     {
         Ok(output) if output.status.success() => {
@@ -411,6 +381,7 @@ fn open_sa_distribution() -> Result<String, String> {
     // Método 2: Explorer como fallback
     match Command::new("explorer")
         .args(&[path])
+        .creation_flags(0x08000000)
         .output()
     {
         Ok(output) if output.status.success() => {
@@ -713,9 +684,7 @@ pub fn run() {
             get_dashboard_data,
             get_current_user,
             update_user_connection,
-            test_dashboard_connection,
-            initialize_user_session,
-            get_dashboard_data_enhanced
+            initialize_user_session
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
