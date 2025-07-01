@@ -1,5 +1,5 @@
-// src/hooks/useDatabaseValidation.tsx - Versión simplificada
-import { useState, useEffect } from 'react';
+// src/hooks/useDatabaseValidation.tsx - Versión con timeout de seguridad
+import { useState, useEffect, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 
 interface DatabaseValidation {
@@ -17,7 +17,7 @@ interface DatabaseResponse {
     error?: string;
 }
 
-const DATABASE_PATH = "\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS\\KAPDataProcessing\\TestData\\app_usage.db";
+const DATABASE_PATH = "\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS\\KAPDataProcessing\\TestData\\base\\app_usage.db";
 
 export const useDatabaseValidation = (): DatabaseValidation => {
     const [isConnected, setIsConnected] = useState(false);
@@ -25,12 +25,26 @@ export const useDatabaseValidation = (): DatabaseValidation => {
     const [error, setError] = useState<string | null>(null);
     const [userCount, setUserCount] = useState(0);
     const [currentUser, setCurrentUser] = useState<string | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Función de validación con manejo de timeouts y reintentos
+    // Función de validación con manejo de timeouts y reintentos + TIMEOUT DE SEGURIDAD
     const validateConnection = async (retryCount: number = 0): Promise<void> => {
         const maxRetries = 2; // Reducido para evitar demasiados reintentos
         setIsLoading(true);
         setError(null);
+
+        // 🔥 TIMEOUT DE SEGURIDAD: 20 segundos máximo por intento
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+            console.warn(`⚠️ Database validation timeout after 20 seconds (attempt ${retryCount + 1})`);
+            setIsLoading(false);
+            setIsConnected(false);
+            setUserCount(0);
+            setError('Connection timeout. Please check your VPN connection and try again.');
+        }, 20000);
 
         try {
             console.log(`🔄 Validating database connection (attempt ${retryCount + 1}/${maxRetries + 1})...`);
@@ -52,6 +66,12 @@ export const useDatabaseValidation = (): DatabaseValidation => {
             const response: DatabaseResponse = await invoke('validate_database_connection', {
                 dbPath: DATABASE_PATH
             });
+
+            // Clear timeout si la respuesta llega a tiempo
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
 
             if (response.success) {
                 setIsConnected(true);
@@ -78,6 +98,12 @@ export const useDatabaseValidation = (): DatabaseValidation => {
                 throw new Error(response.error || 'Unknown database error');
             }
         } catch (err) {
+            // Clear timeout en caso de error
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+
             console.error(`❌ Database validation failed (attempt ${retryCount + 1}):`, err);
             
             // Reintentar si no hemos alcanzado el máximo
@@ -112,7 +138,22 @@ export const useDatabaseValidation = (): DatabaseValidation => {
             validateConnection(0);
         }, 2500); // Aumentado a 2.5 segundos
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            // Cleanup del timeout de seguridad
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Cleanup al desmontar el componente
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
     }, []);
 
     return {

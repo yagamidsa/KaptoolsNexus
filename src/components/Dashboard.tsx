@@ -25,7 +25,7 @@ interface DashboardData {
     timestamp: string;
 }
 
-const DATABASE_PATH = "\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS\\KAPDataProcessing\\TestData\\app_usage.db";
+const DATABASE_PATH = "\\\\mbaw1fs.grpit.local\\KAP_OUTPUTS\\KAPDataProcessing\\TestData\\base\\app_usage.db";
 
 const Dashboard: React.FC<DashboardProps> = ({ isOpen, onClose }) => {
     const [dashboardData, setDashboardData] = useState<UserData[]>([]);

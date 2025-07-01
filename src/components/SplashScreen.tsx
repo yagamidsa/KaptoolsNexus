@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// src/components/SplashScreen.tsx - RESTAURANDO TU DISEÑO ORIGINAL CON CLASES CSS
+import React, { useState, useEffect, useRef } from 'react';
 import { useDatabaseValidation } from '../hooks/useDatabaseValidation';
 import './SplashScreen.css';
 
@@ -12,26 +13,46 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
     const [logoVisible, setLogoVisible] = useState(false);
     const [systemsOnline, setSystemsOnline] = useState<Record<string, boolean>>({});
     const [showError, setShowError] = useState(false);
-
     
+    // 🔥 SOLO AÑADIDO - timeout de seguridad
+    const [forceComplete, setForceComplete] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Hook de validación de base de datos
     const { isConnected, isLoading: dbLoading, error: dbError, userCount, currentUser, retryConnection } = useDatabaseValidation();
 
-    
     const systems = [
-        { id: 'neural', name: 'Start Git', delay: 600 },
-        { id: 'quantum', name: 'Verify Core', delay: 1100 },
-        { id: 'nexus', name: 'Nexus Components', delay: 1800 },
-        { id: 'database', name: 'Start Nexus', delay: 2400 },
-        { id: 'user_session', name: 'User Session', delay: 3200 },
-        { id: 'ai', name: 'Start Systems', delay: 3000 }
+        { id: 'neural', name: 'Neural Networks', delay: 600 },
+        { id: 'quantum', name: 'Quantum Core', delay: 1100 },
+        { id: 'nexus', name: 'Nexus Matrix', delay: 1800 },
+        { id: 'database', name: 'SQLite Database', delay: 2400 },
+        { id: 'ai', name: 'AI Systems', delay: 3000 }
     ];
+
+    // 🔥 SOLO AÑADIDO - timeout maestro
+    useEffect(() => {
+        timeoutRef.current = setTimeout(() => {
+            console.warn('⚠️ SplashScreen master timeout - forcing completion');
+            setForceComplete(true);
+            setProgress(100);
+            setTimeout(() => {
+                onLoadingComplete();
+            }, 2000);
+        }, 30000);
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [onLoadingComplete]);
 
     useEffect(() => {
         setTimeout(() => setLogoVisible(true), 300);
 
-        
+        // Activar sistemas gradualmente (excepto database que depende de la validación)
         systems.forEach((system) => {
-            if (system.id !== 'database' && system.id !== 'user_session') {
+            if (system.id !== 'database') {
                 setTimeout(() => {
                     setSystemsOnline(prev => ({ ...prev, [system.id]: true }));
                 }, system.delay);
@@ -39,9 +60,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
         });
     }, []);
 
-    
+    // Efecto para manejar el estado de la base de datos
     useEffect(() => {
-        if (!dbLoading) {
+        if (!dbLoading && !forceComplete) {
             setTimeout(() => {
                 setSystemsOnline(prev => ({ ...prev, database: isConnected }));
                 
@@ -49,24 +70,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
                     setShowError(true);
                     setCurrentStep('❌ Database Connection Failed');
                 } else if (isConnected) {
-                    setCurrentStep(`✅ Connected `);
-                    
-                    
-                    setTimeout(() => {
-                        setSystemsOnline(prev => ({ ...prev, user_session: true }));
-                        if (currentUser) {
-                            setCurrentStep(`👤 User Session: ${currentUser}`);
-                        }
-                    }, 800);
-                    
+                    setCurrentStep(`✅ Database Connected (${userCount} users)`);
                     // Continuar con el proceso de carga normal
                     startNormalLoading();
                 }
             }, 2400);
         }
-    }, [dbLoading, isConnected, dbError, userCount, currentUser]);
+    }, [dbLoading, isConnected, dbError, userCount, forceComplete]);
 
     const startNormalLoading = () => {
+        if (forceComplete) return;
+
         const loadingSteps = [
             { progress: 15, step: '🔧 Initializing...', delay: 400 },
             { progress: 35, step: '🧠 Loading Neural Networks...', delay: 500 },
@@ -79,20 +93,27 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
         let currentIndex = 0;
 
         const executeStep = () => {
-            if (currentIndex < loadingSteps.length) {
+            if (currentIndex < loadingSteps.length && !forceComplete) {
                 const step = loadingSteps[currentIndex];
 
                 setTimeout(() => {
-                    setProgress(step.progress);
-                    setCurrentStep(step.step);
+                    if (!forceComplete) {
+                        setProgress(step.progress);
+                        setCurrentStep(step.step);
 
-                    if (step.progress === 100) {
-                        setTimeout(() => {
-                            onLoadingComplete();
-                        }, 1000);
-                    } else {
-                        currentIndex++;
-                        executeStep();
+                        if (step.progress === 100) {
+                            setTimeout(() => {
+                                if (!forceComplete) {
+                                    if (timeoutRef.current) {
+                                        clearTimeout(timeoutRef.current);
+                                    }
+                                    onLoadingComplete();
+                                }
+                            }, 1000);
+                        } else {
+                            currentIndex++;
+                            executeStep();
+                        }
                     }
                 }, step.delay);
             }
@@ -108,320 +129,210 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onLoadingComplete }) => {
         retryConnection();
     };
 
-    const styles = {
-        container: {
-            position: 'fixed' as const,
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'radial-gradient(ellipse at center, #1a1d3a 0%, #0f1123 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 99999,
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            overflow: 'hidden'
-        },
-
-        content: {
-            display: 'flex',
-            flexDirection: 'column' as const,
-            alignItems: 'center',
-            textAlign: 'center' as const,
-            maxWidth: '500px',
-            opacity: logoVisible ? 1 : 0,
-            transform: logoVisible ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-        },
-
-        title: {
-            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            fontWeight: 900,
-            background: 'linear-gradient(135deg, #ffffff 0%, #6c5ce7 30%, #ff6b9d 60%, #00ff87 100%)',
-            backgroundSize: '300% 300%',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            animation: 'titleFlow 6s ease infinite',
-            marginBottom: '20px',
-            letterSpacing: '-1px'
-        },
-
-        subtitle: {
-            fontSize: '14px',
-            color: '#a0a3bd',
-            marginBottom: '40px',
-            textTransform: 'uppercase' as const,
-            letterSpacing: '2px',
-            fontWeight: 600
-        },
-
-        progressContainer: {
-            position: 'relative' as const,
-            width: '180px',
-            height: '180px',
-            marginBottom: '30px'
-        },
-
-        progressSvg: {
-            width: '100%',
-            height: '100%',
-            transform: 'rotate(-90deg)',
-            filter: 'drop-shadow(0 0 15px rgba(108, 92, 231, 0.4))'
-        },
-
-        progressText: {
-            position: 'absolute' as const,
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '24px',
-            fontWeight: 900,
-            color: '#ffffff',
-            fontFamily: 'monospace'
-        },
-
-        currentStep: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(37, 42, 74, 0.6)',
-            border: '1px solid rgba(108, 92, 231, 0.2)',
-            borderRadius: '20px',
-            padding: '12px 20px',
-            backdropFilter: 'blur(15px)',
-            marginBottom: '30px',
-            minHeight: '40px',
-            maxWidth: '350px'
-        },
-
-        stepText: {
-            color: '#ffffff',
-            fontSize: '14px',
-            fontWeight: 500
-        },
-
-        systemsPanel: {
-            width: '100%',
-            maxWidth: '400px'
-        },
-
-        systemsGrid: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '12px',
-            padding: '16px',
-            background: 'rgba(37, 42, 74, 0.3)',
-            border: '1px solid rgba(108, 92, 231, 0.1)',
-            borderRadius: '12px',
-            backdropFilter: 'blur(15px)'
-        },
-
-        systemItem: (isOnline: boolean) => ({
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 12px',
-            borderRadius: '8px',
-            background: 'rgba(26, 29, 58, 0.4)',
-            opacity: isOnline ? 1 : 0.3,
-            transform: isOnline ? 'scale(1)' : 'scale(0.95)',
-            transition: 'all 0.6s ease'
-        }),
-
-        systemIndicator: (isOnline: boolean) => ({
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            flexShrink: 0,
-            background: isOnline
-                ? 'linear-gradient(45deg, #00ff87, #6c5ce7)'
-                : 'rgba(108, 92, 231, 0.2)',
-            boxShadow: isOnline ? '0 0 8px currentColor' : 'none',
-            transition: 'all 0.6s ease'
-        }),
-
-        systemName: {
-            color: '#ffffff',
-            fontSize: '12px',
-            fontWeight: 500,
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.5px'
-        },
-
-
-        systemCount: {
-            fontSize: '10px',
-            color: '#ff6b9d',
-            marginLeft: '4px',
-            fontWeight: 500
-        },
-
-        errorPanel: {
-            background: 'rgba(231, 76, 60, 0.1)',
-            border: '1px solid rgba(231, 76, 60, 0.3)',
-            borderRadius: '12px',
-            padding: '20px',
-            marginTop: '20px',
-            maxWidth: '400px'
-        },
-
-        errorTitle: {
-            color: '#e74c3c',
-            fontSize: '16px',
-            fontWeight: 600,
-            marginBottom: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-        },
-
-        errorMessage: {
-            color: '#ffffff',
-            fontSize: '14px',
-            lineHeight: '1.5',
-            marginBottom: '16px'
-        },
-
-        retryButton: {
-            background: 'linear-gradient(135deg, #6c5ce7, #ff6b9d)',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            color: '#ffffff',
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            textTransform: 'uppercase' as const,
-            letterSpacing: '1px'
-        },
-
-
-        footer: {
-            marginTop: '20px',
-            textAlign: 'center' as const
-        },
-
-        userInfo: {
-            color: '#00ff87',
-            fontSize: '12px',
-            fontWeight: 500,
-            marginTop: '8px'
-        }
+    const handleSkipDatabase = () => {
+        setShowError(false);
+        setCurrentStep('⚠️ Continuing without database...');
+        setSystemsOnline(prev => ({ ...prev, database: false }));
+        setTimeout(() => {
+            startNormalLoading();
+        }, 1000);
     };
 
-
-    const radius = 70;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDasharray = `${(progress / 100) * circumference} ${circumference}`;
+    const circumference = 2 * Math.PI * 100; // Para el progreso circular
+    const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.content}>
-                <h1 style={styles.title}>KAPTOOLS NEXUS</h1>
-                <p style={styles.subtitle}>Advanced Analytics Platform</p>
+        <div className="splash-screen-container">
+            {/* Background Effects */}
+            <div className="splash-background-effects">
+                <div className="splash-gradient-overlay"></div>
+                <div className="splash-grid-pattern"></div>
+            </div>
 
-                <div style={styles.progressContainer}>
-                    <svg style={styles.progressSvg}>
-                        <circle
-                            cx="90"
-                            cy="90"
-                            r={radius}
-                            fill="none"
-                            stroke="rgba(108, 92, 231, 0.1)"
-                            strokeWidth="6"
-                        />
-                        <circle
-                            cx="90"
-                            cy="90"
-                            r={radius}
-                            fill="none"
-                            stroke="url(#progressGradient)"
-                            strokeWidth="6"
-                            strokeLinecap="round"
-                            style={{
-                                strokeDasharray,
-                                transition: 'stroke-dasharray 0.5s ease'
-                            }}
-                        />
-                        <defs>
-                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#6c5ce7" />
-                                <stop offset="50%" stopColor="#ff6b9d" />
-                                <stop offset="100%" stopColor="#00ff87" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div style={styles.progressText}>{progress}%</div>
+            {/* Main Content */}
+            <div className="splash-content-container">
+                {/* Logo Section */}
+                <div className={`splash-logo-section ${logoVisible ? 'splash-visible' : ''}`}>
+                    <div className="splash-holographic-icon">
+                        <div className="splash-icon-glow"></div>
+                        <div className="splash-icon-rings">
+                            <div className="splash-ring-1"></div>
+                            <div className="splash-ring-2"></div>
+                            <div className="splash-ring-3"></div>
+                        </div>
+                        <div className="splash-icon-core">
+                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                                <circle cx="30" cy="30" r="25" stroke="url(#iconGradient)" strokeWidth="2" />
+                                <text x="30" y="38" textAnchor="middle" fill="#ffffff" fontSize="18" fontWeight="bold">KT</text>
+                                <defs>
+                                    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stopColor="#6c5ce7" />
+                                        <stop offset="50%" stopColor="#ff6b9d" />
+                                        <stop offset="100%" stopColor="#00ff87" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div className="splash-main-title">
+                        <span className="splash-title-main">KapTools</span>
+                        <div className="splash-title-separator"></div>
+                        <span className="splash-title-sub">Nexus</span>
+                    </div>
+
+                    <div className="splash-subtitle">
+                        <div className="splash-subtitle-dot"></div>
+                        <span className="splash-subtitle-text">Enterprise Data Intelligence</span>
+                        <div className="splash-subtitle-dot"></div>
+                    </div>
+
+                    <div className="splash-version-container">
+                        <div className="splash-version-badge">
+                            <div className="splash-version-glow"></div>
+                            <span className="splash-version-text">Version 2.1.0</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div style={styles.currentStep}>
-                    <span style={styles.stepText}>{currentStep}</span>
+                {/* Progress Section */}
+                <div className="splash-progress-section">
+                    <div className="splash-progress-container">
+                        {/* Progress Ring */}
+                        <svg className="splash-progress-svg" width="220" height="220">
+                            <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#6c5ce7" />
+                                    <stop offset="50%" stopColor="#ff6b9d" />
+                                    <stop offset="100%" stopColor="#00ff87" />
+                                </linearGradient>
+                            </defs>
+                            
+                            {/* Background Circle */}
+                            <circle
+                                cx="110"
+                                cy="110"
+                                r="100"
+                                stroke="rgba(255,255,255,0.05)"
+                                strokeWidth="4"
+                                fill="none"
+                            />
+                            
+                            {/* Progress Circle */}
+                            <circle
+                                cx="110"
+                                cy="110"
+                                r="100"
+                                stroke="url(#progressGradient)"
+                                strokeWidth="4"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeDasharray={circumference}
+                                strokeDashoffset={strokeDashoffset}
+                                className="splash-progress-circle"
+                                transform="rotate(-90 110 110)"
+                            />
+                        </svg>
+
+                        {/* Progress Text */}
+                        <div className="splash-progress-text">
+                            <span className="splash-progress-number">{Math.round(progress)}</span>
+                            <span className="splash-progress-symbol">%</span>
+                        </div>
+
+                        {/* Central Pulse */}
+                        <div className="splash-central-pulse"></div>
+
+                        {/* Outer Rings */}
+                        <div className="splash-outer-rings">
+                            <div className="splash-rotating-ring-1"></div>
+                            <div className="splash-rotating-ring-2"></div>
+                        </div>
+                    </div>
+
+                    {/* Current Step */}
+                    <div className="splash-current-step">
+                        <span className="splash-step-icon">⚡</span>
+                        <span className="splash-step-text">{currentStep || '🚀 Initializing KapTools Nexus...'}</span>
+                    </div>
                 </div>
 
-                <div style={styles.systemsPanel}>
-                    <div style={styles.systemsGrid}>
+                {/* Systems Panel */}
+                <div className="splash-systems-panel">
+                    <div className="splash-systems-grid">
                         {systems.map((system) => (
-                            <div
-                                key={system.id}
-                                style={styles.systemItem(systemsOnline[system.id])}
+                            <div 
+                                key={system.id} 
+                                className={`splash-system-item ${systemsOnline[system.id] ? 'splash-online' : ''}`}
                             >
-                                <div style={styles.systemIndicator(systemsOnline[system.id])}></div>
-                                <span style={styles.systemName}>{system.name}</span>
-                                {/* AGREGADO: Mostrar contador de usuarios en database */}
-                                {system.id === 'database' && isConnected && (
-                                    <span style={styles.systemCount}>({userCount})</span>
-                                )}
-                                {/* AGREGADO: Mostrar nombre de usuario en user_session */}
-                                {system.id === 'user_session' && currentUser && (
-                                    <span style={styles.systemCount}>({currentUser})</span>
+                                <div className="splash-system-indicator"></div>
+                                <span className="splash-system-name">{system.name}</span>
+                                {system.id === 'database' && systemsOnline[system.id] && userCount > 0 && (
+                                    <span className="system-count">({userCount})</span>
                                 )}
                             </div>
                         ))}
                     </div>
+
+                    {/* User Welcome Message */}
+                    {currentUser && isConnected && (
+                        <div className="user-welcome">
+                            Welcome back, {currentUser}!
+                        </div>
+                    )}
                 </div>
 
-                {/* AGREGADO: Footer con mensaje de bienvenida */}
-                {currentUser && systemsOnline.user_session && (
-                    <div style={styles.footer}>
-                        <div style={styles.userInfo}>Welcome back, {currentUser}!</div>
-                    </div>
-                )}
-
-                {showError && dbError && (
-                    <div style={styles.errorPanel}>
-                        <div style={styles.errorTitle}>
-                            ⚠️ Connection Error
+                {/* 🔥 SOLO AÑADIDO - Error Panel con estilos inline simples */}
+                {showError && !forceComplete && (
+                    <div style={{
+                        background: 'rgba(231, 76, 60, 0.1)',
+                        border: '1px solid rgba(231, 76, 60, 0.3)',
+                        borderRadius: '12px',
+                        padding: '15px',
+                        marginTop: '20px',
+                        maxWidth: '350px',
+                        backdropFilter: 'blur(15px)',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ color: '#e74c3c', fontSize: '12px', marginBottom: '8px' }}>
+                            ⚠️ Connection Issue
                         </div>
-                        <div style={styles.errorMessage}>
-                            {dbError}
+                        <div style={{ color: '#ffffff', fontSize: '11px', marginBottom: '12px' }}>
+                            {dbError || 'Database connection failed'}
                         </div>
-                        <button
-                            style={styles.retryButton}
-                            onClick={handleRetry}
-                            onMouseOver={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(108, 92, 231, 0.4)';
-                            }}
-                            onMouseOut={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
-                            Retry Connection
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <button 
+                                onClick={handleRetry}
+                                style={{
+                                    background: 'linear-gradient(135deg, #6c5ce7, #ff6b9d)',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    padding: '6px 12px',
+                                    color: '#ffffff',
+                                    fontSize: '10px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                🔄 Retry
+                            </button>
+                            <button 
+                                onClick={handleSkipDatabase}
+                                style={{
+                                    background: 'rgba(255, 255, 255, 0.1)',
+                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                    borderRadius: '6px',
+                                    padding: '6px 12px',
+                                    color: '#ffffff',
+                                    fontSize: '10px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                ⏭️ Skip
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
-
-            <style>{`
-                @keyframes titleFlow {
-                    0%, 100% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                }
-            `}</style>
         </div>
     );
 };
