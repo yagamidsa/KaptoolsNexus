@@ -277,19 +277,19 @@ async def health_check():
 
 
 
-
-
-
 @app.post("/git/clone-microservices")
-async def clone_microservices(request: CloneRequest):
-
+async def clone_microservices(request: dict):
+    """Clonar microservicios en el workspace especificado"""
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
     
     try:
+        project_path = request.get("project_path", "")
+        branch = request.get("branch", "develop")
+        
         result = await git_service.clone_microservices(
-            project_path=request.project_path,
-            branch=request.branch
+            project_path=project_path,
+            branch=branch
         )
         
         if result["success"]:
@@ -299,6 +299,27 @@ async def clone_microservices(request: CloneRequest):
             
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Git clone error: {str(e)}")
+
+# También verifica que tengas este endpoint
+@app.get("/git/validate-workspace")
+async def validate_workspace(workspace_path: str):
+    """Validar que un workspace sea válido para Git operations"""
+    if not git_service:
+        raise HTTPException(status_code=503, detail="Git service not available")
+        
+    try:
+        validation = git_service.validate_workspace(workspace_path)
+        
+        return {
+            "success": True,
+            "validation": validation,
+            "has_microservices": len(validation.get("existing_repositories", [])) > 0,
+            "existing_repos": validation.get("existing_repositories", []),
+            "workspace_path": workspace_path
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Workspace validation error: {str(e)}")
 
 @app.get("/git/validate-workspace")
 async def validate_workspace(workspace_path: str):
