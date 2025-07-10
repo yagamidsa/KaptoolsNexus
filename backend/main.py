@@ -124,7 +124,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 class CloneRequest(BaseModel):
     project_path: str
-    branch: str = "develop"
+    branch: str = "master"
 
 class AzureDownloadRequest(BaseModel):
     project_folder: str
@@ -279,13 +279,12 @@ async def health_check():
 
 @app.post("/git/clone-microservices")
 async def clone_microservices(request: dict):
-    """Clonar microservicios en el workspace especificado"""
     if not git_service:
         raise HTTPException(status_code=503, detail="Git service not available")
     
     try:
         project_path = request.get("project_path", "")
-        branch = request.get("branch", "develop")
+        branch = request.get("branch", "master")
         
         result = await git_service.clone_microservices(
             project_path=project_path,
@@ -320,30 +319,6 @@ async def validate_workspace(workspace_path: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Workspace validation error: {str(e)}")
-
-@app.get("/git/validate-workspace")
-async def validate_workspace(workspace_path: str):
-
-    if not git_service:
-        raise HTTPException(status_code=503, detail="Git service not available")
-        
-    try:
-        validation = git_service.validate_workspace(workspace_path)
-        
-        return {
-            "success": True,
-            "validation": validation,
-            "has_microservices": len(validation.get("existing_repositories", [])) > 0,
-            "existing_repos": validation.get("existing_repositories", []),
-            "workspace_path": workspace_path
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Workspace validation error: {str(e)}")
-
-
-
-
 
 @app.get("/git/branches")
 async def get_branches(
@@ -2858,7 +2833,7 @@ async def debug_test_git_clone(request: dict):
     """Test específico para debug del método clone_microservices"""
     try:
         project_path = request.get("project_path", "")
-        branch = request.get("branch", "develop")
+        branch = request.get("branch", "master")
         
         debug_info = {
             "timestamp": datetime.now().isoformat(),

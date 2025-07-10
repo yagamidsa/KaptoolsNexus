@@ -111,7 +111,7 @@ class GitService:
     
     
     
-    async def clone_microservices(self, project_path: str, branch: str = "develop") -> Dict[str, any]:
+    async def clone_microservices(self, project_path: str, branch: str = "master") -> Dict[str, any]:
 
         try:
             
